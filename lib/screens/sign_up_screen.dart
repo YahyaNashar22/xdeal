@@ -9,6 +9,7 @@ import 'package:xdeal/widgets/submit_btn.dart';
 
 // TODO: input validation
 // TODO: connect backend
+// TODO: add navigation to otp ( create otp screen )
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
