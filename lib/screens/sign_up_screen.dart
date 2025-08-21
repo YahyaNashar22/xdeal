@@ -3,6 +3,8 @@ import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/screens/sign_in_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/navigation_helper.dart';
+import 'package:xdeal/utils/social_btn_builder.dart';
+import 'package:xdeal/utils/text_field_builder.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -12,7 +14,38 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final addressController = TextEditingController();
+  final countryCodeController = TextEditingController();
+  final phoneController = TextEditingController();
+
   bool agree = false;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    addressController.dispose();
+    countryCodeController.dispose();
+    phoneController.dispose();
+    super.dispose();
+  }
+
+  void _onSignUp() {
+    String email = emailController.text;
+    String password = passwordController.text;
+    String address = addressController.text;
+    String countryCode = countryCodeController.text;
+    String phone = phoneController.text;
+
+    debugPrint("Email: $email");
+    debugPrint("Password: $password");
+    debugPrint("Address: $address");
+    debugPrint("Country Code: $countryCode");
+    debugPrint("Phone: $phone");
+    debugPrint("Agree: $agree");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +56,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AppColors.black),
-          onPressed: () => navigateToReplacement(context, OnBoardingScreen()),
+          onPressed: () =>
+              navigateToReplacement(context, const OnBoardingScreen()),
         ),
         title: Text(
           "Sign up",
@@ -37,23 +71,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Email
-              _buildTextField("Email"),
+              buildTextField("Email", emailController),
               const SizedBox(height: 16),
 
               // Password
-              _buildTextField("Password", obscureText: true),
+              buildTextField("Password", passwordController, obscureText: true),
               const SizedBox(height: 16),
 
               // Address
-              _buildTextField("Address"),
+              buildTextField("Address", addressController),
               const SizedBox(height: 16),
 
               // Phone Row
               Row(
                 children: [
-                  SizedBox(width: 80, child: _buildTextField("+961")),
+                  SizedBox(
+                    width: 80,
+                    child: buildTextField("+961", countryCodeController),
+                  ),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildTextField("Phone Number")),
+                  Expanded(
+                    child: buildTextField("Phone Number", phoneController),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -83,9 +122,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _onSignUp();
+                  },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary, // your purple
+                    backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -114,10 +155,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 runSpacing: 12,
                 alignment: WrapAlignment.center,
                 children: [
-                  _buildSocialButton("Facebook"),
-                  _buildSocialButton("Google"),
-                  _buildSocialButton("Apple IOS"),
-                  _buildSocialButton("Phone Number"),
+                  buildSocialButton("Facebook"),
+                  buildSocialButton("Google"),
+                  buildSocialButton("Apple IOS"),
+                  buildSocialButton("Phone Number"),
                 ],
               ),
 
@@ -127,11 +168,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const SignInScreen(),
-                      ),
-                    );
+                    navigateToReplacement(context, const SignInScreen());
                   },
                   child: Text(
                     "Already have an account? Sign in",
@@ -146,34 +183,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  // Reusable TextField Widget
-  Widget _buildTextField(String hint, {bool obscureText = false}) {
-    return TextField(
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    );
-  }
-
-  // Reusable Social Button
-  Widget _buildSocialButton(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Text(text, style: const TextStyle(fontSize: 14)),
     );
   }
 }
