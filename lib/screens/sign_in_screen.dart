@@ -114,6 +114,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 30),
+              Image.asset('assets/icons/logo_purple_large.png'),
             ],
           ),
         ),

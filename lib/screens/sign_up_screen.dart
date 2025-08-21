@@ -153,6 +153,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
+
+              Image.asset('assets/icons/logo_purple_large.png'),
             ],
           ),
         ),

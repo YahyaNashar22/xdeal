@@ -3,6 +3,9 @@ import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/text_field_builder.dart';
 import 'package:xdeal/widgets/submit_btn.dart';
 
+// TODO: input validation
+// TODO: connect backend
+
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -69,6 +72,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(height: 20),
 
               submitBtn(_onSubmit, "Send Code"),
+
+              const SizedBox(height: 20),
+
+              Image.asset('assets/icons/logo_purple_large.png'),
             ],
           ),
         ),
