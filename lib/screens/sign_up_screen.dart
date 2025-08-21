@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
+import 'package:xdeal/screens/otp_screen.dart';
 import 'package:xdeal/screens/sign_in_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/navigation_helper.dart';
@@ -9,7 +10,6 @@ import 'package:xdeal/widgets/submit_btn.dart';
 
 // TODO: input validation
 // TODO: connect backend
-// TODO: add navigation to otp ( create otp screen )
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -50,6 +50,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     debugPrint("Country Code: $countryCode");
     debugPrint("Phone: $phone");
     debugPrint("Agree: $agree");
+
+    navigateToReplacement(context, const OtpScreen());
   }
 
   @override

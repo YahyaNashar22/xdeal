@@ -8,6 +8,7 @@ import 'package:xdeal/screens/settings_screen.dart';
 import 'package:xdeal/screens/sign_in_screen.dart';
 import 'package:xdeal/screens/sign_up_screen.dart';
 import 'package:xdeal/screens/forgot_password_screen.dart';
+import 'package:xdeal/utils/app_colors.dart';
 
 class ScreenSelector extends StatefulWidget {
   const ScreenSelector({super.key});
@@ -36,6 +37,7 @@ class _ScreenSelectorState extends State<ScreenSelector> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
