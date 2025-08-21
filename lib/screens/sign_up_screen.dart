@@ -5,6 +5,10 @@ import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/navigation_helper.dart';
 import 'package:xdeal/utils/social_btn_builder.dart';
 import 'package:xdeal/utils/text_field_builder.dart';
+import 'package:xdeal/widgets/submit_btn.dart';
+
+// TODO: input validation
+// TODO: connect backend
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -51,19 +55,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.black),
-          onPressed: () =>
-              navigateToReplacement(context, const OnBoardingScreen()),
-        ),
-        title: Text(
-          "Sign up",
-          style: TextStyle(color: AppColors.black, fontWeight: FontWeight.w500),
-        ),
-      ),
+      appBar: _appBar(context),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -119,32 +111,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 20),
 
               // Sign Up Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    _onSignUp();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: Text(
-                    "Sign up",
-                    style: TextStyle(color: AppColors.white, fontSize: 16),
-                  ),
-                ),
-              ),
+              submitBtn(_onSignUp, "Sign up"),
 
               const SizedBox(height: 20),
 
               Center(
                 child: Text(
                   "Or sign up with",
-                  style: TextStyle(color: AppColors.secondary),
+                  style: TextStyle(color: AppColors.black),
                 ),
               ),
               const SizedBox(height: 20),
@@ -162,7 +136,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ],
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
               // Already have account
               Center(
@@ -182,6 +156,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  AppBar _appBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: AppColors.white,
+      elevation: 0,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back, color: AppColors.black),
+        onPressed: () =>
+            navigateToReplacement(context, const OnBoardingScreen()),
+      ),
+      title: Text(
+        "Sign up",
+        style: TextStyle(color: AppColors.black, fontWeight: FontWeight.w500),
       ),
     );
   }
