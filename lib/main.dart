@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
+import 'package:xdeal/theme/app_theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,9 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'XDeal',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      theme: AppTheme.lightTheme,
       home: const OnBoardingScreen(),
     );
   }
