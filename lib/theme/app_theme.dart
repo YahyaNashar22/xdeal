@@ -91,7 +91,7 @@ class AppTheme {
           }
           if (states.contains(WidgetState.pressed) ||
               states.contains(WidgetState.hovered)) {
-            return primaryColor.withOpacity(0.8);
+            return primaryColor.withAlpha(150);
           }
           return textButtonBg;
         }),
@@ -128,7 +128,7 @@ class AppTheme {
         borderRadius: BorderRadius.circular(8.0),
         borderSide: BorderSide.none,
       ),
-      hintStyle: TextStyle(color: textColor.withOpacity(0.6)),
+      hintStyle: TextStyle(color: textColor.withAlpha(150)),
     ),
 
     // SnackBar Theme
@@ -143,7 +143,7 @@ class AppTheme {
       thumbColor: WidgetStateProperty.all(primaryColor),
       trackColor: WidgetStateProperty.resolveWith<Color?>(
         (states) => states.contains(WidgetState.selected)
-            ? primaryColor.withOpacity(0.5)
+            ? primaryColor.withAlpha(150)
             : Colors.grey.shade300,
       ),
     ),

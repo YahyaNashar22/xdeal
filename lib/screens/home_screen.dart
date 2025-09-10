@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/property_vehicle_toggle_appbar.dart';
+import 'package:xdeal/widgets/search_bar_and_filter.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-  final int selectedView = 0;
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int selectedView = 0;
+
+  void selectView(int index) {
+    setState(() {
+      selectedView = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +28,14 @@ class HomeScreen extends StatelessWidget {
           padding: EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [PropertyVehicleToggleAppbar(selectedView: selectedView)],
+            children: [
+              PropertyVehicleToggleAppbar(
+                selectedView: selectedView,
+                selectView: selectView,
+              ),
+              const SizedBox(height: 12),
+              SearchBarAndFilter(),
+            ],
           ),
         ),
       ),
