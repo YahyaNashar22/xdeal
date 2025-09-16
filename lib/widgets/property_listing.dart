@@ -190,14 +190,212 @@ class _PropertyListingState extends State<PropertyListing> {
           ),
         ),
         const SizedBox(height: 12),
-        Text(UtilityFunctions.formatPrice(widget.property['price'])),
-        Text(widget.property['name']),
-        Text(widget.property['category']),
+        // price
+        Text(
+          "USD ${UtilityFunctions.formatPrice(widget.property['price'])}",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: AppTheme.heading1,
+          ),
+        ),
+        // name
+        Text(
+          widget.property['name'],
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: AppTheme.heading2,
+            color: AppColors.primary,
+          ),
+        ),
+        // category
+        Text(
+          widget.property['category'],
+          style: TextStyle(
+            fontSize: AppTheme.heading2,
+            color: AppColors.primary,
+          ),
+        ),
+        // location and date
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(_location.isEmpty ? "Loading location..." : _location),
-            Text(UtilityFunctions.formatDate(widget.property['createdAt'])),
+            TextButton(
+              onPressed: () {},
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: Size(0, 0),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Icon(Icons.location_on_outlined, color: AppColors.primary),
+                  Text(_location.isEmpty ? "Loading location..." : _location),
+                ],
+              ),
+            ),
+            Text(
+              UtilityFunctions.formatDate(widget.property['createdAt']),
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        // additional info
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            // bedrooms
+            Container(
+              height: 40,
+              width: 110,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.greyBg,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.property['bedrooms'].toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(Icons.bed_outlined, color: AppColors.primary),
+                ],
+              ),
+            ),
+            // bathrooms
+            Container(
+              width: 110,
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.greyBg,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.property['bathrooms'].toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(Icons.bathtub_outlined, color: AppColors.primary),
+                ],
+              ),
+            ),
+            // space m²
+            Container(
+              width: 110,
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.greyBg,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${widget.property['space'].toString()} m²',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(Icons.square_foot_outlined, color: AppColors.primary),
+                ],
+              ),
+            ),
+          ],
+        ),
+        // contact info
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            InkWell(
+              onTap: () {},
+              child: Container(
+                height: 40,
+                width: 110,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.greyBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.email_outlined, color: AppColors.primary),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Email',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {},
+              child: Container(
+                height: 40,
+                width: 110,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.greyBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.phone_forwarded_outlined,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Call',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {},
+              child: Container(
+                width: 110,
+                height: 40,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.greyBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Image.asset('assets/icons/whatsapp.png'),
+              ),
+            ),
           ],
         ),
       ],

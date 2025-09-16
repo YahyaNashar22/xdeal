@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class UtilityFunctions {
   static final String _googleApiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
@@ -67,5 +68,28 @@ class UtilityFunctions {
     final month = parsedDate.month.toString().padLeft(2, '0');
     final year = parsedDate.year.toString();
     return '$day/$month/$year';
+  }
+
+  Future<void> launchEmail(String email) async {
+    final Uri uri = Uri(scheme: 'mailto', path: email);
+    if (!await launchUrl(uri)) {
+      throw 'Could not launch $uri';
+    }
+  }
+
+  Future<void> launchCall(String phone) async {
+    final Uri uri = Uri(scheme: 'tel', path: phone);
+    if (!await launchUrl(uri)) {
+      throw 'Could not launch $uri';
+    }
+  }
+
+  Future<void> launchWhatsApp(String phone) async {
+    // phone should be in international format without '+' sign for wa.me
+    final cleaned = phone.replaceAll('+', '');
+    final Uri uri = Uri.parse('https://wa.me/$cleaned');
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $uri';
+    }
   }
 }
