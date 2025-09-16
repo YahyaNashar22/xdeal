@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xdeal/utils/app_colors.dart';
+import 'package:xdeal/widgets/ads_carousel.dart';
 import 'package:xdeal/widgets/property_vehicle_toggle_appbar.dart';
 import 'package:xdeal/widgets/search_bar_and_filter.dart';
 
@@ -37,6 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 12),
               SearchBarAndFilter(selectedView: selectedView),
+              const SizedBox(height: 12),
+              AdsCarousel(),
             ],
           ),
         ),
