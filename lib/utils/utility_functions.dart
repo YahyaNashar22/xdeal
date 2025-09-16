@@ -59,4 +59,13 @@ class UtilityFunctions {
       return 'Unknown location';
     }
   }
+
+  // Converts a DateTime to dd/MM/yyyy
+  static String formatDate(dynamic date) {
+    final parsedDate = DateTime.parse(date);
+    final day = parsedDate.day.toString().padLeft(2, '0');
+    final month = parsedDate.month.toString().padLeft(2, '0');
+    final year = parsedDate.year.toString();
+    return '$day/$month/$year';
+  }
 }

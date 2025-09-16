@@ -197,7 +197,7 @@ class _PropertyListingState extends State<PropertyListing> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(_location.isEmpty ? "Loading location..." : _location),
-            Text('data'),
+            Text(UtilityFunctions.formatDate(widget.property['createdAt'])),
           ],
         ),
       ],
