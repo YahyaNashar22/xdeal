@@ -11,8 +11,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // view index for properties and vehicles
   int selectedView = 0;
 
+  // change view between properties and vehicles
   void selectView(int index) {
     setState(() {
       selectedView = index;
