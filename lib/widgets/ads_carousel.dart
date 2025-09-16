@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/utils/app_colors.dart';
 
+// TODO: fetch ads from backend
+
 class AdsCarousel extends StatefulWidget {
   const AdsCarousel({super.key});
 
@@ -46,7 +48,7 @@ class _AdsCarouselState extends State<AdsCarousel> {
     return Column(
       children: [
         SizedBox(
-          height: 200,
+          height: 150,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Stack(
