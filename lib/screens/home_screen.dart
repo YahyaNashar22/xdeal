@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 selectView: selectView,
               ),
               const SizedBox(height: 12),
-              SearchBarAndFilter(),
+              SearchBarAndFilter(selectedView: selectedView),
             ],
           ),
         ),

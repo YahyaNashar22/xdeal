@@ -8,7 +8,8 @@ import 'package:xdeal/widgets/filters.dart';
 // TODO: fetch filters from backend
 
 class SearchBarAndFilter extends StatefulWidget {
-  const SearchBarAndFilter({super.key});
+  final int selectedView;
+  const SearchBarAndFilter({super.key, required this.selectedView});
 
   @override
   State<SearchBarAndFilter> createState() => _SearchBarAndFilterState();
@@ -72,7 +73,12 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
           ],
         ),
         const SizedBox(height: 12),
-        if (_showFilters) Filters(),
+        if (_showFilters)
+          Filters(
+            filters: widget.selectedView == 0
+                ? DummyData.propertyCategories
+                : DummyData.vehicleCategories,
+          ),
       ],
     );
   }

@@ -7,4 +7,11 @@ class DummyData {
     "Cabins",
     "Mansions",
   ];
+
+  static List<String> vehicleCategories = [
+    "Cars",
+    "Trucks",
+    "Motorcycles",
+    "Boats",
+  ];
 }
