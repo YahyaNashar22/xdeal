@@ -73,6 +73,20 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
     final bool isFeatured = _vehicle!['is_featured'];
     final bool isSponsored = _vehicle!['is_sponsored'];
 
+    void handleBottomNavTap(int index) {
+      switch (index) {
+        case 0:
+          UtilityFunctions.launchEmail(_vehicle!['owner_id']['email']);
+          break;
+        case 1:
+          UtilityFunctions.launchCall(_vehicle!['owner_id']['phone']);
+          break;
+        case 2:
+          UtilityFunctions.launchWhatsApp(_vehicle!['owner_id']['phone']);
+          break;
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.white,
@@ -83,549 +97,581 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
         title: Text('Vehicle Viewer', style: TextStyle(color: AppColors.black)),
         actions: [Image.asset('assets/icons/logo_purple_large.png', width: 50)],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // gallery
-            SizedBox(
-              height: 200,
-              child: ClipRRect(
-                child: Stack(
-                  children: [
-                    // slide show
-                    PageView.builder(
-                      controller: _pageController,
-                      itemCount: _vehicle!['images'].length,
-                      onPageChanged: (int index) {
-                        setState(() {
-                          _currentPage = index;
-                        });
-                      },
-                      itemBuilder: (context, index) {
-                        return Image.network(
-                          _vehicle!['images'][index],
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        );
-                      },
-                    ),
-                    // dots indicator
-                    Positioned(
-                      bottom: 12,
-                      left: 0,
-                      right: 0,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(_vehicle!['images'].length, (
-                          index,
-                        ) {
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: _currentPage == index ? 10 : 8,
-                            height: _currentPage == index ? 10 : 8,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: _currentPage == index
-                                  ? AppColors.primary
-                                  : AppColors.inputBg,
-                            ),
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: handleBottomNavTap,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.email_outlined),
+            label: 'Email',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.phone_forwarded_outlined),
+            label: 'Phone',
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset('assets/icons/whatsapp.png'),
+            label: 'Whatsapp',
+          ),
+        ],
+
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+        //   children: [
+        //     InkWell(
+        //       onTap: () =>
+        //           UtilityFunctions.launchEmail(_vehicle!['owner_id']['email']),
+        //       child: Container(
+        //         height: 40,
+        //         width: 110,
+        //         padding: const EdgeInsets.symmetric(
+        //           horizontal: 12,
+        //           vertical: 2,
+        //         ),
+        //         decoration: BoxDecoration(
+        //           color: AppColors.greyBg,
+        //           borderRadius: BorderRadius.circular(6),
+        //         ),
+        //         child: Row(
+        //           mainAxisAlignment: MainAxisAlignment.center,
+        //           children: [
+        //             Icon(Icons.email_outlined, color: AppColors.primary),
+        //             const SizedBox(width: 4),
+        //             Text(
+        //               'Email',
+        //               style: TextStyle(
+        //                 fontWeight: FontWeight.bold,
+        //                 fontSize: 16,
+        //               ),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //     ),
+        //     InkWell(
+        //       onTap: () =>
+        //           UtilityFunctions.launchCall(_vehicle!['owner_id']['phone']),
+        //       child: Container(
+        //         height: 40,
+        //         width: 110,
+        //         padding: const EdgeInsets.symmetric(
+        //           horizontal: 12,
+        //           vertical: 2,
+        //         ),
+        //         decoration: BoxDecoration(
+        //           color: AppColors.greyBg,
+        //           borderRadius: BorderRadius.circular(6),
+        //         ),
+        //         child: Row(
+        //           mainAxisAlignment: MainAxisAlignment.center,
+        //           children: [
+        //             Icon(
+        //               Icons.phone_forwarded_outlined,
+        //               color: AppColors.primary,
+        //             ),
+        //             const SizedBox(width: 4),
+        //             Text(
+        //               'Call',
+        //               style: TextStyle(
+        //                 fontWeight: FontWeight.bold,
+        //                 fontSize: 16,
+        //               ),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //     ),
+        //     InkWell(
+        //       onTap: () => UtilityFunctions.launchWhatsApp(
+        //         _vehicle!['owner_id']['phone'],
+        //       ),
+        //       child: Container(
+        //         width: 110,
+        //         height: 40,
+        //         padding: const EdgeInsets.symmetric(
+        //           horizontal: 12,
+        //           vertical: 2,
+        //         ),
+        //         decoration: BoxDecoration(
+        //           color: AppColors.greyBg,
+        //           borderRadius: BorderRadius.circular(6),
+        //         ),
+        //         child: Image.asset('assets/icons/whatsapp.png'),
+        //       ),
+        //     ),
+        //   ],
+        // ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // gallery
+              SizedBox(
+                height: 200,
+                child: ClipRRect(
+                  child: Stack(
+                    children: [
+                      // slide show
+                      PageView.builder(
+                        controller: _pageController,
+                        itemCount: _vehicle!['images'].length,
+                        onPageChanged: (int index) {
+                          setState(() {
+                            _currentPage = index;
+                          });
+                        },
+                        itemBuilder: (context, index) {
+                          return Image.network(
+                            _vehicle!['images'][index],
+                            fit: BoxFit.cover,
+                            width: double.infinity,
                           );
-                        }),
+                        },
                       ),
-                    ),
-                    // favorite icon
-                    Positioned(
-                      bottom: 6,
-                      right: 6,
-                      child: _isFavorite
-                          ? IconButton(
-                              onPressed: toggleFavorite,
-                              icon: Icon(Icons.favorite),
-                              color: AppColors.primary,
-                            )
-                          : IconButton(
-                              onPressed: toggleFavorite,
-                              icon: Icon(Icons.favorite_border),
-                            ),
-                    ),
-                    // featured / sponsored flag
-                    if (isSponsored || isFeatured)
+                      // dots indicator
                       Positioned(
-                        top: 6,
-                        left: 6,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            isSponsored ? "Sponsored" : "Featured",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                        bottom: 12,
+                        left: 0,
+                        right: 0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(_vehicle!['images'].length, (
+                            index,
+                          ) {
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: _currentPage == index ? 10 : 8,
+                              height: _currentPage == index ? 10 : 8,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: _currentPage == index
+                                    ? AppColors.primary
+                                    : AppColors.inputBg,
+                              ),
+                            );
+                          }),
                         ),
                       ),
-                    // sale flag
-                    if (isOnSale)
+                      // favorite icon
                       Positioned(
                         bottom: 6,
-                        left: 6,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            "Sale",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.white,
-                              fontWeight: FontWeight.bold,
+                        right: 6,
+                        child: _isFavorite
+                            ? IconButton(
+                                onPressed: toggleFavorite,
+                                icon: Icon(Icons.favorite),
+                                color: AppColors.primary,
+                              )
+                            : IconButton(
+                                onPressed: toggleFavorite,
+                                icon: Icon(Icons.favorite_border),
+                              ),
+                      ),
+                      // featured / sponsored flag
+                      if (isSponsored || isFeatured)
+                        Positioned(
+                          top: 6,
+                          left: 6,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              isSponsored ? "Sponsored" : "Featured",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
+                      // sale flag
+                      if (isOnSale)
+                        Positioned(
+                          bottom: 6,
+                          left: 6,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              "Sale",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // price
+                    const Text(
+                      "Price",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    Text(
+                      "\$${UtilityFunctions.formatPrice(_vehicle!['price'])}",
+                      style: TextStyle(color: AppColors.primary, fontSize: 16),
+                    ),
+                    const SizedBox(height: 12),
+                    // name
+                    Text(
+                      _vehicle!['name'],
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                    // location and date
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            UtilityFunctions.openMapsAtCoords(
+                              _vehicle!['coords'],
+                            );
+                          },
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size(0, 0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                color: AppColors.primary,
+                              ),
+                              Text(
+                                _location.isEmpty
+                                    ? "Loading location..."
+                                    : _location,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          UtilityFunctions.formatDate(_vehicle!['createdAt']),
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Divider(),
+                    const SizedBox(height: 24),
+                    // additional info
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            // year
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.calendar_month_outlined,
+                                  color: AppColors.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _vehicle!['year'],
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            // fuel type
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.ev_station_outlined,
+                                  color: AppColors.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _vehicle!['fuel_type'],
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            // mileage
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.add_road_outlined,
+                                  color: AppColors.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _vehicle!['kilometers'].toString(),
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            // condition
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.car_repair_outlined,
+                                  color: AppColors.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _vehicle!['condition'],
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            // transmission
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.garage_outlined,
+                                  color: AppColors.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _vehicle!['transmission_type'],
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Divider(),
+                    const SizedBox(height: 24),
+                    // addition details
+                    const Text(
+                      "Details",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    VehicleOption(
+                      optionName: "Brand",
+                      optionValue: _vehicle!['brand'],
+                    ),
+                    const SizedBox(height: 12),
+                    VehicleOption(
+                      optionName: "Color",
+                      optionValue: _vehicle!['color'],
+                    ),
+                    const SizedBox(height: 12),
+                    VehicleOption(
+                      optionName: "Brand",
+                      optionValue: _vehicle!['brand'],
+                    ),
+                    const SizedBox(height: 12),
+                    VehicleOption(
+                      optionName: "Number of doors",
+                      optionValue: _vehicle!['number_of_doors'],
+                    ),
+                    const SizedBox(height: 12),
+                    VehicleOption(
+                      optionName: "Model",
+                      optionValue: _vehicle!['model'],
+                    ),
+                    const SizedBox(height: 12),
+                    VehicleOption(
+                      optionName: "Number of Seats",
+                      optionValue: _vehicle!['number_of_seats'],
+                    ),
+                    const SizedBox(height: 12),
+                    VehicleOption(
+                      optionName: "Air Conditioning",
+                      optionValue: _vehicle!['air_conditioning'],
+                    ),
+                    const SizedBox(height: 12),
+                    VehicleOption(
+                      optionName: "Interior",
+                      optionValue: _vehicle!['interior'],
+                    ),
+                    const SizedBox(height: 12),
+                    VehicleOption(
+                      optionName: "Body Type",
+                      optionValue: _vehicle!['body_type'],
+                    ),
+                    const SizedBox(height: 12),
+                    VehicleOption(
+                      optionName: "Payment Option",
+                      optionValue: _vehicle!['payment_option'],
+                    ),
+                    const SizedBox(height: 24),
+                    // Description
+                    const Text(
+                      "Description",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(_vehicle!['description']),
+                    const SizedBox(height: 24),
+                    Divider(),
+                    const SizedBox(height: 12),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // price
-                  const Text(
-                    "Price",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "\$${UtilityFunctions.formatPrice(_vehicle!['price'])}",
-                    style: TextStyle(color: AppColors.primary, fontSize: 16),
-                  ),
-                  const SizedBox(height: 12),
-                  // name
-                  Text(
-                    _vehicle!['name'],
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                  ),
-                  // location and date
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          UtilityFunctions.openMapsAtCoords(
-                            _vehicle!['coords'],
-                          );
-                        },
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size(0, 0),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              // owner info
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: AppColors.greyBg),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadiusGeometry.circular(12),
+                      child: Image.network(
+                        _vehicle!['owner_id']['profile_picture'],
+                        width: 100,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _vehicle!['owner_id']['full_name'],
+                          style: TextStyle(fontSize: 24),
                         ),
+                        TextButton(
+                          // TODO: navigate to owner profile
+                          onPressed: () {},
+                          child: Row(
+                            children: [
+                              Text(
+                                "See profile",
+                                style: TextStyle(color: AppColors.primary),
+                              ),
+                              Icon(Icons.arrow_forward_ios_outlined),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 32,
+                  top: 8,
+                  left: 8,
+                  right: 8,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Divider(),
+                    const SizedBox(height: 24),
+                    ListingMapPreview(listing: _vehicle!),
+                    const SizedBox(height: 24),
+                    // Extra Feature
+                    const Text(
+                      "Extra Feature",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics:
+                          const NeverScrollableScrollPhysics(), // disable its own scrolling
+                      itemCount: _vehicle!['extra_features'].length,
+                      itemBuilder: (context, index) {
+                        final String feature =
+                            _vehicle!['extra_features'][index];
+
+                        return Column(
+                          children: [
+                            VehicleOption(
+                              optionName: feature,
+                              optionValue: true,
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                        );
+                      },
+                    ),
+
+                    Center(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(120, 30),
+                        ),
+                        onPressed: toggleFavorite,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Icon(
-                              Icons.location_on_outlined,
-                              color: AppColors.primary,
-                            ),
-                            Text(
-                              _location.isEmpty
-                                  ? "Loading location..."
-                                  : _location,
-                            ),
+                            _isFavorite
+                                ? Icon(Icons.favorite)
+                                : Icon(Icons.favorite_border),
+                            const SizedBox(width: 12),
+                            Text("Add to Favorites"),
                           ],
                         ),
                       ),
-                      Text(
-                        UtilityFunctions.formatDate(_vehicle!['createdAt']),
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  Divider(),
-                  const SizedBox(height: 24),
-                  // additional info
-                  Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          // year
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.calendar_month_outlined,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                _vehicle!['year'],
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          // fuel type
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.ev_station_outlined,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                _vehicle!['fuel_type'],
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          // mileage
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.add_road_outlined,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                _vehicle!['kilometers'].toString(),
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          // condition
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.car_repair_outlined,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                _vehicle!['condition'],
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          // transmission
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.garage_outlined,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                _vehicle!['transmission_type'],
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  Divider(),
-                  const SizedBox(height: 24),
-                  // addition details
-                  const Text(
-                    "Details",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                  ),
-                  const SizedBox(height: 12),
-                  VehicleOption(
-                    optionName: "Brand",
-                    optionValue: _vehicle!['brand'],
-                  ),
-                  const SizedBox(height: 12),
-                  VehicleOption(
-                    optionName: "Color",
-                    optionValue: _vehicle!['color'],
-                  ),
-                  const SizedBox(height: 12),
-                  VehicleOption(
-                    optionName: "Brand",
-                    optionValue: _vehicle!['brand'],
-                  ),
-                  const SizedBox(height: 12),
-                  VehicleOption(
-                    optionName: "Number of doors",
-                    optionValue: _vehicle!['number_of_doors'],
-                  ),
-                  const SizedBox(height: 12),
-                  VehicleOption(
-                    optionName: "Model",
-                    optionValue: _vehicle!['model'],
-                  ),
-                  const SizedBox(height: 12),
-                  VehicleOption(
-                    optionName: "Number of Seats",
-                    optionValue: _vehicle!['number_of_seats'],
-                  ),
-                  const SizedBox(height: 12),
-                  VehicleOption(
-                    optionName: "Air Conditioning",
-                    optionValue: _vehicle!['air_conditioning'],
-                  ),
-                  const SizedBox(height: 12),
-                  VehicleOption(
-                    optionName: "Interior",
-                    optionValue: _vehicle!['interior'],
-                  ),
-                  const SizedBox(height: 12),
-                  VehicleOption(
-                    optionName: "Body Type",
-                    optionValue: _vehicle!['body_type'],
-                  ),
-                  const SizedBox(height: 12),
-                  VehicleOption(
-                    optionName: "Payment Option",
-                    optionValue: _vehicle!['payment_option'],
-                  ),
-                  const SizedBox(height: 24),
-                  // Description
-                  const Text(
-                    "Description",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(_vehicle!['description']),
-                  const SizedBox(height: 24),
-                  Divider(),
-                  const SizedBox(height: 12),
-                ],
-              ),
-            ),
-            // owner info
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: AppColors.greyBg),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadiusGeometry.circular(12),
-                    child: Image.network(
-                      _vehicle!['owner_id']['profile_picture'],
-                      width: 100,
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _vehicle!['owner_id']['full_name'],
-                        style: TextStyle(fontSize: 24),
-                      ),
-                      TextButton(
-                        // TODO: navigate to owner profile
-                        onPressed: () {},
-                        child: Row(
-                          children: [
-                            Text(
-                              "See profile",
-                              style: TextStyle(color: AppColors.primary),
-                            ),
-                            Icon(Icons.arrow_forward_ios_outlined),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-
-            Padding(
-              padding: const EdgeInsets.only(
-                bottom: 32,
-                top: 8,
-                left: 8,
-                right: 8,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Divider(),
-                  const SizedBox(height: 24),
-                  ListingMapPreview(listing: _vehicle!),
-                  const SizedBox(height: 24),
-                  // Extra Feature
-                  const Text(
-                    "Extra Feature",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                  ),
-                  const SizedBox(height: 12),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics:
-                        const NeverScrollableScrollPhysics(), // disable its own scrolling
-                    itemCount: _vehicle!['extra_features'].length,
-                    itemBuilder: (context, index) {
-                      final String feature = _vehicle!['extra_features'][index];
-
-                      return Column(
-                        children: [
-                          VehicleOption(optionName: feature, optionValue: true),
-                          const SizedBox(height: 12),
-                        ],
-                      );
-                    },
-                  ),
-
-                  Center(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(120, 30),
-                      ),
-                      onPressed: toggleFavorite,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _isFavorite
-                              ? Icon(Icons.favorite)
-                              : Icon(Icons.favorite_border),
-                          const SizedBox(width: 12),
-                          Text("Add to Favorites"),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  // contact information
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      InkWell(
-                        onTap: () => UtilityFunctions.launchEmail(
-                          _vehicle!['owner_id']['email'],
-                        ),
-                        child: Container(
-                          height: 40,
-                          width: 110,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.greyBg,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.email_outlined,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Email',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () => UtilityFunctions.launchCall(
-                          _vehicle!['owner_id']['phone'],
-                        ),
-                        child: Container(
-                          height: 40,
-                          width: 110,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.greyBg,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.phone_forwarded_outlined,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Call',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () => UtilityFunctions.launchWhatsApp(
-                          _vehicle!['owner_id']['phone'],
-                        ),
-                        child: Container(
-                          width: 110,
-                          height: 40,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.greyBg,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Image.asset('assets/icons/whatsapp.png'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
