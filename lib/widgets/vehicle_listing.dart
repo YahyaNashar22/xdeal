@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:xdeal/screens/vehicle_viewer_screen.dart';
 import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
@@ -68,118 +69,126 @@ class _VehicleListingState extends State<VehicleListing> {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: 200,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Stack(
-              children: [
-                // slide show
-                PageView.builder(
-                  controller: _pageController,
-                  itemCount: widget.vehicle['images'].length,
-                  onPageChanged: (int index) {
-                    setState(() {
-                      _currentPage = index;
-                    });
-                  },
-                  itemBuilder: (context, index) {
-                    return Image.network(
-                      widget.vehicle['images'][index],
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    );
-                  },
-                ),
-                // dots indicator
-                Positioned(
-                  bottom: 12,
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(widget.vehicle['images'].length, (
-                      index,
-                    ) {
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: _currentPage == index ? 10 : 8,
-                        height: _currentPage == index ? 10 : 8,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: _currentPage == index
-                              ? AppColors.primary
-                              : AppColors.inputBg,
-                        ),
+        InkWell(
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) =>
+                  VehicleViewerScreen(vehicleId: widget.vehicle['_id']),
+            ),
+          ),
+          child: SizedBox(
+            height: 200,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Stack(
+                children: [
+                  // slide show
+                  PageView.builder(
+                    controller: _pageController,
+                    itemCount: widget.vehicle['images'].length,
+                    onPageChanged: (int index) {
+                      setState(() {
+                        _currentPage = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      return Image.network(
+                        widget.vehicle['images'][index],
+                        fit: BoxFit.cover,
+                        width: double.infinity,
                       );
-                    }),
+                    },
                   ),
-                ),
-                // favorite icon
-                Positioned(
-                  bottom: 6,
-                  right: 6,
-                  child: _isFavorite
-                      ? IconButton(
-                          onPressed: toggleFavorite,
-                          icon: Icon(Icons.favorite),
-                          color: AppColors.primary,
-                        )
-                      : IconButton(
-                          onPressed: toggleFavorite,
-                          icon: Icon(Icons.favorite_border),
-                        ),
-                ),
-                // featured / sponsored flag
-                if (isSponsored || isFeatured)
+                  // dots indicator
                   Positioned(
-                    top: 6,
-                    left: 6,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        isSponsored ? "Sponsored" : "Featured",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    bottom: 12,
+                    left: 0,
+                    right: 0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(widget.vehicle['images'].length, (
+                        index,
+                      ) {
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: _currentPage == index ? 10 : 8,
+                          height: _currentPage == index ? 10 : 8,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: _currentPage == index
+                                ? AppColors.primary
+                                : AppColors.inputBg,
+                          ),
+                        );
+                      }),
                     ),
                   ),
-                // sale flag
-                if (isOnSale)
+                  // favorite icon
                   Positioned(
                     bottom: 6,
-                    left: 6,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        "Sale",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.white,
-                          fontWeight: FontWeight.bold,
+                    right: 6,
+                    child: _isFavorite
+                        ? IconButton(
+                            onPressed: toggleFavorite,
+                            icon: Icon(Icons.favorite),
+                            color: AppColors.primary,
+                          )
+                        : IconButton(
+                            onPressed: toggleFavorite,
+                            icon: Icon(Icons.favorite_border),
+                          ),
+                  ),
+                  // featured / sponsored flag
+                  if (isSponsored || isFeatured)
+                    Positioned(
+                      top: 6,
+                      left: 6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          isSponsored ? "Sponsored" : "Featured",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-              ],
+                  // sale flag
+                  if (isOnSale)
+                    Positioned(
+                      bottom: 6,
+                      left: 6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          "Sale",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
