@@ -92,4 +92,39 @@ class UtilityFunctions {
       throw 'Could not launch $uri';
     }
   }
+
+  static Future<void> openMapsAtCoords(List<double> coords) async {
+    if (coords.length != 2) {
+      throw ArgumentError('coords must be [latitude, longitude]');
+    }
+
+    final double lat = coords[0];
+    final double lng = coords[1];
+
+    // First try Apple Maps on iOS
+    final Uri appleUri = Uri.parse('http://maps.apple.com/?q=$lat,$lng');
+
+    // Google Maps link
+    final Uri googleUri = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=$lat,$lng',
+    );
+
+    // Android geo scheme (works with many map apps)
+    final Uri geoUri = Uri.parse('geo:$lat,$lng?q=$lat,$lng');
+
+    // Android: try geo: scheme (native Maps)
+    if (await canLaunchUrl(geoUri)) {
+      await launchUrl(geoUri);
+      return;
+    }
+
+    // iOS: try Apple Maps
+    if (await canLaunchUrl(appleUri)) {
+      await launchUrl(appleUri);
+      return;
+    }
+
+    // Fallback: open Google Maps link (app or browser)
+    await launchUrl(googleUri, mode: LaunchMode.externalApplication);
+  }
 }

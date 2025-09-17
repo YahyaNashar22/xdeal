@@ -24,10 +24,10 @@ class _ListingsViewerState extends State<ListingsViewer> {
     return Column(
       children:
           listings
-              .map((property) {
+              .map((listing) {
                 return widget.selectedView == 0
-                    ? PropertyListing(property: property)
-                    : VehicleListing();
+                    ? PropertyListing(property: listing)
+                    : VehicleListing(vehicle: listing);
               })
               .expand((widget) => [widget, const SizedBox(height: 24)])
               .toList()

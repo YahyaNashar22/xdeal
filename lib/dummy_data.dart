@@ -136,7 +136,10 @@ class DummyData {
     {
       '_id': '1',
       'name': '2025 Toyota Tundra Capstone CrewMax iForce Max Hybrid',
-      'images': ['https://images.toyota.com/2025-tundra-capstone-crewmax.jpg'],
+      'images': [
+        'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8U1VWfGVufDB8fDB8fHww',
+        'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8U1VWfGVufDB8fDB8fHww',
+      ],
       'price': '84074',
       'category': 'pickup',
       'brand': 'Toyota',
@@ -169,7 +172,10 @@ class DummyData {
     {
       '_id': '2',
       'name': '2025 Mazda CX-50 Hybrid',
-      'images': ['https://images.mazda.com/2025-cx-50-hybrid.jpg'],
+      'images': [
+        'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8U1VWfGVufDB8fDB8fHww',
+        'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8U1VWfGVufDB8fDB8fHww',
+      ],
       'price': '42065',
       'category': 'SUV',
       'brand': 'Mazda',
@@ -186,7 +192,7 @@ class DummyData {
       'air_conditioning': 'automatic',
       'color': 'silver',
       'number_of_seats': 5,
-      'number_of_doors': 5,
+      'number_of_doors': 2,
       'description': 'Efficient hybrid SUV with advanced features.',
       'coords': [33.896717365298535, 35.636843810038684],
       'is_featured': true,
@@ -202,7 +208,10 @@ class DummyData {
     {
       '_id': '3',
       'name': '2025 Ford Escape Hybrid',
-      'images': ['https://images.ford.com/2025-escape-hybrid.jpg'],
+      'images': [
+        'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8U1VWfGVufDB8fDB8fHww',
+        'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8U1VWfGVufDB8fDB8fHww',
+      ],
       'price': '33970',
       'category': 'SUV',
       'brand': 'Ford',
@@ -219,7 +228,7 @@ class DummyData {
       'air_conditioning': 'automatic',
       'color': 'blue',
       'number_of_seats': 5,
-      'number_of_doors': 5,
+      'number_of_doors': 4,
       'description': 'Compact hybrid SUV with modern features.',
       'coords': [33.896717365298535, 35.636843810038684],
       'is_featured': true,
@@ -235,7 +244,10 @@ class DummyData {
     {
       '_id': '4',
       'name': '2025 Honda Civic Si',
-      'images': ['https://images.honda.com/2025-civic-si.jpg'],
+      'images': [
+        'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8U1VWfGVufDB8fDB8fHww',
+        'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8U1VWfGVufDB8fDB8fHww',
+      ],
       'price': '23220',
       'category': 'sedan',
       'brand': 'Honda',
@@ -252,7 +264,7 @@ class DummyData {
       'air_conditioning': 'manual',
       'color': 'red',
       'number_of_seats': 5,
-      'number_of_doors': 4,
+      'number_of_doors': 2,
       'description': 'Sporty compact sedan with manual transmission.',
       'coords': [33.896717365298535, 35.636843810038684],
       'is_featured': false,

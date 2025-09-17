@@ -215,7 +215,9 @@ class _PropertyListingState extends State<PropertyListing> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                UtilityFunctions.openMapsAtCoords(widget.property['coords']);
+              },
               style: TextButton.styleFrom(
                 padding: EdgeInsets.zero,
                 minimumSize: Size(0, 0),
