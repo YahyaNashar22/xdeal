@@ -29,9 +29,11 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
-        manifestPlaceholders = [
-            GOOGLE_API_KEY: GOOGLE_API_KEY
-        ]
+        manifestPlaceholders.putAll(
+        mapOf(
+            "GOOGLE_API_KEY" to (project.findProperty("GOOGLE_API_KEY") ?: "")
+        )
+    )
     }
 
     buildTypes {
