@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:panorama_viewer/panorama_viewer.dart';
 import 'package:xdeal/dummy_data.dart';
+import 'package:xdeal/screens/dealer_profile_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
 import 'package:xdeal/widgets/listing_map_preview.dart';
@@ -465,8 +466,15 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                           style: TextStyle(fontSize: 24),
                         ),
                         TextButton(
-                          // TODO: navigate to owner profile
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => DealerProfileScreen(
+                                  dealerId: _property!['owner_id']['_id'],
+                                ),
+                              ),
+                            );
+                          },
                           child: Row(
                             children: [
                               Text(

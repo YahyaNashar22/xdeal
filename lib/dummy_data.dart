@@ -57,7 +57,7 @@ class DummyData {
       'is_sponsored': true,
       'on_sale': true,
       'owner_id': {
-        'id': '1',
+        '_id': '1',
         "full_name": "Yahya Nashar",
         'email': 'yahyanashar22@gmail.com',
         'phone': '+96176153425',
@@ -89,7 +89,7 @@ class DummyData {
       'is_sponsored': false,
       'on_sale': false,
       'owner_id': {
-        'id': '2',
+        '_id': '2',
         "full_name": "Yahya Nashar",
         'email': 'owner2@example.com',
         'phone': '+96170123456',
@@ -121,7 +121,7 @@ class DummyData {
       'is_sponsored': true,
       'on_sale': true,
       'owner_id': {
-        'id': '3',
+        '_id': '3',
         "full_name": "Yahya Nashar",
         'email': 'owner3@example.com',
         'phone': '+96171123456',
@@ -158,7 +158,7 @@ class DummyData {
       'is_sponsored': false,
       'on_sale': false,
       'owner_id': {
-        'id': '4',
+        '_id': '4',
         "full_name": "Yahya Nashar",
         'email': 'owner4@example.com',
         'phone': '+96176111222',
@@ -210,7 +210,7 @@ class DummyData {
       'is_sponsored': true,
       'on_sale': true,
       'owner_id': {
-        'id': '1',
+        '_id': '1',
         "full_name": "Yahya Nashar",
         'email': 'owner1@example.com',
         'phone': '+96176153425',
@@ -258,7 +258,7 @@ class DummyData {
       'is_sponsored': true,
       'on_sale': true,
       'owner_id': {
-        'id': '2',
+        '_id': '2',
         "full_name": "Yahya Nashar",
         'email': 'owner2@example.com',
         'phone': '+96176153426',
@@ -306,7 +306,7 @@ class DummyData {
       'is_sponsored': true,
       'on_sale': true,
       'owner_id': {
-        'id': '3',
+        '_id': '3',
         "full_name": "Yahya Nashar",
         'email': 'owner3@example.com',
         'phone': '+96176153427',
@@ -358,7 +358,7 @@ class DummyData {
       'is_sponsored': false,
       'on_sale': true,
       'owner_id': {
-        'id': '4',
+        '_id': '4',
         "full_name": "Yahya Nashar",
         'email': 'owner4@example.com',
         'phone': '+96176153428',
@@ -368,4 +368,14 @@ class DummyData {
       'createdAt': '2025-09-16T11:30:00',
     },
   ];
+
+  static Map<String, dynamic> owner = {
+    '_id': '4',
+    "full_name": "Yahya Nashar",
+    'email': 'owner4@example.com',
+    'phone': '+96176153428',
+    "profile_picture":
+        "https://images.unsplash.com/photo-1624355209556-98f79a93fb7a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHN0ZXdpZXxlbnwwfHwwfHx8MA%3D%3D",
+    "number_of_listings": 25,
+  };
 }
