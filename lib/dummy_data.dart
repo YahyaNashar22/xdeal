@@ -157,6 +157,8 @@ class DummyData {
       'color': 'white',
       'number_of_seats': 5,
       'number_of_doors': 4,
+      "interior": "full leather",
+      "payment_option": "installment",
       'description': 'Luxury full-size pickup with advanced features.',
       'coords': [33.896717365298535, 35.636843810038684],
       'is_featured': true,
@@ -164,8 +166,11 @@ class DummyData {
       'on_sale': true,
       'owner_id': {
         'id': '1',
+        "full_name": "Yahya Nashar",
         'email': 'owner1@example.com',
         'phone': '+96176153425',
+        "profile_picture":
+            "https://images.unsplash.com/photo-1624355209556-98f79a93fb7a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHN0ZXdpZXxlbnwwfHwwfHx8MA%3D%3D",
       },
       'createdAt': '2025-09-16T11:15:00',
     },
@@ -193,6 +198,8 @@ class DummyData {
       'color': 'silver',
       'number_of_seats': 5,
       'number_of_doors': 2,
+      "interior": "full leather",
+      "payment_option": "cash",
       'description': 'Efficient hybrid SUV with advanced features.',
       'coords': [33.896717365298535, 35.636843810038684],
       'is_featured': true,
@@ -200,8 +207,11 @@ class DummyData {
       'on_sale': true,
       'owner_id': {
         'id': '2',
+        "full_name": "Yahya Nashar",
         'email': 'owner2@example.com',
         'phone': '+96176153426',
+        "profile_picture":
+            "https://images.unsplash.com/photo-1624355209556-98f79a93fb7a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHN0ZXdpZXxlbnwwfHwwfHx8MA%3D%3D",
       },
       'createdAt': '2025-09-16T11:20:00',
     },
@@ -229,6 +239,8 @@ class DummyData {
       'color': 'blue',
       'number_of_seats': 5,
       'number_of_doors': 4,
+      "interior": "full leather",
+      "payment_option": "cash",
       'description': 'Compact hybrid SUV with modern features.',
       'coords': [33.896717365298535, 35.636843810038684],
       'is_featured': true,
@@ -236,8 +248,11 @@ class DummyData {
       'on_sale': true,
       'owner_id': {
         'id': '3',
+        "full_name": "Yahya Nashar",
         'email': 'owner3@example.com',
         'phone': '+96176153427',
+        "profile_picture":
+            "https://images.unsplash.com/photo-1624355209556-98f79a93fb7a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHN0ZXdpZXxlbnwwfHwwfHx8MA%3D%3D",
       },
       'createdAt': '2025-09-16T11:25:00',
     },
@@ -265,6 +280,8 @@ class DummyData {
       'color': 'red',
       'number_of_seats': 5,
       'number_of_doors': 2,
+      "interior": "full leather",
+      "payment_option": "installment",
       'description': 'Sporty compact sedan with manual transmission.',
       'coords': [33.896717365298535, 35.636843810038684],
       'is_featured': false,
@@ -272,8 +289,11 @@ class DummyData {
       'on_sale': true,
       'owner_id': {
         'id': '4',
+        "full_name": "Yahya Nashar",
         'email': 'owner4@example.com',
         'phone': '+96176153428',
+        "profile_picture":
+            "https://images.unsplash.com/photo-1624355209556-98f79a93fb7a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHN0ZXdpZXxlbnwwfHwwfHx8MA%3D%3D",
       },
       'createdAt': '2025-09-16T11:30:00',
     },

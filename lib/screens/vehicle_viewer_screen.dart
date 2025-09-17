@@ -5,6 +5,7 @@ import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
+import 'package:xdeal/widgets/vehicle_option.dart';
 
 class VehicleViewerScreen extends StatefulWidget {
   final String vehicleId;
@@ -71,6 +72,8 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
     final bool isOnSale = _vehicle!['on_sale'];
     final bool isFeatured = _vehicle!['is_featured'];
     final bool isSponsored = _vehicle!['is_sponsored'];
+
+    print(_vehicle!['owner_id']['profile_picture']);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.white,
@@ -360,6 +363,109 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                   ),
                   const SizedBox(height: 24),
                   Divider(),
+                  const SizedBox(height: 24),
+                  // addition details
+                  const Text(
+                    "Details",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                  ),
+                  const SizedBox(height: 12),
+                  VehicleOption(
+                    optionName: "Brand",
+                    optionValue: _vehicle!['brand'],
+                  ),
+                  const SizedBox(height: 12),
+                  VehicleOption(
+                    optionName: "Color",
+                    optionValue: _vehicle!['color'],
+                  ),
+                  const SizedBox(height: 12),
+                  VehicleOption(
+                    optionName: "Brand",
+                    optionValue: _vehicle!['brand'],
+                  ),
+                  const SizedBox(height: 12),
+                  VehicleOption(
+                    optionName: "Number of doors",
+                    optionValue: _vehicle!['number_of_doors'],
+                  ),
+                  const SizedBox(height: 12),
+                  VehicleOption(
+                    optionName: "Model",
+                    optionValue: _vehicle!['model'],
+                  ),
+                  const SizedBox(height: 12),
+                  VehicleOption(
+                    optionName: "Number of Seats",
+                    optionValue: _vehicle!['number_of_seats'],
+                  ),
+                  const SizedBox(height: 12),
+                  VehicleOption(
+                    optionName: "Air Conditioning",
+                    optionValue: _vehicle!['air_conditioning'],
+                  ),
+                  const SizedBox(height: 12),
+                  VehicleOption(
+                    optionName: "Interior",
+                    optionValue: _vehicle!['interior'],
+                  ),
+                  const SizedBox(height: 12),
+                  VehicleOption(
+                    optionName: "Body Type",
+                    optionValue: _vehicle!['body_type'],
+                  ),
+                  const SizedBox(height: 12),
+                  VehicleOption(
+                    optionName: "Payment Option",
+                    optionValue: _vehicle!['payment_option'],
+                  ),
+                  const SizedBox(height: 24),
+                  // Description
+                  const Text(
+                    "Description",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(_vehicle!['description']),
+                  const SizedBox(height: 24),
+                  Divider(),
+                  const SizedBox(height: 12),
+                  Container(
+                    child: Row(
+                      children: [
+                        Image.network(
+                          _vehicle!['owner_id']['profile_picture'],
+                          width: 100,
+                        ),
+                        const SizedBox(width: 8),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _vehicle!['owner_id']['full_name'],
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            TextButton(
+                              onPressed: () {},
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "See profile",
+                                    style: TextStyle(color: AppColors.primary),
+                                  ),
+                                  Icon(Icons.arrow_forward_ios_outlined),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Divider(),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
