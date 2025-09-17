@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/ads_carousel.dart';
 import 'package:xdeal/widgets/listings_viewer.dart';

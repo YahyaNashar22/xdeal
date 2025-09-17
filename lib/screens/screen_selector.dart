@@ -3,12 +3,9 @@ import 'package:xdeal/screens/add_listings_screen.dart';
 import 'package:xdeal/screens/favorite_screen.dart';
 import 'package:xdeal/screens/home_screen.dart';
 import 'package:xdeal/screens/my_listings_screen.dart';
-import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/screens/settings_screen.dart';
-import 'package:xdeal/screens/sign_in_screen.dart';
-import 'package:xdeal/screens/sign_up_screen.dart';
-import 'package:xdeal/screens/forgot_password_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
+import 'package:xdeal/widgets/bottom_navigation.dart';
 
 class ScreenSelector extends StatefulWidget {
   const ScreenSelector({super.key});
@@ -39,29 +36,9 @@ class _ScreenSelectorState extends State<ScreenSelector> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_box_outlined),
-            label: 'Add Listings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
-            label: 'My Listings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
+      bottomNavigationBar: BottomNavigation(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
     );
   }

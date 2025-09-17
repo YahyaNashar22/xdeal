@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:xdeal/dummy_data.dart';
-import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
 import 'package:xdeal/widgets/listing_map_preview.dart';
@@ -476,7 +475,12 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
             const SizedBox(height: 12),
 
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(
+                bottom: 32,
+                top: 8,
+                left: 8,
+                right: 8,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -506,6 +510,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                       );
                     },
                   ),
+
                   Center(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -524,6 +529,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 24),
                   // contact information
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
