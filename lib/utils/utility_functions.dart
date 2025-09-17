@@ -70,21 +70,21 @@ class UtilityFunctions {
     return '$day/$month/$year';
   }
 
-  Future<void> launchEmail(String email) async {
+  static Future<void> launchEmail(String email) async {
     final Uri uri = Uri(scheme: 'mailto', path: email);
     if (!await launchUrl(uri)) {
       throw 'Could not launch $uri';
     }
   }
 
-  Future<void> launchCall(String phone) async {
+  static Future<void> launchCall(String phone) async {
     final Uri uri = Uri(scheme: 'tel', path: phone);
     if (!await launchUrl(uri)) {
       throw 'Could not launch $uri';
     }
   }
 
-  Future<void> launchWhatsApp(String phone) async {
+  static Future<void> launchWhatsApp(String phone) async {
     // phone should be in international format without '+' sign for wa.me
     final cleaned = phone.replaceAll('+', '');
     final Uri uri = Uri.parse('https://wa.me/$cleaned');

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/ads_carousel.dart';
-import 'package:xdeal/widgets/property_listing.dart';
+import 'package:xdeal/widgets/properties_listings.dart';
 import 'package:xdeal/widgets/property_vehicle_toggle_appbar.dart';
 import 'package:xdeal/widgets/search_bar_and_filter.dart';
 
@@ -29,23 +28,20 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: ListView(
           padding: EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              PropertyVehicleToggleAppbar(
-                selectedView: selectedView,
-                selectView: selectView,
-              ),
-              const SizedBox(height: 12),
-              SearchBarAndFilter(selectedView: selectedView),
-              const SizedBox(height: 12),
-              AdsCarousel(),
-              const SizedBox(height: 24),
-              PropertyListing(property: DummyData.propertiesListings[0]),
-            ],
-          ),
+          children: [
+            PropertyVehicleToggleAppbar(
+              selectedView: selectedView,
+              selectView: selectView,
+            ),
+            const SizedBox(height: 12),
+            SearchBarAndFilter(selectedView: selectedView),
+            const SizedBox(height: 12),
+            AdsCarousel(),
+            const SizedBox(height: 24),
+            PropertiesListings(),
+          ],
         ),
       ),
     );

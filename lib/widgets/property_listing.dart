@@ -50,11 +50,6 @@ class _PropertyListingState extends State<PropertyListing> {
       widget.property['coords'][0],
       widget.property['coords'][1],
     ).then((loc) => setState(() => _location = loc));
-
-    debugPrint(
-      '${widget.property['coords'][0]}, ${widget.property['coords'][1]} ',
-    );
-    debugPrint('$_location ');
   }
 
   @override
@@ -68,7 +63,7 @@ class _PropertyListingState extends State<PropertyListing> {
   Widget build(BuildContext context) {
     final bool isOnSale = widget.property['on_sale'];
     final bool isFeatured = widget.property['is_featured'];
-    final bool isSponsored = widget.property['is_sponsored'] || isFeatured;
+    final bool isSponsored = widget.property['is_sponsored'];
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -320,7 +315,9 @@ class _PropertyListingState extends State<PropertyListing> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             InkWell(
-              onTap: () {},
+              onTap: () => UtilityFunctions.launchEmail(
+                widget.property['owner_id']['email'],
+              ),
               child: Container(
                 height: 40,
                 width: 110,
@@ -349,7 +346,9 @@ class _PropertyListingState extends State<PropertyListing> {
               ),
             ),
             InkWell(
-              onTap: () {},
+              onTap: () => UtilityFunctions.launchCall(
+                widget.property['owner_id']['phone'],
+              ),
               child: Container(
                 height: 40,
                 width: 110,
@@ -381,7 +380,9 @@ class _PropertyListingState extends State<PropertyListing> {
               ),
             ),
             InkWell(
-              onTap: () {},
+              onTap: () => UtilityFunctions.launchWhatsApp(
+                widget.property['owner_id']['phone'],
+              ),
               child: Container(
                 width: 110,
                 height: 40,
