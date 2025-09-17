@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/ads_carousel.dart';
-import 'package:xdeal/widgets/properties_listings.dart';
+import 'package:xdeal/widgets/listings_viewer.dart';
 import 'package:xdeal/widgets/property_vehicle_toggle_appbar.dart';
 import 'package:xdeal/widgets/search_bar_and_filter.dart';
 
@@ -40,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 12),
             AdsCarousel(),
             const SizedBox(height: 24),
-            PropertiesListings(),
+            ListingsViewer(selectedView: selectedView),
           ],
         ),
       ),
