@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:panorama_viewer/panorama_viewer.dart';
 import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
@@ -413,8 +414,28 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                           ],
                         ),
                         const SizedBox(height: 24),
-                        // TODO: ADD 360 viewer here
-                        Text("360"),
+                        Text(
+                          "360° View",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 250,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: PanoramaViewer(
+                              zoom: 1, // adjust zoom so it fills horizontally
+                              interactive: true, // allows drag to rotate
+                              child: Image.network(
+                                'https://raw.githubusercontent.com/aframevr/aframe/master/examples/boilerplate/panorama/puydesancy.jpg',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 24),
                       ],
                     ),
