@@ -74,7 +74,6 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
     final bool isFeatured = _vehicle!['is_featured'];
     final bool isSponsored = _vehicle!['is_sponsored'];
 
-    print(_vehicle!['owner_id']['profile_picture']);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.white,
@@ -431,43 +430,192 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                   const SizedBox(height: 24),
                   Divider(),
                   const SizedBox(height: 12),
-                  Container(
-                    child: Row(
-                      children: [
-                        Image.network(
-                          _vehicle!['owner_id']['profile_picture'],
-                          width: 100,
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _vehicle!['owner_id']['full_name'],
-                              style: TextStyle(fontSize: 24),
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              child: Row(
-                                children: [
-                                  Text(
-                                    "See profile",
-                                    style: TextStyle(color: AppColors.primary),
-                                  ),
-                                  Icon(Icons.arrow_forward_ios_outlined),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                ],
+              ),
+            ),
+            // owner info
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: AppColors.greyBg),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadiusGeometry.circular(12),
+                    child: Image.network(
+                      _vehicle!['owner_id']['profile_picture'],
+                      width: 100,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(width: 8),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _vehicle!['owner_id']['full_name'],
+                        style: TextStyle(fontSize: 24),
+                      ),
+                      TextButton(
+                        // TODO: navigate to owner profile
+                        onPressed: () {},
+                        child: Row(
+                          children: [
+                            Text(
+                              "See profile",
+                              style: TextStyle(color: AppColors.primary),
+                            ),
+                            Icon(Icons.arrow_forward_ios_outlined),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Divider(),
                   const SizedBox(height: 24),
                   ListingMapPreview(listing: _vehicle!),
+                  const SizedBox(height: 24),
+                  // Extra Feature
+                  const Text(
+                    "Extra Feature",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                  ),
+                  const SizedBox(height: 12),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics:
+                        const NeverScrollableScrollPhysics(), // disable its own scrolling
+                    itemCount: _vehicle!['extra_features'].length,
+                    itemBuilder: (context, index) {
+                      final String feature = _vehicle!['extra_features'][index];
+
+                      return Column(
+                        children: [
+                          VehicleOption(optionName: feature, optionValue: true),
+                          const SizedBox(height: 12),
+                        ],
+                      );
+                    },
+                  ),
+                  Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(120, 30),
+                      ),
+                      onPressed: toggleFavorite,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _isFavorite
+                              ? Icon(Icons.favorite)
+                              : Icon(Icons.favorite_border),
+                          const SizedBox(width: 12),
+                          Text("Add to Favorites"),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // contact information
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      InkWell(
+                        onTap: () => UtilityFunctions.launchEmail(
+                          _vehicle!['owner_id']['email'],
+                        ),
+                        child: Container(
+                          height: 40,
+                          width: 110,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.greyBg,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.email_outlined,
+                                color: AppColors.primary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Email',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () => UtilityFunctions.launchCall(
+                          _vehicle!['owner_id']['phone'],
+                        ),
+                        child: Container(
+                          height: 40,
+                          width: 110,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.greyBg,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.phone_forwarded_outlined,
+                                color: AppColors.primary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Call',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () => UtilityFunctions.launchWhatsApp(
+                          _vehicle!['owner_id']['phone'],
+                        ),
+                        child: Container(
+                          width: 110,
+                          height: 40,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.greyBg,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Image.asset('assets/icons/whatsapp.png'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

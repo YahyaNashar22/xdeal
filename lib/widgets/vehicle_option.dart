@@ -22,7 +22,9 @@ class VehicleOption extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(optionName, style: TextStyle(fontSize: 16)),
-          Text(optionValue.toString(), style: TextStyle(fontSize: 16)),
+          optionValue == true
+              ? Icon(Icons.check_box_outlined, color: AppColors.primary)
+              : Text(optionValue.toString(), style: TextStyle(fontSize: 16)),
         ],
       ),
     );
