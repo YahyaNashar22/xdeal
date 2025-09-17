@@ -5,6 +5,7 @@ import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
+import 'package:xdeal/widgets/listing_map_preview.dart';
 import 'package:xdeal/widgets/vehicle_option.dart';
 
 class VehicleViewerScreen extends StatefulWidget {
@@ -466,6 +467,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                   const SizedBox(height: 12),
                   Divider(),
                   const SizedBox(height: 24),
+                  ListingMapPreview(listing: _vehicle!),
                 ],
               ),
             ),

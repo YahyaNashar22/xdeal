@@ -9,6 +9,9 @@ void main() async {
   runApp(const MyApp());
 }
 
+// HACK: FOR IOS BUILD RUN THIS TO BUILD WITH MAP API
+// ! flutter run --dart-define=GOOGLE_API_KEY=YOUR_IOS_KEY
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

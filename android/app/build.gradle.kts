@@ -28,6 +28,10 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        manifestPlaceholders = [
+            GOOGLE_API_KEY: GOOGLE_API_KEY
+        ]
     }
 
     buildTypes {
