@@ -430,7 +430,7 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                               zoom: 1, // adjust zoom so it fills horizontally
                               interactive: true, // allows drag to rotate
                               child: Image.network(
-                                'https://raw.githubusercontent.com/aframevr/aframe/master/examples/boilerplate/panorama/puydesancy.jpg',
+                                _property!['three_sixty'],
                                 fit: BoxFit.cover,
                               ),
                             ),
