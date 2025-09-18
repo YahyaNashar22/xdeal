@@ -501,7 +501,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).push(
+                            Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                 builder: (context) => DealerProfileScreen(
                                   dealerId: _vehicle!['owner_id']['_id'],

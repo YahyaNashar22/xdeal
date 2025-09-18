@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xdeal/dummy_data.dart';
+import 'package:xdeal/screens/screen_selector.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
 import 'package:xdeal/widgets/listings_viewer.dart';
@@ -75,7 +76,11 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.white,
         leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => ScreenSelector()),
+            (Route<dynamic> route) =>
+                false, // false removes all previous routes
+          ),
           icon: Icon(Icons.arrow_back, color: AppColors.black),
         ),
         title: Text('Dealer Profile', style: TextStyle(color: AppColors.black)),
