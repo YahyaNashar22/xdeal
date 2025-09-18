@@ -6,5 +6,6 @@ class AppColors {
   static Color white = const Color(0xFFFFFFFF);
   static Color black = const Color(0xFF000000);
   static Color inputBg = Colors.grey.shade100;
-  static Color greyBg = Colors.grey.shade200;
+  static Color greyBg = Color(0xFFEBE8F2);
+  static Color greyBgDarker = Colors.grey.shade300;
 }

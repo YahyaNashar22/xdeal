@@ -378,4 +378,23 @@ class DummyData {
         "https://images.unsplash.com/photo-1624355209556-98f79a93fb7a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHN0ZXdpZXxlbnwwfHwwfHx8MA%3D%3D",
     "number_of_listings": 25,
   };
+
+  static Map<String, dynamic> user = {
+    '_id': '1',
+    "full_name": "John Doe",
+    'email': 'johndoe@example.com',
+    'phone': '+96176111222',
+    "profile_picture":
+        "https://images.unsplash.com/photo-1715615751025-e7ebe7f47eea?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cHJvZmlsZSUyMHBpY3R1cmUlMjAlMjBhdmF0YXIlNUN8ZW58MHx8MHx8fDA%3D",
+    "number_of_listings": 32,
+    'plan': 'free',
+    'language': 'en',
+  };
+
+  static List<String> savedSearches = [
+    'Summer Villa',
+    'G-Class Black',
+    '2 Doors BMW',
+    'Pool House',
+  ];
 }
