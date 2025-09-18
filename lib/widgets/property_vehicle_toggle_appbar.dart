@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/theme/app_theme.dart';
 
 class PropertyVehicleToggleAppbar extends StatelessWidget {
@@ -12,10 +13,17 @@ class PropertyVehicleToggleAppbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void logout() {
+      // TODO: implement proper logout
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => OnBoardingScreen()),
+      );
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Image.asset('assets/images/avatar.png'),
+        InkWell(onTap: logout, child: Image.asset('assets/images/avatar.png')),
         TextButton(
           style: TextButton.styleFrom(
             foregroundColor: selectedView == 0
