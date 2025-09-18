@@ -8,7 +8,12 @@ import 'package:xdeal/utils/utility_functions.dart';
 
 class PropertyListing extends StatefulWidget {
   final Map<String, dynamic> property;
-  const PropertyListing({super.key, required this.property});
+  final bool isDealerProfile;
+  const PropertyListing({
+    super.key,
+    required this.property,
+    required this.isDealerProfile,
+  });
 
   @override
   State<PropertyListing> createState() => _PropertyListingState();
@@ -323,94 +328,95 @@ class _PropertyListingState extends State<PropertyListing> {
         ),
         // contact info
         const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            InkWell(
-              onTap: () => UtilityFunctions.launchEmail(
-                widget.property['owner_id']['email'],
-              ),
-              child: Container(
-                height: 40,
-                width: 110,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 2,
+        if (!widget.isDealerProfile)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              InkWell(
+                onTap: () => UtilityFunctions.launchEmail(
+                  widget.property['owner_id']['email'],
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.greyBg,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.email_outlined, color: AppColors.primary),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Email',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                child: Container(
+                  height: 40,
+                  width: 110,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.greyBg,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.email_outlined, color: AppColors.primary),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Email',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            InkWell(
-              onTap: () => UtilityFunctions.launchCall(
-                widget.property['owner_id']['phone'],
-              ),
-              child: Container(
-                height: 40,
-                width: 110,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 2,
+              InkWell(
+                onTap: () => UtilityFunctions.launchCall(
+                  widget.property['owner_id']['phone'],
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.greyBg,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.phone_forwarded_outlined,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Call',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                child: Container(
+                  height: 40,
+                  width: 110,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.greyBg,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.phone_forwarded_outlined,
+                        color: AppColors.primary,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Text(
+                        'Call',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            InkWell(
-              onTap: () => UtilityFunctions.launchWhatsApp(
-                widget.property['owner_id']['phone'],
-              ),
-              child: Container(
-                width: 110,
-                height: 40,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 2,
+              InkWell(
+                onTap: () => UtilityFunctions.launchWhatsApp(
+                  widget.property['owner_id']['phone'],
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.greyBg,
-                  borderRadius: BorderRadius.circular(6),
+                child: Container(
+                  width: 110,
+                  height: 40,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.greyBg,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Image.asset('assets/icons/whatsapp.png'),
                 ),
-                child: Image.asset('assets/icons/whatsapp.png'),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
       ],
     );
   }

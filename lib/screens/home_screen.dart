@@ -40,7 +40,11 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 12),
             AdsCarousel(),
             const SizedBox(height: 24),
-            ListingsViewer(selectedView: selectedView),
+            ListingsViewer(
+              selectedView: selectedView,
+              isDealerProfile: false,
+              filter: ListingFilter.none,
+            ),
           ],
         ),
       ),

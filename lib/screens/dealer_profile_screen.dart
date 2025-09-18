@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
+import 'package:xdeal/widgets/listings_viewer.dart';
 
 class DealerProfileScreen extends StatefulWidget {
   final String dealerId;
@@ -13,6 +14,37 @@ class DealerProfileScreen extends StatefulWidget {
 
 class _DealerProfileScreenState extends State<DealerProfileScreen> {
   Map<String, dynamic>? _dealer;
+
+  // 0 -> Properties
+  // 1 -> vehicles
+  int _selectedView = 0;
+
+  ListingFilter _selectedFilter = ListingFilter.none;
+
+  void _selectView(int view) {
+    setState(() {
+      setState(() {
+        _selectedView = view;
+      });
+    });
+  }
+
+  void _selectFilter(ListingFilter filter) {
+    setState(() {
+      if (_selectedFilter == filter) {
+        _selectedFilter = ListingFilter.none;
+      } else {
+        _selectedFilter = filter;
+      }
+    });
+  }
+
+  TextStyle _selectedBtnStyle(int view) {
+    if (_selectedView == view) {
+      return TextStyle(color: AppColors.primary);
+    }
+    return TextStyle(color: AppColors.black);
+  }
 
   @override
   void initState() {
@@ -69,12 +101,13 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 8),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // profile picture
                 Center(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
@@ -85,11 +118,15 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  _dealer!['full_name'],
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                // name
+                Center(
+                  child: Text(
+                    _dealer!['full_name'],
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 const SizedBox(height: 12),
+                // number of listings
                 Container(
                   padding: const EdgeInsets.all(12.0),
                   decoration: BoxDecoration(
@@ -118,6 +155,93 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
                       ],
                     ),
                   ),
+                ),
+                // properties / vehicles switch
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () => _selectView(0),
+                      child: Text("Properties", style: _selectedBtnStyle(0)),
+                    ),
+                    TextButton(
+                      onPressed: () => _selectView(1),
+                      child: Text("Vehicles", style: _selectedBtnStyle(1)),
+                    ),
+                  ],
+                ),
+                Divider(),
+                const SizedBox(height: 12),
+                // Filters
+                const Text(
+                  "Filter",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    // cheapest
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            _selectedFilter == ListingFilter.cheapest
+                            ? AppColors.primary
+                            : AppColors.inputBg,
+                      ),
+                      onPressed: () => _selectFilter(ListingFilter.cheapest),
+                      child: Text(
+                        "Cheapest",
+                        style: TextStyle(
+                          color: _selectedFilter == ListingFilter.cheapest
+                              ? AppColors.white
+                              : AppColors.black,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // expensive
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            _selectedFilter == ListingFilter.expensive
+                            ? AppColors.primary
+                            : AppColors.inputBg,
+                      ),
+                      onPressed: () => _selectFilter(ListingFilter.expensive),
+                      child: Text(
+                        "Expensive",
+                        style: TextStyle(
+                          color: _selectedFilter == ListingFilter.expensive
+                              ? AppColors.white
+                              : AppColors.black,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // newest
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _selectedFilter == ListingFilter.newest
+                            ? AppColors.primary
+                            : AppColors.inputBg,
+                      ),
+                      onPressed: () => _selectFilter(ListingFilter.newest),
+                      child: Text(
+                        "Newest",
+                        style: TextStyle(
+                          color: _selectedFilter == ListingFilter.newest
+                              ? AppColors.white
+                              : AppColors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                // Listings
+                ListingsViewer(
+                  selectedView: _selectedView,
+                  isDealerProfile: true,
+                  filter: _selectedFilter,
                 ),
               ],
             ),

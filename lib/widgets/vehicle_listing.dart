@@ -8,7 +8,12 @@ import 'package:xdeal/utils/utility_functions.dart';
 
 class VehicleListing extends StatefulWidget {
   final Map<String, dynamic> vehicle;
-  const VehicleListing({super.key, required this.vehicle});
+  final bool isDealerProfile;
+  const VehicleListing({
+    super.key,
+    required this.vehicle,
+    required this.isDealerProfile,
+  });
 
   @override
   State<VehicleListing> createState() => _VehicleListingState();
@@ -251,77 +256,96 @@ class _VehicleListingState extends State<VehicleListing> {
         ),
         // additional info
         const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            // doors
-            Container(
-              height: 40,
-              width: 110,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.greyBg,
-                borderRadius: BorderRadius.circular(6),
+        if (!widget.isDealerProfile)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              // doors
+              Container(
+                height: 40,
+                width: 110,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.greyBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      widget.vehicle['number_of_doors'].toString(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(Icons.door_sliding_outlined, color: AppColors.primary),
+                  ],
+                ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    widget.vehicle['number_of_doors'].toString(),
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.door_sliding_outlined, color: AppColors.primary),
-                ],
+              // kilometers
+              Container(
+                width: 110,
+                height: 40,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.greyBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      widget.vehicle['kilometers'].toString(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(Icons.edit_road_outlined, color: AppColors.primary),
+                  ],
+                ),
               ),
-            ),
-            // kilometers
-            Container(
-              width: 110,
-              height: 40,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.greyBg,
-                borderRadius: BorderRadius.circular(6),
+              // condition
+              Container(
+                width: 110,
+                height: 40,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.greyBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      widget.vehicle['condition'],
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.sentiment_very_satisfied_outlined,
+                      color: AppColors.primary,
+                    ),
+                  ],
+                ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    widget.vehicle['kilometers'].toString(),
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.edit_road_outlined, color: AppColors.primary),
-                ],
-              ),
-            ),
-            // condition
-            Container(
-              width: 110,
-              height: 40,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.greyBg,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    widget.vehicle['condition'],
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    Icons.sentiment_very_satisfied_outlined,
-                    color: AppColors.primary,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+            ],
+          ),
         // contact info
         const SizedBox(height: 12),
         Row(
