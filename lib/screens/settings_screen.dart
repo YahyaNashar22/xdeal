@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/custom_appbar.dart';
+import 'package:xdeal/widgets/settings_btn_navigate.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -11,6 +12,13 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  bool _isNotificationAllowed = false;
+  void _toggleNotifications(bool value) {
+    setState(() {
+      _isNotificationAllowed = value;
+    });
+  }
+
   // TODO: fetch real user from backend
   final user = DummyData.user;
   @override
@@ -21,6 +29,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // app bar
               CustomAppbar(title: 'Settings'),
@@ -53,7 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 32),
               // subscription card
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(12.0),
                 child: Stack(
                   children: [
                     SizedBox(
@@ -140,6 +149,76 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               ),
+              const SizedBox(height: 32),
+              // basic settings
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                width: double.infinity,
+                decoration: BoxDecoration(color: AppColors.inputBg),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Notifications", style: TextStyle(fontSize: 18)),
+                        Switch(
+                          value: _isNotificationAllowed,
+                          onChanged: _toggleNotifications,
+                        ),
+                      ],
+                    ),
+                    SettingsBtnNavigate(
+                      title: 'My Account',
+                      onTap: () {
+                        debugPrint("Tapped");
+                      },
+                    ),
+                    SettingsBtnNavigate(
+                      title: 'English',
+                      onTap: () {
+                        debugPrint("Tapped");
+                      },
+                    ),
+                    SettingsBtnNavigate(
+                      title: 'Saved Searches',
+                      onTap: () {
+                        debugPrint("Tapped");
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: const Text(
+                  'Other',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                ),
+              ),
+              const SizedBox(height: 12),
+              // terms and policies
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                width: double.infinity,
+                decoration: BoxDecoration(color: AppColors.inputBg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SettingsBtnNavigate(title: 'About us', onTap: () {}),
+                    SettingsBtnNavigate(title: 'Privacy Policy', onTap: () {}),
+                    SettingsBtnNavigate(
+                      title: 'Terms & Conditions',
+                      onTap: () {},
+                    ),
+                    SettingsBtnNavigate(title: 'Help & Support', onTap: () {}),
+                    SettingsBtnNavigate(title: 'Rate us', onTap: () {}),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
             ],
           ),
         ),
