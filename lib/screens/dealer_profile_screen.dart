@@ -32,7 +32,7 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
   void _selectFilter(ListingFilter filter) {
     setState(() {
       if (_selectedFilter == filter) {
-        _selectedFilter = ListingFilter.none;
+        _selectedFilter = ListingFilter.newest;
       } else {
         _selectedFilter = filter;
       }

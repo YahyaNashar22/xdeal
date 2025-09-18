@@ -16,7 +16,7 @@ class ListingsViewer extends StatefulWidget {
     super.key,
     required this.selectedView,
     required this.isDealerProfile,
-    this.filter = ListingFilter.none,
+    this.filter = ListingFilter.newest,
   });
 
   @override
