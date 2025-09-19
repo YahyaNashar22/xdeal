@@ -11,11 +11,13 @@ enum ListingFilter { none, newest, cheapest, expensive, notListed }
 class ListingsViewer extends StatefulWidget {
   final int selectedView;
   final bool isDealerProfile;
+  final bool isUploaderViewing;
   final ListingFilter filter;
   const ListingsViewer({
     super.key,
     required this.selectedView,
     this.isDealerProfile = false,
+    this.isUploaderViewing = false,
     this.filter = ListingFilter.newest,
   });
 
@@ -75,10 +77,12 @@ class _ListingsViewerState extends State<ListingsViewer> {
                     ? PropertyListing(
                         property: listing,
                         isDealerProfile: widget.isDealerProfile,
+                        isUploaderViewing: widget.isUploaderViewing,
                       )
                     : VehicleListing(
                         vehicle: listing,
                         isDealerProfile: widget.isDealerProfile,
+                        isUploaderViewing: widget.isUploaderViewing,
                       );
               })
               .expand((widget) => [widget, const SizedBox(height: 24)])

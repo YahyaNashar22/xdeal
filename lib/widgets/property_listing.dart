@@ -5,14 +5,17 @@ import 'package:xdeal/screens/property_viewer_screen.dart';
 import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
+import 'package:xdeal/widgets/user_view_listing_modal.dart';
 
 class PropertyListing extends StatefulWidget {
   final Map<String, dynamic> property;
   final bool isDealerProfile;
+  final bool isUploaderViewing;
   const PropertyListing({
     super.key,
     required this.property,
     required this.isDealerProfile,
+    required this.isUploaderViewing,
   });
 
   @override
@@ -27,10 +30,35 @@ class _PropertyListingState extends State<PropertyListing> {
   bool _isFavorite = false;
   String _location = '';
 
-  void toggleFavorite() {
+  void _toggleFavorite() {
     setState(() {
       _isFavorite = !_isFavorite;
     });
+  }
+
+  void _handleListingTap() {
+    if (!widget.isUploaderViewing) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) =>
+              PropertyViewerScreen(propertyId: widget.property['_id']),
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (context) {
+          return UserViewListingModal(
+            listingType: 0,
+            listingId: widget.property['_id'],
+          ); // reuse your screen widget here
+        },
+      );
+    }
   }
 
   @override
@@ -76,12 +104,7 @@ class _PropertyListingState extends State<PropertyListing> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InkWell(
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) =>
-                  PropertyViewerScreen(propertyId: widget.property['_id']),
-            ),
-          ),
+          onTap: _handleListingTap,
           child: SizedBox(
             height: 200,
             child: ClipRRect(
@@ -137,12 +160,12 @@ class _PropertyListingState extends State<PropertyListing> {
                     right: 6,
                     child: _isFavorite
                         ? IconButton(
-                            onPressed: toggleFavorite,
+                            onPressed: _toggleFavorite,
                             icon: Icon(Icons.favorite),
                             color: AppColors.primary,
                           )
                         : IconButton(
-                            onPressed: toggleFavorite,
+                            onPressed: _toggleFavorite,
                             icon: Icon(Icons.favorite_border),
                           ),
                   ),
@@ -328,7 +351,7 @@ class _PropertyListingState extends State<PropertyListing> {
         ),
         // contact info
         const SizedBox(height: 12),
-        if (!widget.isDealerProfile)
+        if (!widget.isDealerProfile && !widget.isUploaderViewing)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [

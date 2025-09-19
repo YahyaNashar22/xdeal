@@ -7,6 +7,8 @@ import 'package:xdeal/widgets/segmented_toggles.dart';
 class MyListingsScreen extends StatefulWidget {
   const MyListingsScreen({super.key});
 
+  // TODO: only fetch listings here by userId
+
   @override
   State<MyListingsScreen> createState() => _MyListingsScreenState();
 }
@@ -33,41 +35,50 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CustomAppbar(title: "My Listings"),
-                Divider(),
-                const SizedBox(height: 12),
-                const Text("Choose Between:", style: TextStyle(fontSize: 18)),
-                const SizedBox(height: 12),
-                // toggle views
-                buildSegmentedToggle(
-                  selectedIndex: _selectedView,
-                  labels: ['Properties', 'Vehicles'],
-                  onPressed: _toggleView,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomAppbar(title: "My Listings"),
+              Divider(),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 12),
+                    const Text(
+                      "Choose Between:",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 12),
+                    // toggle views
+                    buildSegmentedToggle(
+                      selectedIndex: _selectedView,
+                      labels: ['Properties', 'Vehicles'],
+                      onPressed: _toggleView,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text("Is it:", style: TextStyle(fontSize: 18)),
+                    const SizedBox(height: 12),
+                    // listed / not listed toggle
+                    buildSegmentedToggle(
+                      selectedIndex: _selectedFilter,
+                      labels: ['Listed', 'Not Listed'],
+                      onPressed: _toggleFilter,
+                    ),
+                    const SizedBox(height: 24),
+                    // filtered listings
+                    ListingsViewer(
+                      selectedView: _selectedView,
+                      isUploaderViewing: true,
+                      filter: _selectedFilter == 1
+                          ? ListingFilter.notListed
+                          : ListingFilter.newest,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                const Text("Is it:", style: TextStyle(fontSize: 18)),
-                const SizedBox(height: 12),
-                // listed / not listed toggle
-                buildSegmentedToggle(
-                  selectedIndex: _selectedFilter,
-                  labels: ['Listed', 'Not Listed'],
-                  onPressed: _toggleFilter,
-                ),
-                const SizedBox(height: 24),
-                // filtered listings
-                ListingsViewer(
-                  selectedView: _selectedView,
-                  filter: _selectedFilter == 1
-                      ? ListingFilter.notListed
-                      : ListingFilter.newest,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

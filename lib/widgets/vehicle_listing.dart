@@ -5,14 +5,17 @@ import 'package:xdeal/screens/vehicle_viewer_screen.dart';
 import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
+import 'package:xdeal/widgets/user_view_listing_modal.dart';
 
 class VehicleListing extends StatefulWidget {
   final Map<String, dynamic> vehicle;
   final bool isDealerProfile;
+  final bool isUploaderViewing;
   const VehicleListing({
     super.key,
     required this.vehicle,
     required this.isDealerProfile,
+    required this.isUploaderViewing,
   });
 
   @override
@@ -27,10 +30,35 @@ class _VehicleListingState extends State<VehicleListing> {
   bool _isFavorite = false;
   String _location = '';
 
-  void toggleFavorite() {
+  void _toggleFavorite() {
     setState(() {
       _isFavorite = !_isFavorite;
     });
+  }
+
+  void _handleListingTap() {
+    if (!widget.isUploaderViewing) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) =>
+              VehicleViewerScreen(vehicleId: widget.vehicle['_id']),
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (context) {
+          return UserViewListingModal(
+            listingType: 1,
+            listingId: widget.vehicle['_id'],
+          ); // reuse your screen widget here
+        },
+      );
+    }
   }
 
   @override
@@ -75,12 +103,7 @@ class _VehicleListingState extends State<VehicleListing> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InkWell(
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) =>
-                  VehicleViewerScreen(vehicleId: widget.vehicle['_id']),
-            ),
-          ),
+          onTap: _handleListingTap,
           child: SizedBox(
             height: 200,
             child: ClipRRect(
@@ -135,12 +158,12 @@ class _VehicleListingState extends State<VehicleListing> {
                     right: 6,
                     child: _isFavorite
                         ? IconButton(
-                            onPressed: toggleFavorite,
+                            onPressed: _toggleFavorite,
                             icon: Icon(Icons.favorite),
                             color: AppColors.primary,
                           )
                         : IconButton(
-                            onPressed: toggleFavorite,
+                            onPressed: _toggleFavorite,
                             icon: Icon(Icons.favorite_border),
                           ),
                   ),
@@ -256,186 +279,168 @@ class _VehicleListingState extends State<VehicleListing> {
         ),
         // additional info
         const SizedBox(height: 12),
-        if (!widget.isDealerProfile)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              // doors
-              Container(
-                height: 40,
-                width: 110,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.greyBg,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      widget.vehicle['number_of_doors'].toString(),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(Icons.door_sliding_outlined, color: AppColors.primary),
-                  ],
-                ),
-              ),
-              // kilometers
-              Container(
-                width: 110,
-                height: 40,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.greyBg,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      widget.vehicle['kilometers'].toString(),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(Icons.edit_road_outlined, color: AppColors.primary),
-                  ],
-                ),
-              ),
-              // condition
-              Container(
-                width: 110,
-                height: 40,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.greyBg,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      widget.vehicle['condition'],
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.sentiment_very_satisfied_outlined,
-                      color: AppColors.primary,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        // contact info
-        const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            InkWell(
-              onTap: () => UtilityFunctions.launchEmail(
-                widget.vehicle['owner_id']['email'],
+            // doors
+            Container(
+              height: 40,
+              width: 110,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.greyBg,
+                borderRadius: BorderRadius.circular(6),
               ),
-              child: Container(
-                height: 40,
-                width: 110,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.greyBg,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.email_outlined, color: AppColors.primary),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Email',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.vehicle['number_of_doors'].toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(Icons.door_sliding_outlined, color: AppColors.primary),
+                ],
               ),
             ),
-            InkWell(
-              onTap: () => UtilityFunctions.launchCall(
-                widget.vehicle['owner_id']['phone'],
+            // kilometers
+            Container(
+              width: 110,
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.greyBg,
+                borderRadius: BorderRadius.circular(6),
               ),
-              child: Container(
-                height: 40,
-                width: 110,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.greyBg,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.phone_forwarded_outlined,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Call',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.vehicle['kilometers'].toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(Icons.edit_road_outlined, color: AppColors.primary),
+                ],
               ),
             ),
-            InkWell(
-              onTap: () => UtilityFunctions.launchWhatsApp(
-                widget.vehicle['owner_id']['phone'],
+            // condition
+            Container(
+              width: 110,
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.greyBg,
+                borderRadius: BorderRadius.circular(6),
               ),
-              child: Container(
-                width: 110,
-                height: 40,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.greyBg,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Image.asset('assets/icons/whatsapp.png'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.vehicle['condition'],
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.sentiment_very_satisfied_outlined,
+                    color: AppColors.primary,
+                  ),
+                ],
               ),
             ),
           ],
         ),
+        // contact info
+        const SizedBox(height: 12),
+        if (!widget.isDealerProfile && !widget.isUploaderViewing)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              InkWell(
+                onTap: () => UtilityFunctions.launchEmail(
+                  widget.vehicle['owner_id']['email'],
+                ),
+                child: Container(
+                  height: 40,
+                  width: 110,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.greyBg,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.email_outlined, color: AppColors.primary),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Email',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () => UtilityFunctions.launchCall(
+                  widget.vehicle['owner_id']['phone'],
+                ),
+                child: Container(
+                  height: 40,
+                  width: 110,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.greyBg,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.phone_forwarded_outlined,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Call',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () => UtilityFunctions.launchWhatsApp(
+                  widget.vehicle['owner_id']['phone'],
+                ),
+                child: Container(
+                  width: 110,
+                  height: 40,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.greyBg,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Image.asset('assets/icons/whatsapp.png'),
+                ),
+              ),
+            ],
+          ),
       ],
     );
   }
