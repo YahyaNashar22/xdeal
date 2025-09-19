@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xdeal/utils/app_colors.dart';
+import 'package:xdeal/widgets/custom_appbar.dart';
 
 class MyListingsScreen extends StatelessWidget {
   const MyListingsScreen({super.key});
@@ -10,8 +11,7 @@ class MyListingsScreen extends StatelessWidget {
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(20),
-          child: Center(child: Text("My Listings Screen")),
+          child: Column(children: [CustomAppbar(title: "My Listings")]),
         ),
       ),
     );

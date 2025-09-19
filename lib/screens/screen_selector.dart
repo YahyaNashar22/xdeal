@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:xdeal/screens/add_listings_screen.dart';
 import 'package:xdeal/screens/favorite_screen.dart';
 import 'package:xdeal/screens/home_screen.dart';
 import 'package:xdeal/screens/my_listings_screen.dart';
 import 'package:xdeal/screens/settings_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
+import 'package:xdeal/widgets/add_listing_modal.dart';
 import 'package:xdeal/widgets/bottom_navigation.dart';
 
 class ScreenSelector extends StatefulWidget {
@@ -20,15 +20,30 @@ class _ScreenSelectorState extends State<ScreenSelector> {
   final List<Widget> _screens = const [
     HomeScreen(),
     FavoriteScreen(),
-    AddListingsScreen(),
     MyListingsScreen(),
     SettingsScreen(),
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 2) {
+      // the Add Listing item index
+      // show bottom sheet instead of switching screen
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (context) {
+          return const AddListingModal(); // reuse your screen widget here
+        },
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index >= 2 ? index - 1 : index;
+        // because we removed one item from _screens
+      });
+    }
   }
 
   @override

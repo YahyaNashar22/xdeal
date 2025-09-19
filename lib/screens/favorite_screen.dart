@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xdeal/utils/app_colors.dart';
+import 'package:xdeal/widgets/custom_appbar.dart';
 
 class FavoriteScreen extends StatelessWidget {
   const FavoriteScreen({super.key});
@@ -10,8 +11,7 @@ class FavoriteScreen extends StatelessWidget {
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(20),
-          child: Center(child: Text("Favorite Screen")),
+          child: Column(children: [CustomAppbar(title: "Favorites")]),
         ),
       ),
     );
