@@ -12,12 +12,14 @@ class ListingsViewer extends StatefulWidget {
   final int selectedView;
   final bool isDealerProfile;
   final bool isUploaderViewing;
+  final bool onlyFavorites;
   final ListingFilter filter;
   const ListingsViewer({
     super.key,
     required this.selectedView,
     this.isDealerProfile = false,
     this.isUploaderViewing = false,
+    this.onlyFavorites = false,
     this.filter = ListingFilter.newest,
   });
 
@@ -29,10 +31,17 @@ class _ListingsViewerState extends State<ListingsViewer> {
   @override
   Widget build(BuildContext context) {
     // initial list
-    final originalListings = widget.selectedView == 0
-        ? DummyData.propertiesListings
-        : DummyData.vehiclesListings;
 
+    List<Map<String, dynamic>> originalListings;
+    if (widget.onlyFavorites) {
+      originalListings = widget.selectedView == 0
+          ? DummyData.favoritesProperties
+          : DummyData.favoritesVehicles;
+    } else {
+      originalListings = widget.selectedView == 0
+          ? DummyData.propertiesListings
+          : DummyData.vehiclesListings;
+    }
     // filtered listings
 
     // 🚩 always show only listed items by default
@@ -41,7 +50,7 @@ class _ListingsViewerState extends State<ListingsViewer> {
         .toList();
 
     // apply filter
-    switch (widget.filter!) {
+    switch (widget.filter) {
       case ListingFilter.newest:
         listings.sort(
           (a, b) => DateTime.parse(
@@ -69,25 +78,39 @@ class _ListingsViewerState extends State<ListingsViewer> {
         break;
     }
 
-    return Column(
-      children:
-          listings
-              .map((listing) {
-                return widget.selectedView == 0
-                    ? PropertyListing(
-                        property: listing,
-                        isDealerProfile: widget.isDealerProfile,
-                        isUploaderViewing: widget.isUploaderViewing,
-                      )
-                    : VehicleListing(
-                        vehicle: listing,
-                        isDealerProfile: widget.isDealerProfile,
-                        isUploaderViewing: widget.isUploaderViewing,
-                      );
-              })
-              .expand((widget) => [widget, const SizedBox(height: 24)])
-              .toList()
-            ..removeLast(), // remove the last gap
-    );
+    // if no listings, show a placeholder
+    if (listings.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Text(
+            'No current listings',
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          ),
+        ),
+      );
+    }
+
+    // build listing widgets
+    var children = listings
+        .map((listing) {
+          return widget.selectedView == 0
+              ? PropertyListing(
+                  property: listing,
+                  isDealerProfile: widget.isDealerProfile,
+                  isUploaderViewing: widget.isUploaderViewing,
+                )
+              : VehicleListing(
+                  vehicle: listing,
+                  isDealerProfile: widget.isDealerProfile,
+                  isUploaderViewing: widget.isUploaderViewing,
+                );
+        })
+        .expand((w) => [w, const SizedBox(height: 24)])
+        .toList();
+
+    if (children.isNotEmpty) children.removeLast();
+
+    return Column(children: children);
   }
 }
