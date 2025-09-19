@@ -56,6 +56,7 @@ class DummyData {
       'is_featured': false,
       'is_sponsored': true,
       'on_sale': true,
+      'is_listed': false,
       'owner_id': {
         '_id': '1',
         "full_name": "Yahya Nashar",
@@ -88,6 +89,7 @@ class DummyData {
       'is_featured': true,
       'is_sponsored': false,
       'on_sale': false,
+      'is_listed': false,
       'owner_id': {
         '_id': '2',
         "full_name": "Yahya Nashar",
@@ -120,6 +122,7 @@ class DummyData {
       'is_featured': false,
       'is_sponsored': true,
       'on_sale': true,
+      'is_listed': true,
       'owner_id': {
         '_id': '3',
         "full_name": "Yahya Nashar",
@@ -157,6 +160,7 @@ class DummyData {
       'is_featured': true,
       'is_sponsored': false,
       'on_sale': false,
+      'is_listed': true,
       'owner_id': {
         '_id': '4',
         "full_name": "Yahya Nashar",
@@ -209,6 +213,7 @@ class DummyData {
       'is_featured': true,
       'is_sponsored': true,
       'on_sale': true,
+      'is_listed': false,
       'owner_id': {
         '_id': '1',
         "full_name": "Yahya Nashar",
@@ -257,6 +262,7 @@ class DummyData {
       'is_featured': true,
       'is_sponsored': true,
       'on_sale': true,
+      'is_listed': false,
       'owner_id': {
         '_id': '2',
         "full_name": "Yahya Nashar",
@@ -305,6 +311,7 @@ class DummyData {
       'is_featured': true,
       'is_sponsored': true,
       'on_sale': true,
+      'is_listed': false,
       'owner_id': {
         '_id': '3',
         "full_name": "Yahya Nashar",
@@ -357,6 +364,7 @@ class DummyData {
       'is_featured': false,
       'is_sponsored': false,
       'on_sale': true,
+      'is_listed': true,
       'owner_id': {
         '_id': '4',
         "full_name": "Yahya Nashar",

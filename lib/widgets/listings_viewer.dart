@@ -6,7 +6,7 @@ import 'package:xdeal/widgets/vehicle_listing.dart';
 // TODO: fetch real data
 // TODO: implement infinite scrolling
 
-enum ListingFilter { none, newest, cheapest, expensive }
+enum ListingFilter { none, newest, cheapest, expensive, notListed }
 
 class ListingsViewer extends StatefulWidget {
   final int selectedView;
@@ -15,7 +15,7 @@ class ListingsViewer extends StatefulWidget {
   const ListingsViewer({
     super.key,
     required this.selectedView,
-    required this.isDealerProfile,
+    this.isDealerProfile = false,
     this.filter = ListingFilter.newest,
   });
 
@@ -27,9 +27,16 @@ class _ListingsViewerState extends State<ListingsViewer> {
   @override
   Widget build(BuildContext context) {
     // initial list
-    final listings = widget.selectedView == 0
+    final originalListings = widget.selectedView == 0
         ? DummyData.propertiesListings
         : DummyData.vehiclesListings;
+
+    // filtered listings
+
+    // 🚩 always show only listed items by default
+    var listings = originalListings
+        .where((item) => item['is_listed'] == true)
+        .toList();
 
     // apply filter
     switch (widget.filter!) {
@@ -49,6 +56,11 @@ class _ListingsViewerState extends State<ListingsViewer> {
         listings.sort(
           (a, b) => int.parse(b['price']).compareTo(int.parse(a['price'])),
         );
+        break;
+      case ListingFilter.notListed:
+        listings = originalListings
+            .where((item) => item['is_listed'] == false)
+            .toList();
         break;
       case ListingFilter.none:
         // no filter, do nothing
