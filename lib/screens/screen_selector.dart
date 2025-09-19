@@ -16,6 +16,7 @@ class ScreenSelector extends StatefulWidget {
 
 class _ScreenSelectorState extends State<ScreenSelector> {
   int _selectedIndex = 0;
+  int _pageIndex = 0;
 
   final List<Widget> _screens = const [
     HomeScreen(),
@@ -39,8 +40,11 @@ class _ScreenSelectorState extends State<ScreenSelector> {
         },
       );
     } else {
+      // adjust index because we removed AddListingsModal from _screens
+      int mappedIndex = index > 2 ? index - 1 : index;
       setState(() {
-        _selectedIndex = index >= 2 ? index - 1 : index;
+        _selectedIndex = index;
+        _pageIndex = mappedIndex;
         // because we removed one item from _screens
       });
     }
@@ -50,7 +54,7 @@ class _ScreenSelectorState extends State<ScreenSelector> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      body: _screens[_selectedIndex],
+      body: _screens[_pageIndex],
       bottomNavigationBar: BottomNavigation(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
