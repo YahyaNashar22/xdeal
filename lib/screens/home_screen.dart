@@ -28,20 +28,47 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.all(20),
-          children: [
-            PropertyVehicleToggleAppbar(
-              selectedView: selectedView,
-              selectView: selectView,
-            ),
-            const SizedBox(height: 12),
-            SearchBarAndFilter(selectedView: selectedView),
-            const SizedBox(height: 12),
-            AdsCarousel(),
-            const SizedBox(height: 24),
-            ListingsViewer(selectedView: selectedView),
-          ],
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
+              SliverAppBar(
+                // These three properties control the "floating" behavior
+                floating: true,
+                snap:
+                    true, // App bar snaps back into view when you pull down slightly
+                pinned: false,
+                backgroundColor: AppColors.white,
+                elevation: 0,
+                automaticallyImplyLeading: false,
+                // We use flexibleSpace or bottom to house your custom widgets
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    child: Column(
+                      children: [
+                        PropertyVehicleToggleAppbar(
+                          selectedView: selectedView,
+                          selectView: selectView,
+                        ),
+                        const SizedBox(height: 12),
+                        SearchBarAndFilter(selectedView: selectedView),
+                      ],
+                    ),
+                  ),
+                ),
+                expandedHeight: 200,
+              ),
+            ];
+          },
+          body: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            children: [
+              AdsCarousel(),
+              const SizedBox(height: 24),
+              ListingsViewer(selectedView: selectedView),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
