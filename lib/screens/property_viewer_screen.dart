@@ -25,6 +25,7 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
 
   bool _isFavorite = false;
   String _location = '';
+  bool isExpanded = false;
 
   void toggleFavorite() {
     setState(() {
@@ -497,7 +498,69 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Text(_property!['description']),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Create a TextPainter to calculate the size of the text
+                        final span = TextSpan(
+                          text: _property!['description'],
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
+                        );
+
+                        final tp = TextPainter(
+                          text: span,
+                          maxLines: 2,
+                          textAlign: TextAlign.left,
+                          textDirection: TextDirection.ltr,
+                        );
+
+                        // Apply the constraints of the parent width
+                        tp.layout(maxWidth: constraints.maxWidth);
+
+                        // Check if the text actually overflows 2 lines
+                        final bool isOverflowing = tp.didExceedMaxLines;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _property!['description'],
+                              // When not expanded, show only 2 lines. When expanded, show everything.
+                              maxLines: isExpanded ? null : 2,
+                              overflow: isExpanded
+                                  ? TextOverflow.visible
+                                  : TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            if (isOverflowing || isExpanded)
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    isExpanded = !isExpanded;
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
+                                  child: Text(
+                                    isExpanded ? "Show Less" : "Read More",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+
                     const SizedBox(height: 24),
                     ListingMapPreview(listing: _property!),
                     const SizedBox(height: 24),

@@ -81,10 +81,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Add Images',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Text(
                                 user['plan'] == 'free'
                                     ? "Free Plan"
                                     : "Paid Plan",
