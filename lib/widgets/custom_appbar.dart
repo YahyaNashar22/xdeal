@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/utils/app_colors.dart';
+import 'package:xdeal/widgets/notification_modal.dart';
 
 class CustomAppbar extends StatelessWidget {
   final String title;
@@ -15,7 +17,10 @@ class CustomAppbar extends StatelessWidget {
             title,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
           ),
-          Image.asset('assets/icons/logo_purple_large.png', width: 46),
+          IconButton(
+            onPressed: () => showNotificationModal(context),
+            icon: Icon(Icons.notifications, color: AppColors.primary),
+          ),
         ],
       ),
     );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/theme/app_theme.dart';
+import 'package:xdeal/utils/app_colors.dart';
+import 'package:xdeal/widgets/notification_modal.dart';
 
 class PropertyVehicleToggleAppbar extends StatelessWidget {
   final int selectedView;
@@ -42,7 +44,10 @@ class PropertyVehicleToggleAppbar extends StatelessWidget {
           onPressed: () => selectView(1),
           child: Text("Vehicles"),
         ),
-        Image.asset('assets/icons/logo_purple_large.png', width: 46),
+        IconButton(
+          icon: Icon(Icons.notifications, color: AppColors.primary),
+          onPressed: () => showNotificationModal(context),
+        ),
       ],
     );
   }

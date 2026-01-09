@@ -40,7 +40,7 @@ class _UserViewListingModalState extends State<UserViewListingModal> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
-      height: 550,
+      height: 500,
       width: double.infinity,
       child: Column(
         mainAxisSize: MainAxisSize.max,
@@ -51,8 +51,9 @@ class _UserViewListingModalState extends State<UserViewListingModal> {
               _listing!['name'],
               style: TextStyle(
                 color: AppColors.primary,
-                fontSize: 32,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
