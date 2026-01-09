@@ -25,7 +25,6 @@ class VehicleListing extends StatefulWidget {
 class _VehicleListingState extends State<VehicleListing> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  Timer? _timer;
 
   bool _isFavorite = false;
   String _location = '';
@@ -64,20 +63,6 @@ class _VehicleListingState extends State<VehicleListing> {
   @override
   void initState() {
     super.initState();
-    // auto slide every 2 seconds
-    _timer = Timer.periodic(const Duration(seconds: 2), (Timer timer) {
-      if (_currentPage < widget.vehicle['images'].length - 1) {
-        _currentPage++;
-      } else {
-        _currentPage = 0;
-      }
-
-      _pageController.animateToPage(
-        _currentPage,
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeInOut,
-      );
-    });
 
     // reverse geolocation
     UtilityFunctions.getLocationFromCoordinatesGoogle(
@@ -88,7 +73,6 @@ class _VehicleListingState extends State<VehicleListing> {
 
   @override
   void dispose() {
-    _timer?.cancel();
     _pageController.dispose();
     super.dispose();
   }
