@@ -17,18 +17,36 @@ class SearchBarAndFilter extends StatefulWidget {
 
 class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
   final TextEditingController _searchController = TextEditingController();
-  bool _showFilters = false;
-
-  void _toggleFiltersVisibility() {
-    setState(() {
-      _showFilters = !_showFilters;
-    });
-  }
 
   @override
   void dispose() {
     super.dispose();
     _searchController.dispose();
+  }
+
+  void _showCustomFilterModal(BuildContext context) {
+    showBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: double.infinity,
+          padding: const EdgeInsets.all(16),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Text('This is a modal bottom sheet'),
+                ElevatedButton(
+                  child: const Text('Close Modal'),
+                  onPressed: () =>
+                      Navigator.pop(context), // Dismisses the modal
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -63,7 +81,7 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
               ),
             ),
             IconButton(
-              onPressed: () => _toggleFiltersVisibility(),
+              onPressed: () => _showCustomFilterModal(context),
               icon: Icon(
                 Icons.format_list_bulleted_rounded,
                 color: AppColors.primary,
@@ -73,12 +91,11 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
           ],
         ),
         const SizedBox(height: 12),
-        if (_showFilters)
-          Filters(
-            filters: widget.selectedView == 0
-                ? DummyData.propertyCategories
-                : DummyData.vehicleCategories,
-          ),
+        Filters(
+          filters: widget.selectedView == 0
+              ? DummyData.propertyCategories
+              : DummyData.vehicleCategories,
+        ),
       ],
     );
   }
