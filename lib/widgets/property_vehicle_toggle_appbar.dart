@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/notification_modal.dart';
@@ -15,17 +14,10 @@ class PropertyVehicleToggleAppbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void logout() {
-      // TODO: implement proper logout
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (context) => OnBoardingScreen()));
-    }
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        InkWell(onTap: logout, child: Image.asset('assets/images/avatar.png')),
+        Image.asset('assets/images/avatar.png'),
         TextButton(
           style: TextButton.styleFrom(
             foregroundColor: selectedView == 0

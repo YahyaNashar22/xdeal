@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xdeal/dummy_data.dart';
+import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/custom_appbar.dart';
 import 'package:xdeal/widgets/settings_btn_navigate.dart';
@@ -17,6 +18,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _isNotificationAllowed = value;
     });
+  }
+
+  // TODO: Implement proper logout
+  void _logout() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => OnBoardingScreen()),
+    );
+  }
+
+  // TODO: Implement proper delete account
+  void _deleteAccount() {
+    debugPrint("delete account");
   }
 
   // TODO: fetch real user from backend
@@ -215,6 +228,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 32),
+              Center(
+                child: ElevatedButton(
+                  // TODO: implement proper logout
+                  onPressed: _logout,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(256, 32),
+                    backgroundColor: AppColors.greyBg,
+                    foregroundColor: AppColors.primary,
+                  ),
+                  child: Text("Logout"),
+                ),
+              ),
+
+              Center(
+                child: ElevatedButton(
+                  // TODO: implement proper logout
+                  onPressed: _deleteAccount,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(256, 32),
+                    backgroundColor: AppColors.red,
+                  ),
+                  child: Text("Delete Account"),
+                ),
+              ),
             ],
           ),
         ),
