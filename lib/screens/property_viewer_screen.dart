@@ -504,7 +504,7 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).pushReplacement(
+                            Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => DealerProfileScreen(
                                   dealerId: _property!['owner_id']['_id'],

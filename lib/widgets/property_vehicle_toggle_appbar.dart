@@ -15,9 +15,9 @@ class PropertyVehicleToggleAppbar extends StatelessWidget {
   Widget build(BuildContext context) {
     void logout() {
       // TODO: implement proper logout
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => OnBoardingScreen()),
-      );
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (context) => OnBoardingScreen()));
     }
 
     return Row(

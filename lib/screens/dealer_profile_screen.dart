@@ -113,11 +113,7 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.white,
         leading: IconButton(
-          onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => ScreenSelector()),
-            (Route<dynamic> route) =>
-                false, // false removes all previous routes
-          ),
+          onPressed: () => Navigator.of(context).pop(),
           icon: Icon(Icons.arrow_back, color: AppColors.black),
         ),
         title: Text('Dealer Profile', style: TextStyle(color: AppColors.black)),
