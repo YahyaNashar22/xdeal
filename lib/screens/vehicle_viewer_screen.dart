@@ -68,6 +68,43 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
     super.dispose();
   }
 
+  void _showPhonePopup(BuildContext context) {
+    // Extracting the phone number for readability
+    final String phoneNumber = _vehicle!['owner_id']['phone'] ?? 'Unknown';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Text("Contact Owner"),
+          content: Text("Would you like to call $phoneNumber?"),
+          actions: [
+            // Cancel Button
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+            ),
+            // Call Button
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary, // Using your app color
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pop(context); // Close the popup first
+                UtilityFunctions.launchCall(phoneNumber);
+              },
+              child: const Text("Call Now"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isOnSale = _vehicle!['on_sale'];
@@ -80,7 +117,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
           UtilityFunctions.launchEmail(_vehicle!['owner_id']['email']);
           break;
         case 1:
-          UtilityFunctions.launchCall(_vehicle!['owner_id']['phone']);
+          _showPhonePopup(context);
           break;
         case 2:
           UtilityFunctions.launchWhatsApp(_vehicle!['owner_id']['phone']);

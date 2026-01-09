@@ -56,6 +56,43 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
     });
   }
 
+  void _showPhonePopup(BuildContext context) {
+    // Extracting the phone number for readability
+    final String phoneNumber = _dealer!['phone'] ?? 'Unknown';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Text("Contact Owner"),
+          content: Text("Would you like to call $phoneNumber?"),
+          actions: [
+            // Cancel Button
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+            ),
+            // Call Button
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary, // Using your app color
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pop(context); // Close the popup first
+                UtilityFunctions.launchCall(phoneNumber);
+              },
+              child: const Text("Call Now"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     void handleBottomNavTap(int index) {
@@ -64,7 +101,7 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
           UtilityFunctions.launchEmail(_dealer!['email']);
           break;
         case 1:
-          UtilityFunctions.launchCall(_dealer!['phone']);
+          _showPhonePopup(context);
           break;
         case 2:
           UtilityFunctions.launchWhatsApp(_dealer!['phone']);
