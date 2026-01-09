@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:xdeal/screens/property_viewer_screen.dart';
@@ -68,7 +68,9 @@ class _PropertyListingState extends State<PropertyListing> {
     UtilityFunctions.getLocationFromCoordinatesGoogle(
       widget.property['coords'][0],
       widget.property['coords'][1],
-    ).then((loc) => setState(() => _location = loc));
+    ).then((loc) {
+      if (mounted) setState(() => _location = loc);
+    });
   }
 
   @override
@@ -98,7 +100,7 @@ class _PropertyListingState extends State<PropertyListing> {
                   // slide show
                   PageView.builder(
                     controller: _pageController,
-                    itemCount: widget.property['images'].length,
+                    itemCount: math.min(widget.property['images'].length, 3),
                     onPageChanged: (int index) {
                       setState(() {
                         _currentPage = index;
@@ -120,7 +122,7 @@ class _PropertyListingState extends State<PropertyListing> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
-                        widget.property['images'].length,
+                        math.min(widget.property['images'].length, 3),
                         (index) {
                           return AnimatedContainer(
                             duration: const Duration(milliseconds: 300),

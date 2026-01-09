@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:xdeal/screens/vehicle_viewer_screen.dart';
@@ -68,7 +68,9 @@ class _VehicleListingState extends State<VehicleListing> {
     UtilityFunctions.getLocationFromCoordinatesGoogle(
       widget.vehicle['coords'][0],
       widget.vehicle['coords'][1],
-    ).then((loc) => setState(() => _location = loc));
+    ).then((loc) {
+      if (mounted) setState(() => _location = loc);
+    });
   }
 
   @override
@@ -97,7 +99,7 @@ class _VehicleListingState extends State<VehicleListing> {
                   // slide show
                   PageView.builder(
                     controller: _pageController,
-                    itemCount: widget.vehicle['images'].length,
+                    itemCount: math.min(widget.vehicle['images'].length, 3),
                     onPageChanged: (int index) {
                       setState(() {
                         _currentPage = index;
@@ -118,22 +120,23 @@ class _VehicleListingState extends State<VehicleListing> {
                     right: 0,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(widget.vehicle['images'].length, (
-                        index,
-                      ) {
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: _currentPage == index ? 10 : 8,
-                          height: _currentPage == index ? 10 : 8,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: _currentPage == index
-                                ? AppColors.primary
-                                : AppColors.inputBg,
-                          ),
-                        );
-                      }),
+                      children: List.generate(
+                        math.min(widget.vehicle['images'].length, 3),
+                        (index) {
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: _currentPage == index ? 10 : 8,
+                            height: _currentPage == index ? 10 : 8,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: _currentPage == index
+                                  ? AppColors.primary
+                                  : AppColors.inputBg,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   // favorite icon

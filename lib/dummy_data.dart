@@ -414,6 +414,11 @@ class DummyData {
       'images': [
         'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8U1VWfGVufDB8fDB8fHww',
         'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8U1VWfGVufDB8fDB8fHww',
+        'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8U1VWfGVufDB8fDB8fHww',
+        'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8U1VWfGVufDB8fDB8fHww',
+        'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8U1VWfGVufDB8fDB8fHww',
+        'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8U1VWfGVufDB8fDB8fHww',
+        'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8U1VWfGVufDB8fDB8fHww',
       ],
       'price': '84074',
       'category': 'pickup',
@@ -447,7 +452,7 @@ class DummyData {
       'is_featured': true,
       'is_sponsored': true,
       'on_sale': true,
-      'is_listed': false,
+      'is_listed': true,
       'owner_id': {
         '_id': '1',
         "full_name": "Yahya Nashar",
