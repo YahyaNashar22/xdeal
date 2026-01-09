@@ -148,11 +148,14 @@ class _PropertyListingState extends State<PropertyListing> {
                         ? IconButton(
                             onPressed: _toggleFavorite,
                             icon: Icon(Icons.favorite),
-                            color: AppColors.primary,
+                            color: AppColors.white,
                           )
                         : IconButton(
                             onPressed: _toggleFavorite,
-                            icon: Icon(Icons.favorite_border),
+                            icon: Icon(
+                              Icons.favorite_border,
+                              color: AppColors.white,
+                            ),
                           ),
                   ),
                   // featured / sponsored flag
@@ -224,6 +227,7 @@ class _PropertyListingState extends State<PropertyListing> {
             fontWeight: FontWeight.bold,
             fontSize: AppTheme.heading2,
             color: AppColors.primary,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         // category
@@ -273,63 +277,63 @@ class _PropertyListingState extends State<PropertyListing> {
             // bedrooms
             Container(
               height: 40,
-              width: 110,
+              width: 120,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.greyBg,
+                // color: AppColors.greyBg,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Icon(Icons.bed_outlined, color: AppColors.primary),
+                  const SizedBox(width: 4),
                   Text(
                     widget.property['bedrooms'].toString(),
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.bed_outlined, color: AppColors.primary),
                 ],
               ),
             ),
             // bathrooms
             Container(
-              width: 110,
+              width: 120,
               height: 40,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.greyBg,
+                // color: AppColors.greyBg,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Icon(Icons.bathtub_outlined, color: AppColors.primary),
+                  const SizedBox(width: 4),
                   Text(
                     widget.property['bathrooms'].toString(),
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.bathtub_outlined, color: AppColors.primary),
                 ],
               ),
             ),
             // space m²
             Container(
-              width: 110,
+              width: 120,
               height: 40,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: AppColors.greyBg,
+                // color: AppColors.greyBg,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Icon(Icons.square_foot_outlined, color: AppColors.primary),
+                  const SizedBox(width: 4),
                   Text(
                     '${widget.property['space'].toString()} m²',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.square_foot_outlined, color: AppColors.primary),
                 ],
               ),
             ),
@@ -347,13 +351,13 @@ class _PropertyListingState extends State<PropertyListing> {
                 ),
                 child: Container(
                   height: 40,
-                  width: 110,
+                  width: 120,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.greyBg,
+                    // color: AppColors.greyBg,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(
@@ -373,18 +377,16 @@ class _PropertyListingState extends State<PropertyListing> {
                 ),
               ),
               InkWell(
-                onTap: () => UtilityFunctions.launchCall(
-                  widget.property['owner_id']['phone'],
-                ),
+                onTap: () => _showPhonePopup(context),
                 child: Container(
                   height: 40,
-                  width: 110,
+                  width: 120,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.greyBg,
+                    // color: AppColors.greyBg,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(
@@ -411,14 +413,14 @@ class _PropertyListingState extends State<PropertyListing> {
                   widget.property['owner_id']['phone'],
                 ),
                 child: Container(
-                  width: 110,
+                  width: 120,
                   height: 40,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.greyBg,
+                    // color: AppColors.greyBg,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Image.asset('assets/icons/whatsapp.png'),
@@ -426,7 +428,46 @@ class _PropertyListingState extends State<PropertyListing> {
               ),
             ],
           ),
+        const SizedBox(height: 12),
       ],
+    );
+  }
+
+  void _showPhonePopup(BuildContext context) {
+    // Extracting the phone number for readability
+    final String phoneNumber =
+        widget.property['owner_id']['phone'] ?? 'Unknown';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Text("Contact Owner"),
+          content: Text("Would you like to call $phoneNumber?"),
+          actions: [
+            // Cancel Button
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+            ),
+            // Call Button
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary, // Using your app color
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pop(context); // Close the popup first
+                UtilityFunctions.launchCall(phoneNumber);
+              },
+              child: const Text("Call Now"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

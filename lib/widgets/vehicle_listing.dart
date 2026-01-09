@@ -84,13 +84,13 @@ class _VehicleListingState extends State<VehicleListing> {
     final bool isOnSale = widget.vehicle['on_sale'];
     final bool isFeatured = widget.vehicle['is_featured'];
     final bool isSponsored = widget.vehicle['is_sponsored'];
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        InkWell(
-          onTap: _handleListingTap,
-          child: SizedBox(
+    return InkWell(
+      onTap: _handleListingTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
             height: 200,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -147,11 +147,14 @@ class _VehicleListingState extends State<VehicleListing> {
                         ? IconButton(
                             onPressed: _toggleFavorite,
                             icon: Icon(Icons.favorite),
-                            color: AppColors.primary,
+                            color: AppColors.white,
                           )
                         : IconButton(
                             onPressed: _toggleFavorite,
-                            icon: Icon(Icons.favorite_border),
+                            icon: Icon(
+                              Icons.favorite_border,
+                              color: AppColors.white,
+                            ),
                           ),
                   ),
                   // featured / sponsored flag
@@ -206,229 +209,284 @@ class _VehicleListingState extends State<VehicleListing> {
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-        // price
-        Text(
-          "USD ${UtilityFunctions.formatPrice(widget.vehicle['price'])}",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: AppTheme.heading1,
+          const SizedBox(height: 12),
+          // price
+          Text(
+            "USD ${UtilityFunctions.formatPrice(widget.vehicle['price'])}",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppTheme.heading1,
+            ),
           ),
-        ),
-        // name + model
-        Text(
-          widget.vehicle['name'],
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: AppTheme.heading2,
-            color: AppColors.primary,
+          // name + model
+          Text(
+            widget.vehicle['name'],
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppTheme.heading2,
+              color: AppColors.primary,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-        ),
-        // category
-        Text(
-          widget.vehicle['category'],
-          style: TextStyle(
-            fontSize: AppTheme.heading2,
-            color: AppColors.primary,
+          // category
+          Text(
+            widget.vehicle['category'],
+            style: TextStyle(
+              fontSize: AppTheme.heading2,
+              color: AppColors.primary,
+            ),
           ),
-        ),
-        // location and date
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            TextButton(
-              onPressed: () {
-                UtilityFunctions.openMapsAtCoords(widget.vehicle['coords']);
-              },
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size(0, 0),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(Icons.location_on_outlined, color: AppColors.primary),
-                  Text(_location.isEmpty ? "Loading location..." : _location),
-                ],
-              ),
-            ),
-            Text(
-              UtilityFunctions.formatDate(widget.vehicle['createdAt']),
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        // additional info
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            // doors
-            Container(
-              height: 40,
-              width: 110,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.greyBg,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    widget.vehicle['number_of_doors'].toString(),
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.door_sliding_outlined, color: AppColors.primary),
-                ],
-              ),
-            ),
-            // kilometers
-            Container(
-              width: 110,
-              height: 40,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.greyBg,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    widget.vehicle['kilometers'].toString(),
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.edit_road_outlined, color: AppColors.primary),
-                ],
-              ),
-            ),
-            // condition
-            Container(
-              width: 110,
-              height: 40,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.greyBg,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    widget.vehicle['condition'],
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    Icons.sentiment_very_satisfied_outlined,
-                    color: AppColors.primary,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        // contact info
-        const SizedBox(height: 12),
-        if (!widget.isDealerProfile && !widget.isUploaderViewing)
+          // location and date
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              InkWell(
-                onTap: () => UtilityFunctions.launchEmail(
-                  widget.vehicle['owner_id']['email'],
+              TextButton(
+                onPressed: () {
+                  UtilityFunctions.openMapsAtCoords(widget.vehicle['coords']);
+                },
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size(0, 0),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: Container(
-                  height: 40,
-                  width: 110,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.greyBg,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.email_outlined, color: AppColors.primary),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Email',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.location_on_outlined, color: AppColors.primary),
+                    Text(_location.isEmpty ? "Loading location..." : _location),
+                  ],
                 ),
               ),
-              InkWell(
-                onTap: () => UtilityFunctions.launchCall(
-                  widget.vehicle['owner_id']['phone'],
-                ),
-                child: Container(
-                  height: 40,
-                  width: 110,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.greyBg,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.phone_forwarded_outlined,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Call',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () => UtilityFunctions.launchWhatsApp(
-                  widget.vehicle['owner_id']['phone'],
-                ),
-                child: Container(
-                  width: 110,
-                  height: 40,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.greyBg,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Image.asset('assets/icons/whatsapp.png'),
+              Text(
+                UtilityFunctions.formatDate(widget.vehicle['createdAt']),
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-      ],
+          // additional info
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              // doors
+              Container(
+                height: 40,
+                width: 120,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  // color: AppColors.greyBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.calendar_today, color: AppColors.primary),
+                    const SizedBox(width: 4),
+                    Text(
+                      widget.vehicle['year'].toString(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // kilometers
+              Container(
+                width: 120,
+                height: 40,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  // color: AppColors.greyBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.edit_road_outlined, color: AppColors.primary),
+                    const SizedBox(width: 4),
+                    Text(
+                      widget.vehicle['kilometers'].toString(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // condition
+              Container(
+                width: 120,
+                height: 40,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  // color: AppColors.greyBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.directions_car_outlined,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      widget.vehicle['fuel_type'],
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          // contact info
+          const SizedBox(height: 12),
+          if (!widget.isDealerProfile && !widget.isUploaderViewing)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                InkWell(
+                  onTap: () => UtilityFunctions.launchEmail(
+                    widget.vehicle['owner_id']['email'],
+                  ),
+                  child: Container(
+                    height: 40,
+                    width: 120,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      // color: AppColors.greyBg,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.email_outlined, color: AppColors.primary),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Email',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () => _showPhonePopup(context),
+                  child: Container(
+                    height: 40,
+                    width: 120,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      // color: AppColors.greyBg,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.phone_forwarded_outlined,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Call',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () => UtilityFunctions.launchWhatsApp(
+                    widget.vehicle['owner_id']['phone'],
+                  ),
+                  child: Container(
+                    width: 120,
+                    height: 40,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      // color: AppColors.greyBg,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Image.asset('assets/icons/whatsapp.png'),
+                  ),
+                ),
+              ],
+            ),
+          const SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+
+  void _showPhonePopup(BuildContext context) {
+    // Extracting the phone number for readability
+    final String phoneNumber = widget.vehicle['owner_id']['phone'] ?? 'Unknown';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Text("Contact Owner"),
+          content: Text("Would you like to call $phoneNumber?"),
+          actions: [
+            // Cancel Button
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+            ),
+            // Call Button
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary, // Using your app color
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pop(context); // Close the popup first
+                UtilityFunctions.launchCall(phoneNumber);
+              },
+              child: const Text("Call Now"),
+            ),
+          ],
+        );
+      },
     );
   }
 }
