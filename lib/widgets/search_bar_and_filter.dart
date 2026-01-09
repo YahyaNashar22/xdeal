@@ -70,7 +70,7 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                   controller: _searchController,
                   style: TextStyle(color: AppTheme.primaryColor),
                   decoration: InputDecoration(
-                    hintText: "Beirut",
+                    hintText: "Lebanon",
                     hintStyle: TextStyle(color: AppTheme.primaryColor),
                     prefixIcon: Icon(
                       Icons.search,

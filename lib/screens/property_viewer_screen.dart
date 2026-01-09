@@ -480,53 +480,7 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                   ],
                 ),
               ),
-              // owner info
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: AppColors.greyBg),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadiusGeometry.circular(12),
-                      child: Image.network(
-                        _property!['owner_id']['profile_picture'],
-                        width: 100,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _property!['owner_id']['full_name'],
-                          style: TextStyle(fontSize: 24),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => DealerProfileScreen(
-                                  dealerId: _property!['owner_id']['_id'],
-                                ),
-                              ),
-                            );
-                          },
-                          child: Row(
-                            children: [
-                              Text(
-                                "See profile",
-                                style: TextStyle(color: AppColors.primary),
-                              ),
-                              Icon(Icons.arrow_forward_ios_outlined),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+
               Padding(
                 padding: const EdgeInsets.all(8.0),
 
@@ -599,6 +553,54 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                           ],
                         ),
                       ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // owner info
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: AppColors.greyBg),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadiusGeometry.circular(12),
+                      child: Image.network(
+                        _property!['owner_id']['profile_picture'],
+                        width: 100,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _property!['owner_id']['full_name'],
+                          style: TextStyle(fontSize: 24),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => DealerProfileScreen(
+                                  dealerId: _property!['owner_id']['_id'],
+                                ),
+                              ),
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                "See profile",
+                                style: TextStyle(color: AppColors.primary),
+                              ),
+                              Icon(Icons.arrow_forward_ios_outlined),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

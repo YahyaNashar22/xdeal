@@ -508,60 +508,9 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(_vehicle!['description']),
-                    const SizedBox(height: 24),
-                    Divider(),
-                    const SizedBox(height: 12),
                   ],
                 ),
               ),
-              // owner info
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: AppColors.greyBg),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadiusGeometry.circular(12),
-                      child: Image.network(
-                        _vehicle!['owner_id']['profile_picture'],
-                        width: 100,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _vehicle!['owner_id']['full_name'],
-                          style: TextStyle(fontSize: 24),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => DealerProfileScreen(
-                                  dealerId: _vehicle!['owner_id']['_id'],
-                                ),
-                              ),
-                            );
-                          },
-                          child: Row(
-                            children: [
-                              Text(
-                                "See profile",
-                                style: TextStyle(color: AppColors.primary),
-                              ),
-                              Icon(Icons.arrow_forward_ios_outlined),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
 
               Padding(
                 padding: const EdgeInsets.only(
@@ -573,7 +522,6 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Divider(),
                     const SizedBox(height: 24),
                     ListingMapPreview(listing: _vehicle!),
                     const SizedBox(height: 24),
@@ -624,6 +572,54 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                           ],
                         ),
                       ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // owner info
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: AppColors.greyBg),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadiusGeometry.circular(12),
+                      child: Image.network(
+                        _vehicle!['owner_id']['profile_picture'],
+                        width: 100,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _vehicle!['owner_id']['full_name'],
+                          style: TextStyle(fontSize: 24),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => DealerProfileScreen(
+                                  dealerId: _vehicle!['owner_id']['_id'],
+                                ),
+                              ),
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                "See profile",
+                                style: TextStyle(color: AppColors.primary),
+                              ),
+                              Icon(Icons.arrow_forward_ios_outlined),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
