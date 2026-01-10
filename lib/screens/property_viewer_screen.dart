@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:panorama_viewer/panorama_viewer.dart';
 import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/screens/dealer_profile_screen.dart';
+import 'package:xdeal/screens/full_screen_image_viewer.dart';
+import 'package:xdeal/screens/full_screen_panorama.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
 import 'package:xdeal/widgets/listing_map_preview.dart';
@@ -180,10 +182,23 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                           });
                         },
                         itemBuilder: (context, index) {
-                          return Image.network(
-                            _property!['images'][index],
-                            fit: BoxFit.cover,
-                            width: double.infinity,
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => FullScreenImageViewer(
+                                    images: _property!['images'],
+                                    initialIndex: index,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image.network(
+                              _property!['images'][index],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            ),
                           );
                         },
                       ),
@@ -463,16 +478,43 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                         const SizedBox(height: 12),
                         SizedBox(
                           height: 250,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: PanoramaViewer(
-                              zoom: 1, // adjust zoom so it fills horizontally
-                              interactive: true, // allows drag to rotate
-                              child: Image.network(
-                                _property!['three_sixty'],
-                                fit: BoxFit.cover,
+                          child: Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: PanoramaViewer(
+                                  zoom: 1,
+                                  interactive: true,
+                                  child: Image.network(
+                                    _property!['three_sixty'],
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
-                            ),
+                              // Add a full-screen button since drag is used for rotating
+                              Positioned(
+                                right: 8,
+                                bottom: 8,
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.fullscreen,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            FullScreenPanorama(
+                                              imageUrl:
+                                                  _property!['three_sixty'],
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 24),

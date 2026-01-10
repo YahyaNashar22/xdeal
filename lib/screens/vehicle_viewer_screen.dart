@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/screens/dealer_profile_screen.dart';
+import 'package:xdeal/screens/full_screen_image_viewer.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
 import 'package:xdeal/widgets/listing_map_preview.dart';
@@ -175,10 +176,23 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                           });
                         },
                         itemBuilder: (context, index) {
-                          return Image.network(
-                            _vehicle!['images'][index],
-                            fit: BoxFit.cover,
-                            width: double.infinity,
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => FullScreenImageViewer(
+                                    images: _vehicle!['images'],
+                                    initialIndex: index,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image.network(
+                              _vehicle!['images'][index],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            ),
                           );
                         },
                       ),
