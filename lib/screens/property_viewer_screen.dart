@@ -9,6 +9,7 @@ import 'package:xdeal/screens/full_screen_panorama.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
 import 'package:xdeal/widgets/listing_map_preview.dart';
+import 'package:xdeal/widgets/notification_modal.dart';
 
 class PropertyViewerScreen extends StatefulWidget {
   final String propertyId;
@@ -141,7 +142,12 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
           'Property Viewer',
           style: TextStyle(color: AppColors.black),
         ),
-        actions: [Image.asset('assets/icons/logo_purple_large.png', width: 50)],
+        actions: [
+          IconButton(
+            onPressed: () => showNotificationModal(context),
+            icon: Icon(Icons.notifications, color: AppColors.primary),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: handleBottomNavTap,
