@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/screens/otp_screen.dart';
 import 'package:xdeal/screens/sign_in_screen.dart';
+import 'package:xdeal/services/auth_service.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/navigation_helper.dart';
 import 'package:xdeal/utils/social_btn_builder.dart';
 import 'package:xdeal/utils/text_field_builder.dart';
 import 'package:xdeal/widgets/submit_btn.dart';
-
-// TODO: input validation
-// TODO: connect backend
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -19,6 +17,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final fullNameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final addressController = TextEditingController();
@@ -26,9 +25,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final phoneController = TextEditingController();
 
   bool agree = false;
+  bool isLoading = false;
 
   @override
   void dispose() {
+    fullNameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     addressController.dispose();
@@ -37,21 +38,57 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  void _onSignUp() {
-    String email = emailController.text;
-    String password = passwordController.text;
-    String address = addressController.text;
-    String countryCode = countryCodeController.text;
-    String phone = phoneController.text;
+  void _onSignUp() async {
+    if (!agree) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("You must agree to the terms")),
+      );
+      return;
+    }
 
-    debugPrint("Email: $email");
-    debugPrint("Password: $password");
-    debugPrint("Address: $address");
-    debugPrint("Country Code: $countryCode");
-    debugPrint("Phone: $phone");
-    debugPrint("Agree: $agree");
+    String fullName = fullNameController.text.trim();
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+    String address = addressController.text.trim();
+    String phone =
+        "${countryCodeController.text.trim()}${phoneController.text.trim()}";
 
-    navigateToReplacement(context, const OtpScreen());
+    if (fullName.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Please fill in the full name, email, password, and phone number",
+          ),
+        ),
+      );
+      return;
+    }
+
+    final userData = {
+      "full_name": fullName,
+      "email": email,
+      "password": password,
+      "address": address,
+      "phone": phone,
+    };
+
+    setState(() => isLoading = true);
+
+    try {
+      await AuthService.sendOtp(userData["email"]!);
+
+      if (!mounted) return;
+      navigateToReplacement(context, OtpScreen(userData: userData));
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -65,6 +102,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Full Name
+              buildTextField("Full Name", fullNameController),
+              const SizedBox(height: 16),
+
               // Email
               buildTextField("Email", emailController),
               const SizedBox(height: 16),
@@ -114,31 +155,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 20),
 
               // Sign Up Button
-              submitBtn(_onSignUp, "Sign up"),
+              isLoading
+                  ? SizedBox(
+                      height: 20.0,
+                      width: 20.0,
+                      child: CircularProgressIndicator(),
+                    )
+                  : submitBtn(_onSignUp, "Sign up"),
 
               const SizedBox(height: 20),
 
-              Center(
-                child: Text(
-                  "Or sign up with",
-                  style: TextStyle(color: AppColors.black),
-                ),
-              ),
-              const SizedBox(height: 20),
+              // TODO: IMPLEMENT THESE LATER ON
+              // Center(
+              //   child: Text(
+              //     "Or sign up with",
+              //     style: TextStyle(color: AppColors.black),
+              //   ),
+              // ),
+              // const SizedBox(height: 20),
 
-              // Social Buttons
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                alignment: WrapAlignment.center,
-                children: [
-                  buildSocialButton("Facebook"),
-                  buildSocialButton("Google"),
-                  buildSocialButton("Apple IOS"),
-                  buildSocialButton("Phone Number"),
-                ],
-              ),
-
+              // // Social Buttons
+              // Wrap(
+              //   spacing: 12,
+              //   runSpacing: 12,
+              //   alignment: WrapAlignment.center,
+              //   children: [
+              //     buildSocialButton("Facebook"),
+              //     buildSocialButton("Google"),
+              //     buildSocialButton("Apple IOS"),
+              //     buildSocialButton("Phone Number"),
+              //   ],
+              // ),
               const SizedBox(height: 20),
 
               // Already have account

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/screens/sign_up_screen.dart';
+import 'package:xdeal/services/auth_service.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/navigation_helper.dart';
 import 'package:xdeal/utils/text_field_builder.dart';
 import 'package:xdeal/widgets/submit_btn.dart';
 
-// TODO: input validation
-// TODO: connect backend
-
 class OtpScreen extends StatefulWidget {
-  const OtpScreen({super.key});
+  final Map<String, String> userData;
+  const OtpScreen({super.key, required this.userData});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -18,14 +18,48 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   TextEditingController otpController = TextEditingController();
 
+  bool isLoading = false;
+
   @override
   void dispose() {
     otpController.dispose();
     super.dispose();
   }
 
-  void _onSubmit() {
-    debugPrint("otp: $otpController");
+  void _onSubmit() async {
+    final otp = otpController.text.trim();
+
+    if (otp.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Enter OTP")));
+      return;
+    }
+
+    try {
+      setState(() => isLoading = true);
+      await AuthService.verifyOtp(email: widget.userData["email"]!, otp: otp);
+
+      await AuthService.signup(
+        fullName: widget.userData["full_name"]!,
+        email: widget.userData["email"]!,
+        password: widget.userData["password"]!,
+        address: widget.userData["address"]!,
+        phone: widget.userData["phone"]!,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Account created successfully!")),
+      );
+      navigateToReplacement(context, OnBoardingScreen());
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -55,7 +89,13 @@ class _OtpScreenState extends State<OtpScreen> {
 
               buildTextField("Otp", otpController),
               const SizedBox(height: 20),
-              submitBtn(_onSubmit, "Verify"),
+              isLoading
+                  ? SizedBox(
+                      height: 20.0,
+                      width: 20.0,
+                      child: CircularProgressIndicator(),
+                    )
+                  : submitBtn(_onSubmit, "Verify"),
               const SizedBox(height: 20),
               Image.asset('assets/icons/logo_purple_large.png'),
             ],

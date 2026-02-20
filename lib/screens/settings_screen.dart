@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xdeal/dummy_data.dart';
+import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/custom_appbar.dart';
@@ -20,10 +23,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  // TODO: Implement proper logout
-  void _logout() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => OnBoardingScreen()),
+  Future<void> _logout() async {
+    final preferences = await SharedPreferences.getInstance();
+
+    // 1️⃣ Remove token from storage
+    await preferences.remove('token');
+
+    // 2️⃣ Clear user from provider
+    if (!mounted) return;
+    Provider.of<UserProvider>(context, listen: false).clearUser();
+
+    // 3️⃣ Remove all previous routes
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => OnBoardingScreen()),
+      (route) => false,
     );
   }
 
@@ -230,7 +243,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 32),
               Center(
                 child: ElevatedButton(
-                  // TODO: implement proper logout
                   onPressed: _logout,
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(256, 32),
