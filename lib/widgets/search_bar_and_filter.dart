@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:xdeal/dummy_data.dart';
+import 'package:xdeal/services/api_client.dart';
+import 'package:xdeal/services/property_category_service.dart';
+import 'package:xdeal/services/vehicle_category_service.dart';
 import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/filters.dart';
@@ -18,10 +21,47 @@ class SearchBarAndFilter extends StatefulWidget {
 class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
   final TextEditingController _searchController = TextEditingController();
 
+  late final ApiClient _api;
+  late final VehicleCategoryService _vehicleService;
+  late final PropertyCategoryService _propertyService;
+
+  bool _loadingFilters = false;
+  List<String> _propertyFilters = [];
+  List<String> _vehicleFilters = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // set your baseUrl (example)
+    _api = ApiClient(baseUrl: 'http://10.0.2.2:5000');
+    _vehicleService = VehicleCategoryService(_api);
+    _propertyService = PropertyCategoryService(_api);
+
+    _loadFilters();
+  }
+
   @override
   void dispose() {
     super.dispose();
     _searchController.dispose();
+  }
+
+  Future<void> _loadFilters() async {
+    setState(() => _loadingFilters = true);
+    try {
+      final property = await _propertyService.getAll(limit: 200);
+      final vehicle = await _vehicleService.getAll(limit: 200);
+
+      setState(() {
+        _propertyFilters = property.map((e) => e.title).toList();
+        _vehicleFilters = vehicle.map((e) => e.title).toList();
+      });
+    } catch (_) {
+      // optional: show toast/snackbar
+    } finally {
+      if (mounted) setState(() => _loadingFilters = false);
+    }
   }
 
   void _showCustomFilterModal(BuildContext context) {
@@ -51,6 +91,10 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
 
   @override
   Widget build(BuildContext context) {
+    final filters = widget.selectedView == 0
+        ? _propertyFilters
+        : _vehicleFilters;
+
     return Column(
       children: [
         Row(
@@ -91,11 +135,13 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
           ],
         ),
         const SizedBox(height: 12),
-        Filters(
-          filters: widget.selectedView == 0
-              ? DummyData.propertyCategories
-              : DummyData.vehicleCategories,
-        ),
+        if (_loadingFilters)
+          const SizedBox(
+            height: 40,
+            child: Center(child: CircularProgressIndicator()),
+          )
+        else
+          Filters(filters: filters),
       ],
     );
   }

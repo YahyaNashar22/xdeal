@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xdeal/providers/user_provider.dart';
-import 'package:xdeal/screens/home_screen.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
+import 'package:xdeal/screens/screen_selector.dart';
 import 'package:xdeal/services/auth_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -52,9 +52,9 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _goToHome() {
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const ScreenSelector()),
+    );
   }
 
   void _goToOnboarding() {

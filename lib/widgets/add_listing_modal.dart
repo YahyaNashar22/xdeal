@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/screens/create_car_listing_screen.dart';
 import 'package:xdeal/widgets/custom_appbar.dart';
 
 class AddListingModal extends StatelessWidget {
@@ -31,7 +32,13 @@ class AddListingModal extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 40),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => CreateCarListingScreen(),
+                  ),
+                );
+              },
               child: Text("Add Vehicle"),
             ),
           ),

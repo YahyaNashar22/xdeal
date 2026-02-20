@@ -6,6 +6,7 @@ class User {
   final String plan;
   final bool isAdmin;
   final String token;
+  final String profilePicture;
 
   User({
     required this.id,
@@ -15,6 +16,7 @@ class User {
     required this.plan,
     required this.isAdmin,
     required this.token,
+    required this.profilePicture,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -25,6 +27,7 @@ class User {
     plan: json['plan'],
     isAdmin: json['is_admin'],
     token: json['token'],
+    profilePicture: (json['profile_picture'] ?? '').toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -35,5 +38,6 @@ class User {
     "plan": plan,
     "is_admin": isAdmin,
     "token": token,
+    "profile_picture": profilePicture,
   };
 }
