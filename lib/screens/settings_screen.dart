@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
