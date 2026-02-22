@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:xdeal/models/vehicle_listing.dart';
+import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/services/api_client.dart';
+import 'package:xdeal/services/favorite_vehicle_service.dart';
 import 'package:xdeal/services/vehicle_listing_service.dart';
 
 import 'package:xdeal/screens/dealer_profile_screen.dart';
@@ -41,14 +44,18 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
     ApiClient(baseUrl: 'http://10.0.2.2:5000'),
   );
 
-  void toggleFavorite() {
-    setState(() => _isFavorite = !_isFavorite);
-  }
+  late final FavoriteVehicleService favService = FavoriteVehicleService(
+    ApiClient(baseUrl: 'http://10.0.2.2:5000'),
+  );
+
+  bool _favLoading = false;
 
   @override
   void initState() {
     super.initState();
     _loadVehicle();
+    // after vehicle load, you can check favorite:
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadFavoriteState());
   }
 
   Future<void> _loadVehicle() async {
@@ -67,8 +74,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
         _loading = false;
       });
 
-      // optionally increment views (if you want)
-      // unawaited(_service.incrementViews(widget.vehicleId));
+      unawaited(_service.incrementViews(widget.vehicleId));
 
       _startAutoSlide();
 
@@ -86,6 +92,49 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
         _error = e.toString();
         _loading = false;
       });
+    }
+  }
+
+  Future<void> _loadFavoriteState() async {
+    final user = context.read<UserProvider>().user;
+    if (user == null) return;
+
+    try {
+      final isFav = await favService.isFavorited(user, widget.vehicleId);
+      if (!mounted) return;
+      setState(() => _isFavorite = isFav);
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${error.toString()}'),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating, // Makes it look modern
+        ),
+      );
+    }
+  }
+
+  Future<void> toggleFavoriteBackend() async {
+    final user = context.read<UserProvider>().user;
+    if (user == null) return;
+
+    if (_favLoading) return;
+    setState(() => _favLoading = true);
+
+    try {
+      final newState = await favService.toggle(user, widget.vehicleId);
+      if (!mounted) return;
+      setState(() => _isFavorite = newState);
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${error.toString()}'),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating, // Makes it look modern
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _favLoading = false);
     }
   }
 
@@ -309,7 +358,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                         bottom: 6,
                         right: 6,
                         child: IconButton(
-                          onPressed: toggleFavorite,
+                          onPressed: toggleFavoriteBackend,
                           icon: Icon(
                             _isFavorite
                                 ? Icons.favorite
@@ -709,7 +758,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                         style: ElevatedButton.styleFrom(
                           minimumSize: Size(120, 30),
                         ),
-                        onPressed: toggleFavorite,
+                        onPressed: toggleFavoriteBackend,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [

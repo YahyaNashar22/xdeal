@@ -1,7 +1,11 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/screens/vehicle_viewer_screen.dart';
+import 'package:xdeal/services/api_client.dart';
+import 'package:xdeal/services/favorite_vehicle_service.dart';
 import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
@@ -24,10 +28,47 @@ class VehicleListing extends StatefulWidget {
 
 class _VehicleListingState extends State<VehicleListing> {
   final PageController _pageController = PageController();
+
+  late final FavoriteVehicleService favService = FavoriteVehicleService(
+    ApiClient(baseUrl: 'http://10.0.2.2:5000'),
+  );
+
   int _currentPage = 0;
 
   bool _isFavorite = false;
+  bool _favLoading = false;
   String _location = '';
+
+  Future<void> _loadFavoriteState() async {
+    final user = context.read<UserProvider>().user;
+    if (user == null) return;
+
+    try {
+      final isFav = await favService.isFavorited(user, widget.vehicle['_id']);
+      if (!mounted) return;
+      setState(() => _isFavorite = isFav);
+    } catch (_) {
+      // ignore (or show snackbar)
+    }
+  }
+
+  Future<void> _toggleFavoriteBackend() async {
+    final user = context.read<UserProvider>().user;
+    if (user == null) return;
+
+    if (_favLoading) return;
+    setState(() => _favLoading = true);
+
+    try {
+      final newState = await favService.toggle(user, widget.vehicle['_id']);
+      if (!mounted) return;
+      setState(() => _isFavorite = newState);
+    } catch (_) {
+      // optional: show snackbar
+    } finally {
+      if (mounted) setState(() => _favLoading = false);
+    }
+  }
 
   void _toggleFavorite() {
     setState(() {
@@ -70,6 +111,10 @@ class _VehicleListingState extends State<VehicleListing> {
       widget.vehicle['coords'][1],
     ).then((loc) {
       if (mounted) setState(() => _location = loc);
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadFavoriteState();
     });
   }
 
@@ -144,19 +189,21 @@ class _VehicleListingState extends State<VehicleListing> {
                   Positioned(
                     bottom: 6,
                     right: 6,
-                    child: _isFavorite
-                        ? IconButton(
-                            onPressed: _toggleFavorite,
-                            icon: Icon(Icons.favorite),
-                            color: AppColors.white,
-                          )
-                        : IconButton(
-                            onPressed: _toggleFavorite,
-                            icon: Icon(
-                              Icons.favorite_border,
-                              color: AppColors.white,
+                    child: IconButton(
+                      onPressed: _favLoading ? null : _toggleFavoriteBackend,
+                      icon: _favLoading
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Icon(
+                              _isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
                             ),
-                          ),
+                      color: AppColors.white,
+                    ),
                   ),
                   // featured / sponsored flag
                   if (isSponsored || isFeatured)
