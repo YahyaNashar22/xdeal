@@ -66,6 +66,8 @@ class VehicleListing {
   final String userId;
   final String? userName;
   final String? userEmail;
+  final String? userPhone;
+  final String? userProfilePicture;
 
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -105,6 +107,8 @@ class VehicleListing {
     required this.userId,
     this.userName,
     this.userEmail,
+    this.userPhone,
+    this.userProfilePicture,
     this.createdAt,
     this.updatedAt,
   });
@@ -140,11 +144,15 @@ class VehicleListing {
     String userId = '';
     String? userName;
     String? userEmail;
+    String? userPhone;
+    String? userProfilePicture;
 
     if (rawUser is Map) {
       userId = (rawUser['_id'] ?? rawUser['id'] ?? '').toString();
-      userName = rawUser['name']?.toString();
+      userName = rawUser['full_name']?.toString();
       userEmail = rawUser['email']?.toString();
+      userPhone = rawUser['phone_number']?.toString();
+      userProfilePicture = rawUser['profile_picture']?.toString();
     } else {
       userId = (rawUser ?? '').toString();
     }
@@ -197,6 +205,8 @@ class VehicleListing {
       userId: userId,
       userName: userName,
       userEmail: userEmail,
+      userPhone: userPhone,
+      userProfilePicture: userProfilePicture,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
           : null,
@@ -209,11 +219,13 @@ class VehicleListing {
   /// For create/update requests (send ids, not populated objects)
   Map<String, dynamic> toJson() {
     return {
+      '_id': id,
       'name': name,
       'images': images,
       'price': price,
       'description': description,
       'category': categoryId,
+      'categoryTitle': categoryTitle ?? "not populated",
       'coords': coords,
       'brand': brand,
       'model': model,
@@ -238,7 +250,13 @@ class VehicleListing {
       'is_listed': isListed,
       'on_sale': onSale,
       'number_of_views': numberOfViews,
-      'user_id': userId,
+      'user_id': {
+        '_id': userId,
+        'email': userEmail,
+        'full_name': userName,
+        'phone_number': userPhone,
+        'profile_picture': userProfilePicture,
+      },
     };
   }
 }

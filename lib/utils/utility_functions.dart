@@ -63,11 +63,25 @@ class UtilityFunctions {
 
   // Converts a DateTime to dd/MM/yyyy
   static String formatDate(dynamic date) {
-    final parsedDate = DateTime.parse(date);
-    final day = parsedDate.day.toString().padLeft(2, '0');
-    final month = parsedDate.month.toString().padLeft(2, '0');
-    final year = parsedDate.year.toString();
-    return '$day/$month/$year';
+    if (date == null) return '';
+
+    DateTime? parsedDate;
+
+    if (date is DateTime) {
+      parsedDate = date;
+    } else if (date is String) {
+      try {
+        parsedDate = DateTime.parse(date);
+      } catch (_) {
+        return date; // already formatted or invalid string
+      }
+    } else {
+      return '';
+    }
+
+    return "${parsedDate.day.toString().padLeft(2, '0')}/"
+        "${parsedDate.month.toString().padLeft(2, '0')}/"
+        "${parsedDate.year}";
   }
 
   static Future<void> launchEmail(String email) async {

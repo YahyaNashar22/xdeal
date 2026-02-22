@@ -60,14 +60,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ];
           },
-          body: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            children: [
-              AdsCarousel(),
-              const SizedBox(height: 24),
-              ListingsViewer(selectedView: selectedView),
-              const SizedBox(height: 20),
-            ],
+          body: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                AdsCarousel(),
+                const SizedBox(height: 24),
+
+                // ✅ ListingsViewer must be the scrollable
+                Expanded(child: ListingsViewer(selectedView: selectedView)),
+
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

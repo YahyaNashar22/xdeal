@@ -84,6 +84,7 @@ class _VehicleListingState extends State<VehicleListing> {
     final bool isOnSale = widget.vehicle['on_sale'];
     final bool isFeatured = widget.vehicle['is_featured'];
     final bool isSponsored = widget.vehicle['is_sponsored'];
+
     return InkWell(
       onTap: _handleListingTap,
       child: Column(
@@ -230,7 +231,7 @@ class _VehicleListingState extends State<VehicleListing> {
           ),
           // category
           Text(
-            widget.vehicle['category'],
+            widget.vehicle['categoryTitle'],
             style: TextStyle(
               fontSize: AppTheme.heading2,
               color: AppColors.primary,

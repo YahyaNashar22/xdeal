@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:xdeal/models/vehicle_category.dart';
 import 'package:xdeal/screens/map_picker_screen.dart';
+import 'package:xdeal/screens/screen_selector.dart';
 import 'package:xdeal/services/upload_service.dart';
 import 'package:xdeal/services/vehicle_category_service.dart';
 
@@ -46,6 +47,8 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
   String? _model;
   String _condition = "new"; // new/used
   String? _fuelType;
+  String? _bodyType;
+  String? _transmission_type;
   String? _airConditioning;
   String? _color;
   String _doors = "2/3";
@@ -53,9 +56,6 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
   final List<String> _selectedExtraFeatures = [];
   String? _source;
   String? _paymentOption;
-
-  // Currency
-  String _priceCurrency = "USD";
 
   // Category
   bool _loadingCategories = false;
@@ -89,6 +89,8 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
     "gas",
   ];
   final List<String> _airConds = ["manual", "automatic", "none"];
+  final List<String> _bodyTypes = ["SUV", "Pickup", "Sedan"];
+  final List<String> _transmission_types = ["manual", "automatic"];
   final List<String> _colors = ["Black", "White", "Silver", "Blue", "Red"];
   final List<String> _interiors = [
     "cloth",
@@ -298,7 +300,7 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
       final payload = {
         "name": _titleCtrl.text.trim(),
         "images": imageUrls,
-        "price": "${_priceCurrency} ${_priceCtrl.text.trim()}",
+        "price": _priceCtrl.text.trim(),
         "description": _descriptionCtrl.text.trim(),
         "category": _selectedCategoryId,
         "coords": _coords,
@@ -312,8 +314,8 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
             int.tryParse(_kilometersCtrl.text.replaceAll(",", "").trim()) ?? 0,
         "year": _yearCtrl.text.trim(),
         "fuel_type": _fuelType,
-        "transmission_type": "automatic", // add field to UI if needed
-        "body_type": "suv", // add field to UI if needed
+        "transmission_type": _transmission_type,
+        "body_type": _bodyType,
         "air_conditioning": _airConditioning,
         "color": _color,
         "number_of_seats": int.tryParse(_seatsCtrl.text.trim()) ?? 0,
@@ -594,6 +596,31 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
 
                       const SizedBox(height: 34),
 
+                      _sectionLabel("Body Type", required: true),
+                      _dropdown(
+                        hint: "Choose BodyType",
+                        value: _bodyType,
+                        items: _itemsFromStrings(_bodyTypes),
+                        onChanged: (v) => setState(() => _bodyType = v),
+                        validator: (v) =>
+                            v == null ? "Body Type is required" : null,
+                      ),
+
+                      const SizedBox(height: 34),
+
+                      _sectionLabel("Transmission Type", required: true),
+                      _dropdown(
+                        hint: "Choose TransmissionType",
+                        value: _transmission_type,
+                        items: _itemsFromStrings(_transmission_types),
+                        onChanged: (v) =>
+                            setState(() => _transmission_type = v),
+                        validator: (v) =>
+                            v == null ? "Transmission Type is required" : null,
+                      ),
+
+                      const SizedBox(height: 34),
+
                       _sectionLabel("Air Conditioning"),
                       _dropdown(
                         hint: "Choose Air Conditioning",
@@ -727,68 +754,84 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
                       const SizedBox(height: 14),
 
                       _sectionLabel("Price", required: true),
+                      TextFormField(
+                        controller: _priceCtrl,
+                        keyboardType: TextInputType.number,
+                        decoration: _inputDecoration("Enter Price"),
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? "Price is required"
+                            : null,
+                      ),
+
+                      const SizedBox(height: 32),
+
                       Row(
+                        // alignment: Alignment.centerRight,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                            width: 90,
-                            child: _dropdown(
-                              hint: "USD",
-                              value: _priceCurrency,
-                              items: _itemsFromStrings(["USD", "LBP"]),
-                              onChanged: (v) =>
-                                  setState(() => _priceCurrency = v ?? "USD"),
+                            height: 44,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (_submitting) {
+                                  return;
+                                } else {
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => ScreenSelector(),
+                                    ),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.secondary,
+                                disabledBackgroundColor: Colors.red.withValues(
+                                  alpha: 0.5,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 18,
+                                ),
+                              ),
+                              child: Text("Cancel"),
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: TextFormField(
-                              controller: _priceCtrl,
-                              keyboardType: TextInputType.number,
-                              decoration: _inputDecoration("Enter Price"),
-                              validator: (v) => (v == null || v.trim().isEmpty)
-                                  ? "Price is required"
-                                  : null,
+                          SizedBox(
+                            height: 44,
+                            child: ElevatedButton(
+                              onPressed: _submitting ? null : _submit,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                disabledBackgroundColor: Colors.red.withValues(
+                                  alpha: 0.5,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 18,
+                                ),
+                              ),
+                              child: _submitting
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text(
+                                      "Post Now",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
                             ),
                           ),
                         ],
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: SizedBox(
-                          height: 44,
-                          child: ElevatedButton(
-                            onPressed: _submitting ? null : _submit,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              disabledBackgroundColor: Colors.red.withValues(
-                                alpha: 0.5,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              elevation: 0,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                              ),
-                            ),
-                            child: _submitting
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Text(
-                                    "Post Now",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                          ),
-                        ),
                       ),
 
                       const SizedBox(height: 14),

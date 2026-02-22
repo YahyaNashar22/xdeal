@@ -1,7 +1,10 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:xdeal/dummy_data.dart';
+
+import 'package:xdeal/models/vehicle_listing.dart';
+import 'package:xdeal/services/api_client.dart';
+import 'package:xdeal/services/vehicle_listing_service.dart';
+
 import 'package:xdeal/screens/dealer_profile_screen.dart';
 import 'package:xdeal/screens/full_screen_image_viewer.dart';
 import 'package:xdeal/utils/app_colors.dart';
@@ -23,32 +26,79 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
   int _currentPage = 0;
   Timer? _timer;
 
-  Map<String, dynamic>? _vehicle;
+  // backend state
+  VehicleListing? _vehicle;
+  bool _loading = true;
+  String? _error;
+
   bool _isFavorite = false;
   String _location = '';
   bool isExpanded = false;
 
+  // inject your ApiClient however you do it in the app (Provider/GetIt/etc).
+  // For now: create it here (replace with your real instance).
+  late final VehicleListingService _service = VehicleListingService(
+    ApiClient(baseUrl: 'http://10.0.2.2:5000'),
+  );
+
   void toggleFavorite() {
-    setState(() {
-      _isFavorite = !_isFavorite;
-    });
+    setState(() => _isFavorite = !_isFavorite);
   }
 
   @override
   void initState() {
     super.initState();
+    _loadVehicle();
+  }
+
+  Future<void> _loadVehicle() async {
     setState(() {
-      _vehicle = DummyData.vehiclesListings
-          .where((v) => v['_id'] == widget.vehicleId)
-          .first;
+      _loading = true;
+      _error = null;
     });
-    // auto slide every 2 seconds
-    _timer = Timer.periodic(const Duration(seconds: 2), (Timer timer) {
-      if (_currentPage < _vehicle!['images'].length - 1) {
-        _currentPage++;
-      } else {
-        _currentPage = 0;
+
+    try {
+      final v = await _service.getById(widget.vehicleId);
+
+      if (!mounted) return;
+
+      setState(() {
+        _vehicle = v;
+        _loading = false;
+      });
+
+      // optionally increment views (if you want)
+      // unawaited(_service.incrementViews(widget.vehicleId));
+
+      _startAutoSlide();
+
+      // reverse geolocation
+      if (v.coords.length >= 2) {
+        final loc = await UtilityFunctions.getLocationFromCoordinatesGoogle(
+          v.coords[0],
+          v.coords[1],
+        );
+        if (mounted) setState(() => _location = loc);
       }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
+        _loading = false;
+      });
+    }
+  }
+
+  void _startAutoSlide() {
+    _timer?.cancel();
+
+    final images = _vehicle?.images ?? const <String>[];
+    if (images.length <= 1) return;
+
+    _timer = Timer.periodic(const Duration(seconds: 2), (Timer timer) {
+      if (!mounted) return;
+      final len = images.length;
+      _currentPage = (_currentPage + 1) % len;
 
       _pageController.animateToPage(
         _currentPage,
@@ -56,12 +106,6 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
         curve: Curves.easeInOut,
       );
     });
-
-    // reverse geolocation
-    UtilityFunctions.getLocationFromCoordinatesGoogle(
-      _vehicle!['coords'][0],
-      _vehicle!['coords'][1],
-    ).then((loc) => setState(() => _location = loc));
   }
 
   @override
@@ -71,10 +115,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
     super.dispose();
   }
 
-  void _showPhonePopup(BuildContext context) {
-    // Extracting the phone number for readability
-    final String phoneNumber = _vehicle!['owner_id']['phone'] ?? 'Unknown';
-
+  void _showPhonePopup(BuildContext context, String phoneNumber) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -85,19 +126,17 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
           title: const Text("Contact Owner"),
           content: Text("Would you like to call $phoneNumber?"),
           actions: [
-            // Cancel Button
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
             ),
-            // Call Button
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary, // Using your app color
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
-                Navigator.pop(context); // Close the popup first
+                Navigator.pop(context);
                 UtilityFunctions.launchCall(phoneNumber);
               },
               child: const Text("Call Now"),
@@ -110,20 +149,67 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isOnSale = _vehicle!['on_sale'];
-    final bool isFeatured = _vehicle!['is_featured'];
-    final bool isSponsored = _vehicle!['is_sponsored'];
+    if (_loading) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.white,
+          leading: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: Icon(Icons.arrow_back, color: AppColors.black),
+          ),
+          title: Text(
+            'Vehicle Viewer',
+            style: TextStyle(color: AppColors.black),
+          ),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_error != null) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.white,
+          leading: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: Icon(Icons.arrow_back, color: AppColors.black),
+          ),
+          title: Text(
+            'Vehicle Viewer',
+            style: TextStyle(color: AppColors.black),
+          ),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_error!, textAlign: TextAlign.center),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: _loadVehicle,
+                child: const Text("Retry"),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final v = _vehicle!;
+    final bool isOnSale = v.onSale == true;
+    final bool isFeatured = v.isFeatured == true;
+    final bool isSponsored = v.isSponsored == true;
 
     void handleBottomNavTap(int index) {
       switch (index) {
         case 0:
-          UtilityFunctions.launchEmail(_vehicle!['owner_id']['email']);
+          UtilityFunctions.launchEmail(v.userEmail ?? "no email");
           break;
         case 1:
-          _showPhonePopup(context);
+          _showPhonePopup(context, v.userPhone ?? 'no phone');
           break;
         case 2:
-          UtilityFunctions.launchWhatsApp(_vehicle!['owner_id']['phone']);
+          UtilityFunctions.launchWhatsApp(v.userPhone ?? "no phone");
           break;
       }
     }
@@ -146,11 +232,11 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
       bottomNavigationBar: BottomNavigationBar(
         onTap: handleBottomNavTap,
         items: [
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.email_outlined),
             label: 'Email',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.phone_forwarded_outlined),
             label: 'Phone',
           ),
@@ -163,23 +249,18 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // gallery
               SizedBox(
                 height: 200,
                 child: ClipRRect(
                   child: Stack(
                     children: [
-                      // slide show
                       PageView.builder(
                         controller: _pageController,
-                        itemCount: _vehicle!['images'].length,
+                        itemCount: v.images.length,
                         onPageChanged: (int index) {
-                          setState(() {
-                            _currentPage = index;
-                          });
+                          setState(() => _currentPage = index);
                         },
                         itemBuilder: (context, index) {
                           return GestureDetector(
@@ -188,30 +269,27 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => FullScreenImageViewer(
-                                    images: _vehicle!['images'],
+                                    images: v.images,
                                     initialIndex: index,
                                   ),
                                 ),
                               );
                             },
                             child: Image.network(
-                              _vehicle!['images'][index],
+                              v.images[index],
                               fit: BoxFit.cover,
                               width: double.infinity,
                             ),
                           );
                         },
                       ),
-                      // dots indicator
                       Positioned(
                         bottom: 12,
                         left: 0,
                         right: 0,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(_vehicle!['images'].length, (
-                            index,
-                          ) {
+                          children: List.generate(v.images.length, (index) {
                             return AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
                               margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -227,22 +305,19 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                           }),
                         ),
                       ),
-                      // favorite icon
                       Positioned(
                         bottom: 6,
                         right: 6,
-                        child: _isFavorite
-                            ? IconButton(
-                                onPressed: toggleFavorite,
-                                icon: Icon(Icons.favorite),
-                                color: AppColors.primary,
-                              )
-                            : IconButton(
-                                onPressed: toggleFavorite,
-                                icon: Icon(Icons.favorite_border),
-                              ),
+                        child: IconButton(
+                          onPressed: toggleFavorite,
+                          icon: Icon(
+                            _isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                          ),
+                          color: _isFavorite ? AppColors.primary : null,
+                        ),
                       ),
-                      // featured / sponsored flag
                       if (isSponsored || isFeatured)
                         Positioned(
                           top: 6,
@@ -266,7 +341,6 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                             ),
                           ),
                         ),
-                      // sale flag
                       if (isOnSale)
                         Positioned(
                           bottom: 6,
@@ -294,6 +368,10 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                   ),
                 ),
               ),
+
+              // ...keep the rest of your UI exactly the same,
+              // but replace `_vehicle!['field']` with `v.field`
+              // and `owner_id` with `v.ownerId` etc.
               const SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -310,13 +388,13 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                       ),
                     ),
                     Text(
-                      "\$${UtilityFunctions.formatPrice(_vehicle!['price'])}",
+                      "\$${UtilityFunctions.formatPrice(_vehicle!.price)}",
                       style: TextStyle(color: AppColors.primary, fontSize: 16),
                     ),
                     const SizedBox(height: 12),
                     // name
                     Text(
-                      _vehicle!['name'],
+                      _vehicle!.name,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 24,
@@ -329,9 +407,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                       children: [
                         TextButton(
                           onPressed: () {
-                            UtilityFunctions.openMapsAtCoords(
-                              _vehicle!['coords'],
-                            );
+                            UtilityFunctions.openMapsAtCoords(_vehicle!.coords);
                           },
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,
@@ -355,7 +431,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                           ),
                         ),
                         Text(
-                          UtilityFunctions.formatDate(_vehicle!['createdAt']),
+                          UtilityFunctions.formatDate(_vehicle!.createdAt),
                           style: TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
@@ -382,7 +458,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  _vehicle!['year'],
+                                  _vehicle!.year,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -397,7 +473,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  _vehicle!['fuel_type'],
+                                  _vehicle!.fuelType,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -412,7 +488,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  _vehicle!['kilometers'].toString(),
+                                  _vehicle!.kilometers.toString(),
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -433,7 +509,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  _vehicle!['condition'],
+                                  _vehicle!.condition,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -448,7 +524,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  _vehicle!['transmission_type'],
+                                  _vehicle!.transmissionType,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -471,52 +547,52 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                     const SizedBox(height: 12),
                     VehicleOption(
                       optionName: "Brand",
-                      optionValue: _vehicle!['brand'],
+                      optionValue: _vehicle!.brand,
                     ),
                     const SizedBox(height: 12),
                     VehicleOption(
                       optionName: "Color",
-                      optionValue: _vehicle!['color'],
+                      optionValue: _vehicle!.color,
                     ),
                     const SizedBox(height: 12),
                     VehicleOption(
                       optionName: "Brand",
-                      optionValue: _vehicle!['brand'],
+                      optionValue: _vehicle!.brand,
                     ),
                     const SizedBox(height: 12),
                     VehicleOption(
                       optionName: "Number of doors",
-                      optionValue: _vehicle!['number_of_doors'],
+                      optionValue: _vehicle!.numberOfDoors,
                     ),
                     const SizedBox(height: 12),
                     VehicleOption(
                       optionName: "Model",
-                      optionValue: _vehicle!['model'],
+                      optionValue: _vehicle!.model,
                     ),
                     const SizedBox(height: 12),
                     VehicleOption(
                       optionName: "Number of Seats",
-                      optionValue: _vehicle!['number_of_seats'],
+                      optionValue: _vehicle!.numberOfSeats,
                     ),
                     const SizedBox(height: 12),
                     VehicleOption(
                       optionName: "Air Conditioning",
-                      optionValue: _vehicle!['air_conditioning'],
+                      optionValue: _vehicle!.airConditioning,
                     ),
                     const SizedBox(height: 12),
                     VehicleOption(
                       optionName: "Interior",
-                      optionValue: _vehicle!['interior'],
+                      optionValue: _vehicle!.interior,
                     ),
                     const SizedBox(height: 12),
                     VehicleOption(
                       optionName: "Body Type",
-                      optionValue: _vehicle!['body_type'],
+                      optionValue: _vehicle!.bodyType,
                     ),
                     const SizedBox(height: 12),
                     VehicleOption(
                       optionName: "Payment Option",
-                      optionValue: _vehicle!['payment_option'],
+                      optionValue: _vehicle!.paymentOption,
                     ),
                     const SizedBox(height: 24),
                     // Description
@@ -524,7 +600,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                       builder: (context, constraints) {
                         // Create a TextPainter to calculate the size of the text
                         final span = TextSpan(
-                          text: _vehicle!['description'],
+                          text: _vehicle!.description,
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.black87,
@@ -547,7 +623,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _vehicle!['description'],
+                              _vehicle!.description,
                               // When not expanded, show only 2 lines. When expanded, show everything.
                               maxLines: isExpanded ? null : 2,
                               overflow: isExpanded
@@ -612,10 +688,9 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                       shrinkWrap: true,
                       physics:
                           const NeverScrollableScrollPhysics(), // disable its own scrolling
-                      itemCount: _vehicle!['extra_features'].length,
+                      itemCount: _vehicle!.extraFeatures.length,
                       itemBuilder: (context, index) {
-                        final String feature =
-                            _vehicle!['extra_features'][index];
+                        final String feature = _vehicle!.extraFeatures[index];
 
                         return Column(
                           children: [
@@ -660,7 +735,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                     ClipRRect(
                       borderRadius: BorderRadiusGeometry.circular(12),
                       child: Image.network(
-                        _vehicle!['owner_id']['profile_picture'],
+                        "http://10.0.2.2:5000${_vehicle!.userProfilePicture!}",
                         width: 100,
                       ),
                     ),
@@ -670,7 +745,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _vehicle!['owner_id']['full_name'],
+                          _vehicle!.userName ?? "Unknown",
                           style: TextStyle(fontSize: 24),
                         ),
                         TextButton(
@@ -678,7 +753,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => DealerProfileScreen(
-                                  dealerId: _vehicle!['owner_id']['_id'],
+                                  dealerId: _vehicle!.userId,
                                 ),
                               ),
                             );

@@ -610,7 +610,8 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                     ),
 
                     const SizedBox(height: 24),
-                    ListingMapPreview(listing: _property!),
+                    // TODO: FIX THIS FOR PROPERTY
+                    // ListingMapPreview(listing: _property!),
                     const SizedBox(height: 24),
                     const Text(
                       "Features",
