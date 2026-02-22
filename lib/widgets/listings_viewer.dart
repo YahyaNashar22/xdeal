@@ -278,7 +278,7 @@ class _ListingsViewerState extends State<ListingsViewer> {
         // Your existing widget expects a Map; you should update it to accept VehicleListing.
         // If you can't, convert to map via toJson().
         return w.VehicleListing(
-          vehicle: listing.toJson(),
+          vehicle: listing,
           isDealerProfile: widget.isDealerProfile,
           isUploaderViewing: widget.isUploaderViewing,
         );

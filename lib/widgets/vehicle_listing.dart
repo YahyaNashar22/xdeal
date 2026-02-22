@@ -10,9 +10,10 @@ import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
 import 'package:xdeal/widgets/user_view_listing_modal.dart';
+import 'package:xdeal/models/vehicle_listing.dart' as model;
 
 class VehicleListing extends StatefulWidget {
-  final Map<String, dynamic> vehicle;
+  final model.VehicleListing vehicle;
   final bool isDealerProfile;
   final bool isUploaderViewing;
   const VehicleListing({
@@ -44,7 +45,7 @@ class _VehicleListingState extends State<VehicleListing> {
     if (user == null) return;
 
     try {
-      final isFav = await favService.isFavorited(user, widget.vehicle['_id']);
+      final isFav = await favService.isFavorited(user, widget.vehicle.id);
       if (!mounted) return;
       setState(() => _isFavorite = isFav);
     } catch (_) {
@@ -60,7 +61,7 @@ class _VehicleListingState extends State<VehicleListing> {
     setState(() => _favLoading = true);
 
     try {
-      final newState = await favService.toggle(user, widget.vehicle['_id']);
+      final newState = await favService.toggle(user, widget.vehicle.id);
       if (!mounted) return;
       setState(() => _isFavorite = newState);
     } catch (_) {
@@ -70,18 +71,12 @@ class _VehicleListingState extends State<VehicleListing> {
     }
   }
 
-  void _toggleFavorite() {
-    setState(() {
-      _isFavorite = !_isFavorite;
-    });
-  }
-
   void _handleListingTap() {
     if (!widget.isUploaderViewing) {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) =>
-              VehicleViewerScreen(vehicleId: widget.vehicle['_id']),
+              VehicleViewerScreen(vehicleId: widget.vehicle.id),
         ),
       );
     } else {
@@ -94,7 +89,7 @@ class _VehicleListingState extends State<VehicleListing> {
         builder: (context) {
           return UserViewListingModal(
             listingType: 1,
-            listingId: widget.vehicle['_id'],
+            listingId: widget.vehicle.id,
           ); // reuse your screen widget here
         },
       );
@@ -107,8 +102,8 @@ class _VehicleListingState extends State<VehicleListing> {
 
     // reverse geolocation
     UtilityFunctions.getLocationFromCoordinatesGoogle(
-      widget.vehicle['coords'][0],
-      widget.vehicle['coords'][1],
+      widget.vehicle.coords[0],
+      widget.vehicle.coords[1],
     ).then((loc) {
       if (mounted) setState(() => _location = loc);
     });
@@ -126,9 +121,9 @@ class _VehicleListingState extends State<VehicleListing> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isOnSale = widget.vehicle['on_sale'];
-    final bool isFeatured = widget.vehicle['is_featured'];
-    final bool isSponsored = widget.vehicle['is_sponsored'];
+    final bool isOnSale = widget.vehicle.onSale;
+    final bool isFeatured = widget.vehicle.isFeatured;
+    final bool isSponsored = widget.vehicle.isSponsored;
 
     return InkWell(
       onTap: _handleListingTap,
@@ -145,7 +140,7 @@ class _VehicleListingState extends State<VehicleListing> {
                   // slide show
                   PageView.builder(
                     controller: _pageController,
-                    itemCount: math.min(widget.vehicle['images'].length, 3),
+                    itemCount: math.min(widget.vehicle.images.length, 3),
                     onPageChanged: (int index) {
                       setState(() {
                         _currentPage = index;
@@ -153,7 +148,7 @@ class _VehicleListingState extends State<VehicleListing> {
                     },
                     itemBuilder: (context, index) {
                       return Image.network(
-                        widget.vehicle['images'][index],
+                        widget.vehicle.images[index],
                         fit: BoxFit.cover,
                         width: double.infinity,
                       );
@@ -167,7 +162,7 @@ class _VehicleListingState extends State<VehicleListing> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
-                        math.min(widget.vehicle['images'].length, 3),
+                        math.min(widget.vehicle.images.length, 3),
                         (index) {
                           return AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
@@ -260,7 +255,7 @@ class _VehicleListingState extends State<VehicleListing> {
           const SizedBox(height: 12),
           // price
           Text(
-            "USD ${UtilityFunctions.formatPrice(widget.vehicle['price'])}",
+            "USD ${UtilityFunctions.formatPrice(widget.vehicle.price)}",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: AppTheme.heading1,
@@ -268,7 +263,7 @@ class _VehicleListingState extends State<VehicleListing> {
           ),
           // name + model
           Text(
-            widget.vehicle['name'],
+            widget.vehicle.name,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: AppTheme.heading2,
@@ -278,7 +273,7 @@ class _VehicleListingState extends State<VehicleListing> {
           ),
           // category
           Text(
-            widget.vehicle['categoryTitle'],
+            widget.vehicle.categoryTitle!,
             style: TextStyle(
               fontSize: AppTheme.heading2,
               color: AppColors.primary,
@@ -290,7 +285,7 @@ class _VehicleListingState extends State<VehicleListing> {
             children: [
               TextButton(
                 onPressed: () {
-                  UtilityFunctions.openMapsAtCoords(widget.vehicle['coords']);
+                  UtilityFunctions.openMapsAtCoords(widget.vehicle.coords);
                 },
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
@@ -307,7 +302,7 @@ class _VehicleListingState extends State<VehicleListing> {
                 ),
               ),
               Text(
-                UtilityFunctions.formatDate(widget.vehicle['createdAt']),
+                UtilityFunctions.formatDate(widget.vehicle.createdAt),
                 style: TextStyle(
                   color: AppColors.primary,
                   fontWeight: FontWeight.bold,
@@ -338,7 +333,7 @@ class _VehicleListingState extends State<VehicleListing> {
                     Icon(Icons.calendar_today, color: AppColors.primary),
                     const SizedBox(width: 4),
                     Text(
-                      widget.vehicle['year'].toString(),
+                      widget.vehicle.year.toString(),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -365,7 +360,7 @@ class _VehicleListingState extends State<VehicleListing> {
                     Icon(Icons.edit_road_outlined, color: AppColors.primary),
                     const SizedBox(width: 4),
                     Text(
-                      widget.vehicle['kilometers'].toString(),
+                      widget.vehicle.kilometers.toString(),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -395,7 +390,7 @@ class _VehicleListingState extends State<VehicleListing> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      widget.vehicle['fuel_type'],
+                      widget.vehicle.fuelType,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -414,7 +409,7 @@ class _VehicleListingState extends State<VehicleListing> {
               children: [
                 InkWell(
                   onTap: () => UtilityFunctions.launchEmail(
-                    widget.vehicle['owner_id']['email'],
+                    widget.vehicle.userEmail ?? "no email",
                   ),
                   child: Container(
                     height: 40,
@@ -477,7 +472,7 @@ class _VehicleListingState extends State<VehicleListing> {
                 ),
                 InkWell(
                   onTap: () => UtilityFunctions.launchWhatsApp(
-                    widget.vehicle['owner_id']['phone'],
+                    widget.vehicle.userPhone ?? "no phone",
                   ),
                   child: Container(
                     width: 120,
@@ -503,7 +498,7 @@ class _VehicleListingState extends State<VehicleListing> {
 
   void _showPhonePopup(BuildContext context) {
     // Extracting the phone number for readability
-    final String phoneNumber = widget.vehicle['owner_id']['phone'] ?? 'Unknown';
+    final String phoneNumber = widget.vehicle.userPhone ?? 'no phone';
 
     showDialog(
       context: context,
