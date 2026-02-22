@@ -23,6 +23,10 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   // 1 -> vehicles
   int _selectedView = 0;
 
+  // filters state
+  String _q = '';
+  String? _categoryId;
+
   void _selectView(int view) {
     setState(() {
       setState(() {
@@ -72,6 +76,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                     ListingsViewer(
                       selectedView: _selectedView,
                       onlyFavorites: true,
+                      q: _q,
+                      categoryId: _categoryId,
                     ),
                   ],
                 ),

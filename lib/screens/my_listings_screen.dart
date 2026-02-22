@@ -15,6 +15,11 @@ class MyListingsScreen extends StatefulWidget {
 
 class _MyListingsScreenState extends State<MyListingsScreen> {
   int _selectedView = 0;
+
+  // filters state
+  String _q = '';
+  String? _categoryId;
+
   int _selectedFilter = 0;
 
   void _toggleView(index) {
@@ -74,6 +79,9 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                       filter: _selectedFilter == 1
                           ? ListingFilter.notListed
                           : ListingFilter.newest,
+
+                      q: _q,
+                      categoryId: _categoryId,
                     ),
                   ],
                 ),

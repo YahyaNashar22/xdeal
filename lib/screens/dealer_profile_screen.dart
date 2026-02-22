@@ -20,6 +20,10 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
   // 1 -> vehicles
   int _selectedView = 0;
 
+  // filters state
+  String _q = '';
+  String? _categoryId;
+
   ListingFilter _selectedFilter = ListingFilter.none;
 
   void _selectView(int view) {
@@ -280,6 +284,8 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
                   selectedView: _selectedView,
                   isDealerProfile: true,
                   filter: _selectedFilter,
+                  q: _q,
+                  categoryId: _categoryId,
                 ),
               ],
             ),

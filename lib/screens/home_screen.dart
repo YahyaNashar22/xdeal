@@ -16,10 +16,37 @@ class _HomeScreenState extends State<HomeScreen> {
   // view index for properties and vehicles
   int selectedView = 0;
 
+  // filters state
+  String _q = '';
+  String? _categoryId;
+
   // change view between properties and vehicles
   void selectView(int index) {
     setState(() {
       selectedView = index;
+
+      // reset filters when switching tabs
+      _q = '';
+      _categoryId = null;
+    });
+  }
+
+  void _onFiltersChanged(String q, String? categoryId) {
+    if (!mounted) return;
+
+    // avoid useless rebuilds
+    if (_q == q && _categoryId == categoryId) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      // check again (in case multiple callbacks queued)
+      if (_q == q && _categoryId == categoryId) return;
+
+      setState(() {
+        _q = q;
+        _categoryId = categoryId;
+      });
     });
   }
 
@@ -51,7 +78,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           selectView: selectView,
                         ),
                         const SizedBox(height: 12),
-                        SearchBarAndFilter(selectedView: selectedView),
+                        SearchBarAndFilter(
+                          selectedView: selectedView,
+                          onChanged: _onFiltersChanged,
+                        ),
                       ],
                     ),
                   ),
@@ -68,7 +98,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 24),
 
                 // ✅ ListingsViewer must be the scrollable
-                Expanded(child: ListingsViewer(selectedView: selectedView)),
+                Expanded(
+                  child: ListingsViewer(
+                    selectedView: selectedView,
+                    q: _q,
+                    categoryId: _categoryId,
+                  ),
+                ),
 
                 const SizedBox(height: 20),
               ],

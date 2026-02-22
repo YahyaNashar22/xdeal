@@ -1,5 +1,6 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:xdeal/dummy_data.dart';
 import 'package:xdeal/services/api_client.dart';
 import 'package:xdeal/services/property_category_service.dart';
 import 'package:xdeal/services/vehicle_category_service.dart';
@@ -7,12 +8,26 @@ import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/filters.dart';
 
+class CategoryItem {
+  final String id;
+  final String title;
+  CategoryItem({required this.id, required this.title});
+}
+
 // TODO: implement search bar and filter functionality
 // TODO: fetch filters from backend
 
 class SearchBarAndFilter extends StatefulWidget {
   final int selectedView;
-  const SearchBarAndFilter({super.key, required this.selectedView});
+
+  /// called whenever search/category changes
+  final void Function(String q, String? categoryId) onChanged;
+
+  const SearchBarAndFilter({
+    super.key,
+    required this.selectedView,
+    required this.onChanged,
+  });
 
   @override
   State<SearchBarAndFilter> createState() => _SearchBarAndFilterState();
@@ -26,8 +41,11 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
   late final PropertyCategoryService _propertyService;
 
   bool _loadingFilters = false;
-  List<String> _propertyFilters = [];
-  List<String> _vehicleFilters = [];
+  List<CategoryItem> _propertyCategories = [];
+  List<CategoryItem> _vehicleCategories = [];
+
+  String? _selectedCategoryId;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -44,7 +62,16 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
   @override
   void dispose() {
     super.dispose();
+    _debounce?.cancel();
     _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      widget.onChanged(value.trim(), _selectedCategoryId);
+    });
   }
 
   Future<void> _loadFilters() async {
@@ -53,12 +80,20 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
       final property = await _propertyService.getAll(limit: 200);
       final vehicle = await _vehicleService.getAll(limit: 200);
 
+      if (!mounted) return;
+
       setState(() {
-        _propertyFilters = property.map((e) => e.title).toList();
-        _vehicleFilters = vehicle.map((e) => e.title).toList();
+        _propertyCategories = property
+            .map((e) => CategoryItem(id: e.id, title: e.title))
+            .toList();
+
+        _vehicleCategories = vehicle
+            .map((e) => CategoryItem(id: e.id, title: e.title))
+            .toList();
+
+        // reset selected category when switching view later
+        _selectedCategoryId = null;
       });
-    } catch (_) {
-      // optional: show toast/snackbar
     } finally {
       if (mounted) setState(() => _loadingFilters = false);
     }
@@ -90,10 +125,22 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
   }
 
   @override
+  void didUpdateWidget(covariant SearchBarAndFilter oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedView != widget.selectedView) {
+      setState(() => _selectedCategoryId = null);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        widget.onChanged(_searchController.text.trim(), null);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final filters = widget.selectedView == 0
-        ? _propertyFilters
-        : _vehicleFilters;
+    final cats = widget.selectedView == 0
+        ? _propertyCategories
+        : _vehicleCategories;
 
     return Column(
       children: [
@@ -112,6 +159,7 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                 height: 48,
                 child: TextField(
                   controller: _searchController,
+                  onChanged: _onSearchChanged,
                   style: TextStyle(color: AppTheme.primaryColor),
                   decoration: InputDecoration(
                     hintText: "Lebanon",
@@ -141,8 +189,48 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
             child: Center(child: CircularProgressIndicator()),
           )
         else
-          Filters(filters: filters),
+          _buildCategoryChips(cats),
       ],
+    );
+  }
+
+  Widget _buildCategoryChips(List<CategoryItem> cats) {
+    return SizedBox(
+      height: 40,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: cats.length + 1,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          // "All" chip
+          if (index == 0) {
+            final selected = _selectedCategoryId == null;
+            return ChoiceChip(
+              label: const Text('All'),
+              selected: selected,
+              onSelected: (_) {
+                setState(() => _selectedCategoryId = null);
+                widget.onChanged(_searchController.text.trim(), null);
+              },
+            );
+          }
+
+          final c = cats[index - 1];
+          final selected = _selectedCategoryId == c.id;
+
+          return ChoiceChip(
+            label: Text(c.title),
+            selected: selected,
+            onSelected: (_) {
+              setState(() => _selectedCategoryId = selected ? null : c.id);
+              widget.onChanged(
+                _searchController.text.trim(),
+                _selectedCategoryId,
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

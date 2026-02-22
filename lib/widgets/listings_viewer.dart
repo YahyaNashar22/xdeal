@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:xdeal/providers/user_provider.dart';
 
 import 'package:xdeal/services/api_client.dart';
 import 'package:xdeal/services/vehicle_listing_service.dart';
 import 'package:xdeal/models/vehicle_listing.dart' as model;
 
 import 'package:xdeal/widgets/vehicle_listing.dart' as w;
-import 'package:xdeal/widgets/property_listing.dart'; // keep for selectedView == 0
 
 enum ListingFilter { none, newest, cheapest, expensive, notListed }
 
@@ -18,9 +15,14 @@ class ListingsViewer extends StatefulWidget {
   final bool onlyFavorites;
   final ListingFilter filter;
 
+  final String q;
+  final String? categoryId;
+
   const ListingsViewer({
     super.key,
     required this.selectedView,
+    required this.q,
+    required this.categoryId,
     this.isDealerProfile = false,
     this.isUploaderViewing = false,
     this.onlyFavorites = false,
@@ -49,7 +51,6 @@ class _ListingsViewerState extends State<ListingsViewer> {
   void initState() {
     super.initState();
 
-    // If you already have a singleton ApiClient, use it instead.
     _api = ApiClient(baseUrl: 'http://10.0.2.2:5000');
     _vehicleService = VehicleListingService(_api);
 
@@ -62,12 +63,15 @@ class _ListingsViewerState extends State<ListingsViewer> {
   void didUpdateWidget(covariant ListingsViewer oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // If view/filter changes, reset and refetch
     final viewChanged = oldWidget.selectedView != widget.selectedView;
     final filterChanged = oldWidget.filter != widget.filter;
     final favChanged = oldWidget.onlyFavorites != widget.onlyFavorites;
 
-    if (viewChanged || filterChanged || favChanged) {
+    // ✅ these were missing
+    final qChanged = oldWidget.q != widget.q;
+    final catChanged = oldWidget.categoryId != widget.categoryId;
+
+    if (viewChanged || filterChanged || favChanged || qChanged || catChanged) {
       _resetAndRefetch();
     }
   }
@@ -83,43 +87,46 @@ class _ListingsViewerState extends State<ListingsViewer> {
     if (!_hasMore || _loadingMore || _loadingFirstPage) return;
 
     final position = _scrollController.position;
-    // Load more when 250px near bottom
     if (position.pixels >= position.maxScrollExtent - 250) {
       _fetchMore();
     }
   }
 
   Future<void> _resetAndRefetch() async {
+    if (!mounted) return;
+
     setState(() {
       _vehicles.clear();
       _page = 1;
       _hasMore = true;
       _error = null;
     });
+
+    // reset scroll so user sees new results from top
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(0);
+    }
+
     await _fetchFirstPage();
   }
 
-  // Map your UI filters to backend sort
   ({String sortBy, String sortDir, bool? isListed}) _filterToQuery() {
     switch (widget.filter) {
       case ListingFilter.newest:
         return (sortBy: "createdAt", sortDir: "desc", isListed: true);
       case ListingFilter.cheapest:
-        // if your backend sorts by "price", ensure it's numeric in DB
         return (sortBy: "price", sortDir: "asc", isListed: true);
       case ListingFilter.expensive:
         return (sortBy: "price", sortDir: "desc", isListed: true);
       case ListingFilter.notListed:
         return (sortBy: "createdAt", sortDir: "desc", isListed: false);
       case ListingFilter.none:
-        // default: only listed (your old behavior)
         return (sortBy: "createdAt", sortDir: "desc", isListed: true);
     }
   }
 
   Future<void> _fetchFirstPage() async {
-    if (widget.selectedView != 1)
-      return; // vehicles only in this implementation
+    if (widget.selectedView != 1) return;
 
     setState(() {
       _loadingFirstPage = true;
@@ -129,25 +136,29 @@ class _ListingsViewerState extends State<ListingsViewer> {
     try {
       final f = _filterToQuery();
 
+      // ✅ pass q + categoryId
       final items = await _vehicleService.getAll(
         page: 1,
         limit: _limit,
+        q: widget.q.trim().isEmpty ? null : widget.q.trim(),
+        categoryId: widget.categoryId,
         isListed: f.isListed,
         sortBy: f.sortBy,
         sortDir: f.sortDir,
       );
 
-      // Client-side favorites filtering (only if you have that data)
       final filtered = widget.onlyFavorites ? _applyFavorites(items) : items;
 
+      if (!mounted) return;
       setState(() {
         _vehicles
           ..clear()
           ..addAll(filtered);
         _page = 1;
-        _hasMore = items.length == _limit; // heuristic
+        _hasMore = items.length == _limit;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _loadingFirstPage = false);
@@ -156,6 +167,7 @@ class _ListingsViewerState extends State<ListingsViewer> {
 
   Future<void> _fetchMore() async {
     if (widget.selectedView != 1) return;
+    if (_loadingMore || _loadingFirstPage || !_hasMore) return;
 
     setState(() {
       _loadingMore = true;
@@ -166,9 +178,12 @@ class _ListingsViewerState extends State<ListingsViewer> {
       final nextPage = _page + 1;
       final f = _filterToQuery();
 
+      // ✅ pass q + categoryId here too
       final items = await _vehicleService.getAll(
         page: nextPage,
         limit: _limit,
+        q: widget.q.trim().isEmpty ? null : widget.q.trim(),
+        categoryId: widget.categoryId,
         isListed: f.isListed,
         sortBy: f.sortBy,
         sortDir: f.sortDir,
@@ -176,34 +191,27 @@ class _ListingsViewerState extends State<ListingsViewer> {
 
       final filtered = widget.onlyFavorites ? _applyFavorites(items) : items;
 
+      if (!mounted) return;
       setState(() {
         _vehicles.addAll(filtered);
         _page = nextPage;
         _hasMore = items.length == _limit;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _loadingMore = false);
     }
   }
 
-  // Adjust this to match your real favorite system
   List<model.VehicleListing> _applyFavorites(List<model.VehicleListing> items) {
-    // Option A: if model has `isFavorite`
-    // return items.where((x) => x.isFavorite == true).toList();
-
-    // Option B: if favorites stored in a provider (recommended)
-    // final favIds = context.read<FavoritesProvider>().vehicleIds;
-    // return items.where((x) => favIds.contains(x.id)).toList();
-
-    // For now: no-op (keeps behavior but won’t filter)
+    // currently no-op (you can wire it to FavoriteVehicleService later)
     return items;
   }
 
   @override
   Widget build(BuildContext context) {
-    // Properties still using dummy widgets (you can add a PropertyListingService later)
     if (widget.selectedView == 0) {
       return const Center(
         child: Padding(
@@ -245,7 +253,7 @@ class _ListingsViewerState extends State<ListingsViewer> {
           padding: const EdgeInsets.all(24.0),
           child: Text(
             'No current listings',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
         ),
       );
@@ -255,7 +263,7 @@ class _ListingsViewerState extends State<ListingsViewer> {
       controller: _scrollController,
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.only(bottom: 24),
-      itemCount: _vehicles.length + 1, // +1 for footer loader
+      itemCount: _vehicles.length + 1,
       separatorBuilder: (_, __) => const SizedBox(height: 24),
       itemBuilder: (context, index) {
         if (index == _vehicles.length) {
@@ -275,10 +283,12 @@ class _ListingsViewerState extends State<ListingsViewer> {
 
         final listing = _vehicles[index];
 
-        // Your existing widget expects a Map; you should update it to accept VehicleListing.
-        // If you can't, convert to map via toJson().
+        // ✅ your widget expects Map<String, dynamic>
+        // Ensure your model has toJson() that matches the keys your widget uses.
+        final vehicleMap = listing;
+
         return w.VehicleListing(
-          vehicle: listing,
+          vehicle: vehicleMap,
           isDealerProfile: widget.isDealerProfile,
           isUploaderViewing: widget.isUploaderViewing,
         );

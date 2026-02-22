@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
+import 'package:xdeal/utils/utility_functions.dart';
 import 'package:xdeal/widgets/notification_modal.dart';
 
 class PropertyVehicleToggleAppbar extends StatelessWidget {
@@ -14,10 +17,22 @@ class PropertyVehicleToggleAppbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.read<UserProvider>().user;
+
+    final profileImage = (user?.profilePicture.isNotEmpty ?? false)
+        ? Image.network(
+            UtilityFunctions.resolveImageUrl(user!.profilePicture),
+            width: 46,
+            height: 46,
+            errorBuilder: (_, __, ___) =>
+                const SizedBox(width: 100, child: Icon(Icons.person)),
+          )
+        : Image.asset('assets/images/avatar.png');
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Image.asset('assets/images/avatar.png'),
+        profileImage,
         TextButton(
           style: TextButton.styleFrom(
             foregroundColor: selectedView == 0
