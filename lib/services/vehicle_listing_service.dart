@@ -92,6 +92,11 @@ class VehicleListingService {
     return VehicleListing.fromJson(Map<String, dynamic>.from(data));
   }
 
+  Future<VehicleListing> createFromMap(Map<String, dynamic> payload) async {
+    final data = await api.postJson('/api/v1/vehicle-listing', body: payload);
+    return VehicleListing.fromJson(Map<String, dynamic>.from(data));
+  }
+
   Future<VehicleListing> update(String id, Map<String, dynamic> patch) async {
     final data = await api.putJson('/api/v1/vehicle-listing/$id', body: patch);
     return VehicleListing.fromJson(Map<String, dynamic>.from(data));

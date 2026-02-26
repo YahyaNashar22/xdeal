@@ -17,7 +17,6 @@ import 'package:xdeal/providers/user_provider.dart';
 
 import 'package:xdeal/services/api_client.dart';
 import 'package:xdeal/services/vehicle_listing_service.dart';
-import 'package:xdeal/models/vehicle_listing.dart';
 
 class CreateCarListingScreen extends StatefulWidget {
   const CreateCarListingScreen({super.key});
@@ -41,6 +40,8 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
   final _seatsCtrl = TextEditingController();
   final _descriptionCtrl = TextEditingController();
   final _priceCtrl = TextEditingController();
+  final _compatibilityCtrl = TextEditingController();
+  final _warrantyCtrl = TextEditingController();
 
   // Dropdown values
   String? _brand;
@@ -56,6 +57,7 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
   final List<String> _selectedExtraFeatures = [];
   String? _source;
   String? _paymentOption;
+  String? _accessoryType;
 
   // Category
   bool _loadingCategories = false;
@@ -102,6 +104,16 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
   final List<String> _extras = ["Sunroof", "Camera", "Sensors", "Heated seats"];
   final List<String> _sources = ["Dealer", "Owner"];
   final List<String> _paymentOptions = ["cash", "installment"];
+  final List<String> _accessoryTypes = [
+    "Wheels & Tires",
+    "Audio",
+    "Interior",
+    "Exterior",
+    "Electronics",
+    "Performance",
+    "Safety",
+    "Other",
+  ];
 
   bool _submitting = false;
 
@@ -125,8 +137,20 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
     _seatsCtrl.dispose();
     _descriptionCtrl.dispose();
     _priceCtrl.dispose();
+    _compatibilityCtrl.dispose();
+    _warrantyCtrl.dispose();
     super.dispose();
   }
+
+  VehicleCategory? get _selectedCategory {
+    for (final c in _categories) {
+      if (c.id == _selectedCategoryId) return c;
+    }
+    return null;
+  }
+
+  bool get _isAccessoryCategory =>
+      (_selectedCategory?.title.toLowerCase().contains('accessor') ?? false);
 
   Future<void> _loadVehicleCategories() async {
     setState(() => _loadingCategories = true);
@@ -264,7 +288,7 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
 
   Future<void> _submit() async {
     final user = context.read<UserProvider>().user;
-    final userId = user?.id ?? user?.id;
+    final userId = user?.id;
 
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -291,50 +315,93 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
       return;
     }
 
+    if (_categories.isEmpty || _selectedCategoryId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a valid category.")),
+      );
+      return;
+    }
+
+    if (_isAccessoryCategory && (_accessoryType == null || _accessoryType!.isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select accessory type.")),
+      );
+      return;
+    }
+
     setState(() => _submitting = true);
     try {
       // 1) upload images
       final imageUrls = await _uploadService.uploadVehicleImages(_images);
 
       // 2) build payload
-      final payload = {
-        "name": _titleCtrl.text.trim(),
-        "images": imageUrls,
-        "price": _priceCtrl.text.trim(),
-        "description": _descriptionCtrl.text.trim(),
-        "category": _selectedCategoryId,
-        "coords": _coords,
-        "brand": _brand,
-        "model": _model,
-        "version": _versionCtrl.text.trim().isEmpty
-            ? null
-            : _versionCtrl.text.trim(),
-        "condition": _condition,
-        "kilometers":
-            int.tryParse(_kilometersCtrl.text.replaceAll(",", "").trim()) ?? 0,
-        "year": _yearCtrl.text.trim(),
-        "fuel_type": _fuelType,
-        "transmission_type": _transmission_type,
-        "body_type": _bodyType,
-        "air_conditioning": _airConditioning,
-        "color": _color,
-        "number_of_seats": int.tryParse(_seatsCtrl.text.trim()) ?? 0,
-        "number_of_doors": _doors == "2/3" ? 2 : 4,
-        "interior": _interior,
-        "payment_option": _paymentOption,
-        "extra_features": _selectedExtraFeatures,
-        "is_featured": false,
-        "is_sponsored": false,
-        "is_listed": true,
-        "on_sale": false,
-        "number_of_views": 0,
-        "user_id": userId,
-      };
+      final payload = _isAccessoryCategory
+          ? {
+              "listing_type": "accessory",
+              "name": _titleCtrl.text.trim(),
+              "images": imageUrls,
+              "price": _priceCtrl.text.trim(),
+              "description": _descriptionCtrl.text.trim(),
+              "category": _selectedCategoryId,
+              "coords": _coords,
+              "condition": _condition,
+              "accessory_type": _accessoryType,
+              "compatibility": _compatibilityCtrl.text
+                  .split(',')
+                  .map((e) => e.trim())
+                  .where((e) => e.isNotEmpty)
+                  .toList(),
+              "warranty_months": int.tryParse(_warrantyCtrl.text.trim()),
+              "payment_option": _paymentOption,
+              "extra_features": _selectedExtraFeatures,
+              "is_featured": false,
+              "is_sponsored": false,
+              "is_listed": true,
+              "on_sale": false,
+              "number_of_views": 0,
+              "user_id": userId,
+            }
+          : {
+              "listing_type": "vehicle",
+              "name": _titleCtrl.text.trim(),
+              "images": imageUrls,
+              "price": _priceCtrl.text.trim(),
+              "description": _descriptionCtrl.text.trim(),
+              "category": _selectedCategoryId,
+              "coords": _coords,
+              "brand": _brand,
+              "model": _model,
+              "version": _versionCtrl.text.trim().isEmpty
+                  ? null
+                  : _versionCtrl.text.trim(),
+              "condition": _condition,
+              "kilometers": int.tryParse(
+                    _kilometersCtrl.text.replaceAll(",", "").trim(),
+                  ) ??
+                  0,
+              "year": _yearCtrl.text.trim(),
+              "fuel_type": _fuelType,
+              "transmission_type": _transmission_type,
+              "body_type": _bodyType,
+              "air_conditioning": _airConditioning,
+              "color": _color,
+              "number_of_seats": int.tryParse(_seatsCtrl.text.trim()) ?? 0,
+              "number_of_doors": _doors == "2/3" ? 2 : 4,
+              "interior": _interior,
+              "payment_option": _paymentOption,
+              "extra_features": _selectedExtraFeatures,
+              "is_featured": false,
+              "is_sponsored": false,
+              "is_listed": true,
+              "on_sale": false,
+              "number_of_views": 0,
+              "user_id": userId,
+            };
 
       // Call your service (wire it to your API)
       final api = ApiClient(baseUrl: 'http://10.0.2.2:5000');
       final service = VehicleListingService(api);
-      await service.create(VehicleListing.fromJson(payload));
+      await service.createFromMap(payload);
 
       // For now just simulate success:
       await Future.delayed(const Duration(milliseconds: 500));
@@ -501,200 +568,237 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
                       _sectionLabel("Title", required: true),
                       TextFormField(
                         controller: _titleCtrl,
-                        decoration: _inputDecoration("Enter Car title"),
+                        decoration: _inputDecoration(
+                          _isAccessoryCategory
+                              ? "Enter accessory title"
+                              : "Enter car title",
+                        ),
                         validator: (v) => (v == null || v.trim().isEmpty)
                             ? "Title is required"
                             : null,
                       ),
 
                       const SizedBox(height: 14),
-
-                      _sectionLabel("Car Brand", required: true),
-                      _dropdown(
-                        hint: "Choose Brand",
-                        value: _brand,
-                        items: _itemsFromStrings(_brands),
-                        onChanged: (v) {
-                          setState(() {
-                            _brand = v;
-                            _model = null;
-                          });
-                        },
-                        validator: (v) =>
-                            v == null ? "Brand is required" : null,
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      _sectionLabel("Car Model", required: true),
-                      _dropdown(
-                        hint: "Choose Model",
-                        value: _model,
-                        items: _itemsFromStrings(models),
-                        onChanged: (v) => setState(() => _model = v),
-                        validator: (v) =>
-                            v == null ? "Model is required" : null,
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      _sectionLabel("Version"),
-                      TextFormField(
-                        controller: _versionCtrl,
-                        decoration: _inputDecoration("Choose Version"),
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      _sectionLabel("Condition", required: true),
-                      _segmentedChips(
-                        items: const [
-                          MapEntry("New", "new"),
-                          MapEntry("Used", "used"),
-                        ],
-                        value: _condition,
-                        onChanged: (v) => setState(() => _condition = v),
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      _sectionLabel("Kilometers", required: true),
-                      TextFormField(
-                        controller: _kilometersCtrl,
-                        keyboardType: TextInputType.number,
-                        decoration: _inputDecoration(
-                          "Enter Kilometers, eg: 42,500",
+                      if (_isAccessoryCategory) ...[
+                        _sectionLabel("Accessory Type", required: true),
+                        _dropdown(
+                          hint: "Choose accessory type",
+                          value: _accessoryType,
+                          items: _itemsFromStrings(_accessoryTypes),
+                          onChanged: (v) => setState(() => _accessoryType = v),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? "Accessory type is required"
+                              : null,
                         ),
-                        validator: (v) => (v == null || v.trim().isEmpty)
-                            ? "Kilometers is required"
-                            : null,
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      _sectionLabel("Year", required: true),
-                      TextFormField(
-                        controller: _yearCtrl,
-                        keyboardType: TextInputType.number,
-                        decoration: _inputDecoration("Enter Year"),
-                        validator: (v) => (v == null || v.trim().isEmpty)
-                            ? "Year is required"
-                            : null,
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      _sectionLabel("Fuel Type", required: true),
-                      _dropdown(
-                        hint: "Choose FuelType",
-                        value: _fuelType,
-                        items: _itemsFromStrings(_fuelTypes),
-                        onChanged: (v) => setState(() => _fuelType = v),
-                        validator: (v) =>
-                            v == null ? "Fuel Type is required" : null,
-                      ),
-
-                      const SizedBox(height: 34),
-
-                      _sectionLabel("Body Type", required: true),
-                      _dropdown(
-                        hint: "Choose BodyType",
-                        value: _bodyType,
-                        items: _itemsFromStrings(_bodyTypes),
-                        onChanged: (v) => setState(() => _bodyType = v),
-                        validator: (v) =>
-                            v == null ? "Body Type is required" : null,
-                      ),
-
-                      const SizedBox(height: 34),
-
-                      _sectionLabel("Transmission Type", required: true),
-                      _dropdown(
-                        hint: "Choose TransmissionType",
-                        value: _transmission_type,
-                        items: _itemsFromStrings(_transmission_types),
-                        onChanged: (v) =>
-                            setState(() => _transmission_type = v),
-                        validator: (v) =>
-                            v == null ? "Transmission Type is required" : null,
-                      ),
-
-                      const SizedBox(height: 34),
-
-                      _sectionLabel("Air Conditioning"),
-                      _dropdown(
-                        hint: "Choose Air Conditioning",
-                        value: _airConditioning,
-                        items: _itemsFromStrings(_airConds),
-                        onChanged: (v) => setState(() => _airConditioning = v),
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      _sectionLabel("Color", required: true),
-                      _dropdown(
-                        hint: "Choose Color",
-                        value: _color,
-                        items: _itemsFromStrings(_colors),
-                        onChanged: (v) => setState(() => _color = v),
-                        validator: (v) =>
-                            v == null ? "Color is required" : null,
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      _sectionLabel("Number of Seats"),
-                      TextFormField(
-                        controller: _seatsCtrl,
-                        keyboardType: TextInputType.number,
-                        decoration: _inputDecoration("Enter Number of Seats"),
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      _sectionLabel("Number of Doors", required: true),
-                      _segmentedChips(
-                        items: const [
-                          MapEntry("2/3", "2/3"),
-                          MapEntry("4/5", "4/5"),
-                        ],
-                        value: _doors,
-                        onChanged: (v) => setState(() => _doors = v),
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      _sectionLabel("Interior"),
-                      _dropdown(
-                        hint: "Choose Interior",
-                        value: _interior,
-                        items: _itemsFromStrings(_interiors),
-                        onChanged: (v) => setState(() => _interior = v),
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      _sectionLabel("Extra Features"),
-                      _multiSelectChips(
-                        options: _extras,
-                        selected: _selectedExtraFeatures,
-                        onChanged: (next) => setState(() {
-                          _selectedExtraFeatures
-                            ..clear()
-                            ..addAll(next);
-                        }),
-                      ),
-                      const SizedBox(height: 14),
-
-                      _sectionLabel("Source"),
-                      _dropdown(
-                        hint: "Choose Source",
-                        value: _source,
-                        items: _itemsFromStrings(_sources),
-                        onChanged: (v) => setState(() => _source = v),
-                      ),
-
-                      const SizedBox(height: 14),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Condition", required: true),
+                        _segmentedChips(
+                          items: const [
+                            MapEntry("New", "new"),
+                            MapEntry("Used", "used"),
+                          ],
+                          value: _condition,
+                          onChanged: (v) => setState(() => _condition = v),
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Compatibility"),
+                        TextFormField(
+                          controller: _compatibilityCtrl,
+                          decoration: _inputDecoration(
+                            "Comma separated, e.g. BMW 3 Series, E90",
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Warranty (Months)"),
+                        TextFormField(
+                          controller: _warrantyCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: _inputDecoration(
+                            "Enter warranty months (optional)",
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Extra Features"),
+                        _multiSelectChips(
+                          options: _extras,
+                          selected: _selectedExtraFeatures,
+                          onChanged: (next) => setState(() {
+                            _selectedExtraFeatures
+                              ..clear()
+                              ..addAll(next);
+                          }),
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Source"),
+                        _dropdown(
+                          hint: "Choose Source",
+                          value: _source,
+                          items: _itemsFromStrings(_sources),
+                          onChanged: (v) => setState(() => _source = v),
+                        ),
+                        const SizedBox(height: 14),
+                      ] else ...[
+                        _sectionLabel("Car Brand", required: true),
+                        _dropdown(
+                          hint: "Choose Brand",
+                          value: _brand,
+                          items: _itemsFromStrings(_brands),
+                          onChanged: (v) {
+                            setState(() {
+                              _brand = v;
+                              _model = null;
+                            });
+                          },
+                          validator: (v) =>
+                              v == null ? "Brand is required" : null,
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Car Model", required: true),
+                        _dropdown(
+                          hint: "Choose Model",
+                          value: _model,
+                          items: _itemsFromStrings(models),
+                          onChanged: (v) => setState(() => _model = v),
+                          validator: (v) =>
+                              v == null ? "Model is required" : null,
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Version"),
+                        TextFormField(
+                          controller: _versionCtrl,
+                          decoration: _inputDecoration("Choose Version"),
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Condition", required: true),
+                        _segmentedChips(
+                          items: const [
+                            MapEntry("New", "new"),
+                            MapEntry("Used", "used"),
+                          ],
+                          value: _condition,
+                          onChanged: (v) => setState(() => _condition = v),
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Kilometers", required: true),
+                        TextFormField(
+                          controller: _kilometersCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: _inputDecoration(
+                            "Enter Kilometers, eg: 42,500",
+                          ),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? "Kilometers is required"
+                              : null,
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Year", required: true),
+                        TextFormField(
+                          controller: _yearCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: _inputDecoration("Enter Year"),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? "Year is required"
+                              : null,
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Fuel Type", required: true),
+                        _dropdown(
+                          hint: "Choose FuelType",
+                          value: _fuelType,
+                          items: _itemsFromStrings(_fuelTypes),
+                          onChanged: (v) => setState(() => _fuelType = v),
+                          validator: (v) =>
+                              v == null ? "Fuel Type is required" : null,
+                        ),
+                        const SizedBox(height: 34),
+                        _sectionLabel("Body Type", required: true),
+                        _dropdown(
+                          hint: "Choose BodyType",
+                          value: _bodyType,
+                          items: _itemsFromStrings(_bodyTypes),
+                          onChanged: (v) => setState(() => _bodyType = v),
+                          validator: (v) =>
+                              v == null ? "Body Type is required" : null,
+                        ),
+                        const SizedBox(height: 34),
+                        _sectionLabel("Transmission Type", required: true),
+                        _dropdown(
+                          hint: "Choose TransmissionType",
+                          value: _transmission_type,
+                          items: _itemsFromStrings(_transmission_types),
+                          onChanged: (v) =>
+                              setState(() => _transmission_type = v),
+                          validator: (v) => v == null
+                              ? "Transmission Type is required"
+                              : null,
+                        ),
+                        const SizedBox(height: 34),
+                        _sectionLabel("Air Conditioning"),
+                        _dropdown(
+                          hint: "Choose Air Conditioning",
+                          value: _airConditioning,
+                          items: _itemsFromStrings(_airConds),
+                          onChanged: (v) =>
+                              setState(() => _airConditioning = v),
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Color", required: true),
+                        _dropdown(
+                          hint: "Choose Color",
+                          value: _color,
+                          items: _itemsFromStrings(_colors),
+                          onChanged: (v) => setState(() => _color = v),
+                          validator: (v) =>
+                              v == null ? "Color is required" : null,
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Number of Seats"),
+                        TextFormField(
+                          controller: _seatsCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: _inputDecoration(
+                            "Enter Number of Seats",
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Number of Doors", required: true),
+                        _segmentedChips(
+                          items: const [
+                            MapEntry("2/3", "2/3"),
+                            MapEntry("4/5", "4/5"),
+                          ],
+                          value: _doors,
+                          onChanged: (v) => setState(() => _doors = v),
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Interior"),
+                        _dropdown(
+                          hint: "Choose Interior",
+                          value: _interior,
+                          items: _itemsFromStrings(_interiors),
+                          onChanged: (v) => setState(() => _interior = v),
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Extra Features"),
+                        _multiSelectChips(
+                          options: _extras,
+                          selected: _selectedExtraFeatures,
+                          onChanged: (next) => setState(() {
+                            _selectedExtraFeatures
+                              ..clear()
+                              ..addAll(next);
+                          }),
+                        ),
+                        const SizedBox(height: 14),
+                        _sectionLabel("Source"),
+                        _dropdown(
+                          hint: "Choose Source",
+                          value: _source,
+                          items: _itemsFromStrings(_sources),
+                          onChanged: (v) => setState(() => _source = v),
+                        ),
+                        const SizedBox(height: 14),
+                      ],
 
                       _sectionLabel("Description"),
                       TextFormField(
@@ -749,6 +853,9 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
                         value: _paymentOption,
                         items: _itemsFromStrings(_paymentOptions),
                         onChanged: (v) => setState(() => _paymentOption = v),
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? "Payment option is required"
+                            : null,
                       ),
 
                       const SizedBox(height: 14),

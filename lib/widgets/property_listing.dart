@@ -15,11 +15,13 @@ class PropertyListing extends StatefulWidget {
   final Map<String, dynamic> property;
   final bool isDealerProfile;
   final bool isUploaderViewing;
+  final VoidCallback? onListingChanged;
   const PropertyListing({
     super.key,
     required this.property,
     required this.isDealerProfile,
     required this.isUploaderViewing,
+    this.onListingChanged,
   });
 
   @override
@@ -85,7 +87,7 @@ class _PropertyListingState extends State<PropertyListing> {
         ),
       );
     } else {
-      showModalBottomSheet(
+      showModalBottomSheet<bool>(
         context: context,
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(
@@ -97,7 +99,11 @@ class _PropertyListingState extends State<PropertyListing> {
             listingId: widget.property['_id'],
           ); // reuse your screen widget here
         },
-      );
+      ).then((changed) {
+        if (changed == true) {
+          widget.onListingChanged?.call();
+        }
+      });
     }
   }
 

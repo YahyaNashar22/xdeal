@@ -16,11 +16,13 @@ class VehicleListing extends StatefulWidget {
   final model.VehicleListing vehicle;
   final bool isDealerProfile;
   final bool isUploaderViewing;
+  final VoidCallback? onListingChanged;
   const VehicleListing({
     super.key,
     required this.vehicle,
     required this.isDealerProfile,
     required this.isUploaderViewing,
+    this.onListingChanged,
   });
 
   @override
@@ -80,7 +82,7 @@ class _VehicleListingState extends State<VehicleListing> {
         ),
       );
     } else {
-      showModalBottomSheet(
+      showModalBottomSheet<bool>(
         context: context,
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(
@@ -92,7 +94,11 @@ class _VehicleListingState extends State<VehicleListing> {
             listingId: widget.vehicle.id,
           ); // reuse your screen widget here
         },
-      );
+      ).then((changed) {
+        if (changed == true) {
+          widget.onListingChanged?.call();
+        }
+      });
     }
   }
 

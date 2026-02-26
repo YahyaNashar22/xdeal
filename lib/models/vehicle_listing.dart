@@ -1,6 +1,7 @@
 // lib/models/vehicle_listing.dart
 class VehicleListing {
   final String id;
+  final String listingType;
 
   final String name;
   final List<String> images;
@@ -47,6 +48,9 @@ class VehicleListing {
 
   /// cloth|leather|...
   final String interior;
+  final String? accessoryType;
+  final List<String> compatibility;
+  final double? warrantyMonths;
 
   /// cash|installment
   final String paymentOption;
@@ -74,6 +78,7 @@ class VehicleListing {
 
   VehicleListing({
     required this.id,
+    required this.listingType,
     required this.name,
     required this.images,
     required this.price,
@@ -97,6 +102,9 @@ class VehicleListing {
     required this.numberOfSeats,
     required this.numberOfDoors,
     required this.interior,
+    this.accessoryType,
+    required this.compatibility,
+    this.warrantyMonths,
     required this.paymentOption,
     required this.extraFeatures,
     required this.isFeatured,
@@ -170,6 +178,7 @@ class VehicleListing {
 
     return VehicleListing(
       id: (json['_id'] ?? json['id'] ?? '').toString(),
+      listingType: (json['listing_type'] ?? 'vehicle').toString(),
       name: (json['name'] ?? '').toString(),
       images: images,
       price: (json['price'] ?? '').toString(),
@@ -195,6 +204,13 @@ class VehicleListing {
       numberOfSeats: _toDouble(json['number_of_seats'], fallback: 0),
       numberOfDoors: _toDouble(json['number_of_doors'], fallback: 0),
       interior: (json['interior'] ?? '').toString(),
+      accessoryType: json['accessory_type']?.toString(),
+      compatibility:
+          (json['compatibility'] as List?)?.map((e) => e.toString()).toList() ??
+          <String>[],
+      warrantyMonths: json['warranty_months'] == null
+          ? null
+          : _toDouble(json['warranty_months']),
       paymentOption: (json['payment_option'] ?? '').toString(),
       extraFeatures: extraFeatures,
       isFeatured: _toBool(json['is_featured']),
@@ -220,6 +236,7 @@ class VehicleListing {
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
+      'listing_type': listingType,
       'name': name,
       'images': images,
       'price': price,
@@ -243,6 +260,9 @@ class VehicleListing {
       'number_of_seats': numberOfSeats,
       'number_of_doors': numberOfDoors,
       'interior': interior,
+      if (accessoryType != null) 'accessory_type': accessoryType,
+      'compatibility': compatibility,
+      if (warrantyMonths != null) 'warranty_months': warrantyMonths,
       'payment_option': paymentOption,
       'extra_features': extraFeatures,
       'is_featured': isFeatured,

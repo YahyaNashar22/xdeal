@@ -601,6 +601,9 @@ class _ListingsViewerState extends State<ListingsViewer> {
             property: _toPropertyCardMap(listing),
             isDealerProfile: widget.isDealerProfile,
             isUploaderViewing: widget.isUploaderViewing,
+            onListingChanged: () {
+              _resetAndRefetch();
+            },
           );
         }
 
@@ -609,6 +612,9 @@ class _ListingsViewerState extends State<ListingsViewer> {
           vehicle: listing,
           isDealerProfile: widget.isDealerProfile,
           isUploaderViewing: widget.isUploaderViewing,
+          onListingChanged: () {
+            _resetAndRefetch();
+          },
         );
       },
     );
