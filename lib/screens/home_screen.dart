@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/ads_carousel.dart';
 import 'package:xdeal/widgets/listings_viewer.dart';
@@ -19,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // filters state
   String _q = '';
   String? _categoryId;
+  Map<String, dynamic> _extraFilters = {};
 
   // change view between properties and vehicles
   void selectView(int index) {
@@ -28,24 +30,38 @@ class _HomeScreenState extends State<HomeScreen> {
       // reset filters when switching tabs
       _q = '';
       _categoryId = null;
+      _extraFilters = {};
     });
   }
 
-  void _onFiltersChanged(String q, String? categoryId) {
+  void _onFiltersChanged(
+    String q,
+    String? categoryId,
+    Map<String, dynamic> extraFilters,
+  ) {
     if (!mounted) return;
 
     // avoid useless rebuilds
-    if (_q == q && _categoryId == categoryId) return;
+    if (_q == q &&
+        _categoryId == categoryId &&
+        mapEquals(_extraFilters, extraFilters)) {
+      return;
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
       // check again (in case multiple callbacks queued)
-      if (_q == q && _categoryId == categoryId) return;
+      if (_q == q &&
+          _categoryId == categoryId &&
+          mapEquals(_extraFilters, extraFilters)) {
+        return;
+      }
 
       setState(() {
         _q = q;
         _categoryId = categoryId;
+        _extraFilters = Map<String, dynamic>.from(extraFilters);
       });
     });
   }
@@ -71,22 +87,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 flexibleSpace: FlexibleSpaceBar(
                   background: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                    child: Column(
-                      children: [
-                        PropertyVehicleToggleAppbar(
-                          selectedView: selectedView,
-                          selectView: selectView,
-                        ),
-                        const SizedBox(height: 12),
-                        SearchBarAndFilter(
-                          selectedView: selectedView,
-                          onChanged: _onFiltersChanged,
-                        ),
-                      ],
+                    child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          PropertyVehicleToggleAppbar(
+                            selectedView: selectedView,
+                            selectView: selectView,
+                          ),
+                          const SizedBox(height: 12),
+                          SearchBarAndFilter(
+                            selectedView: selectedView,
+                            onChanged: _onFiltersChanged,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                expandedHeight: 200,
+                expandedHeight: 240,
               ),
             ];
           },
@@ -103,6 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     selectedView: selectedView,
                     q: _q,
                     categoryId: _categoryId,
+                    extraFilters: _extraFilters,
                   ),
                 ),
 

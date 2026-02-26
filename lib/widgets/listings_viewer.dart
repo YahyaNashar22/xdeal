@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:xdeal/providers/user_provider.dart';
 
@@ -24,6 +25,7 @@ class ListingsViewer extends StatefulWidget {
 
   final String q;
   final String? categoryId;
+  final Map<String, dynamic> extraFilters;
 
   const ListingsViewer({
     super.key,
@@ -35,6 +37,7 @@ class ListingsViewer extends StatefulWidget {
     this.onlyFavorites = false,
     this.filter = ListingFilter.newest,
     this.userId,
+    this.extraFilters = const {},
   });
 
   @override
@@ -84,13 +87,15 @@ class _ListingsViewerState extends State<ListingsViewer> {
     final userChanged = oldWidget.userId != widget.userId;
     final qChanged = oldWidget.q != widget.q;
     final catChanged = oldWidget.categoryId != widget.categoryId;
+    final extraChanged = !mapEquals(oldWidget.extraFilters, widget.extraFilters);
 
     if (viewChanged ||
         filterChanged ||
         favChanged ||
         userChanged ||
         qChanged ||
-        catChanged) {
+        catChanged ||
+        extraChanged) {
       _resetAndRefetch();
     }
   }
@@ -225,6 +230,18 @@ class _ListingsViewerState extends State<ListingsViewer> {
           isListed: f.isListed,
           sortBy: f.sortBy,
           sortDir: f.sortDir,
+          onSale: _boolFilter('on_sale'),
+          isRent: _boolFilter('is_rent'),
+          agentType: _strFilter('agent_type'),
+          bedroomsMin: _intFilter('bedrooms_min'),
+          bedroomsMax: _intFilter('bedrooms_max'),
+          bathroomsMin: _intFilter('bathrooms_min'),
+          bathroomsMax: _intFilter('bathrooms_max'),
+          spaceMin: _intFilter('space_min'),
+          spaceMax: _intFilter('space_max'),
+          lat: _doubleFilter('lat'),
+          lng: _doubleFilter('lng'),
+          radiusKm: _doubleFilter('radius_km'),
         );
 
         final filtered = widget.onlyFavorites
@@ -249,6 +266,21 @@ class _ListingsViewerState extends State<ListingsViewer> {
           isListed: f.isListed,
           sortBy: f.sortBy,
           sortDir: f.sortDir,
+          onSale: _boolFilter('on_sale'),
+          condition: _strFilter('condition'),
+          brand: _strFilter('brand'),
+          model: _strFilter('model'),
+          fuelType: _strFilter('fuel_type'),
+          transmissionType: _strFilter('transmission_type'),
+          bodyType: _strFilter('body_type'),
+          paymentOption: _strFilter('payment_option'),
+          yearMin: _intFilter('year_min'),
+          yearMax: _intFilter('year_max'),
+          kmMin: _intFilter('km_min'),
+          kmMax: _intFilter('km_max'),
+          lat: _doubleFilter('lat'),
+          lng: _doubleFilter('lng'),
+          radiusKm: _doubleFilter('radius_km'),
         );
 
         final filtered = widget.onlyFavorites ? _applyVehicleFavorites(items) : items;
@@ -331,6 +363,18 @@ class _ListingsViewerState extends State<ListingsViewer> {
           isListed: f.isListed,
           sortBy: f.sortBy,
           sortDir: f.sortDir,
+          onSale: _boolFilter('on_sale'),
+          isRent: _boolFilter('is_rent'),
+          agentType: _strFilter('agent_type'),
+          bedroomsMin: _intFilter('bedrooms_min'),
+          bedroomsMax: _intFilter('bedrooms_max'),
+          bathroomsMin: _intFilter('bathrooms_min'),
+          bathroomsMax: _intFilter('bathrooms_max'),
+          spaceMin: _intFilter('space_min'),
+          spaceMax: _intFilter('space_max'),
+          lat: _doubleFilter('lat'),
+          lng: _doubleFilter('lng'),
+          radiusKm: _doubleFilter('radius_km'),
         );
 
         final filtered = widget.onlyFavorites
@@ -353,6 +397,21 @@ class _ListingsViewerState extends State<ListingsViewer> {
           isListed: f.isListed,
           sortBy: f.sortBy,
           sortDir: f.sortDir,
+          onSale: _boolFilter('on_sale'),
+          condition: _strFilter('condition'),
+          brand: _strFilter('brand'),
+          model: _strFilter('model'),
+          fuelType: _strFilter('fuel_type'),
+          transmissionType: _strFilter('transmission_type'),
+          bodyType: _strFilter('body_type'),
+          paymentOption: _strFilter('payment_option'),
+          yearMin: _intFilter('year_min'),
+          yearMax: _intFilter('year_max'),
+          kmMin: _intFilter('km_min'),
+          kmMax: _intFilter('km_max'),
+          lat: _doubleFilter('lat'),
+          lng: _doubleFilter('lng'),
+          radiusKm: _doubleFilter('radius_km'),
         );
 
         final filtered = widget.onlyFavorites ? _applyVehicleFavorites(items) : items;
@@ -389,6 +448,39 @@ class _ListingsViewerState extends State<ListingsViewer> {
     if (direct is Map<String, dynamic>) return direct;
     if (direct is Map) return Map<String, dynamic>.from(direct);
     if (raw.containsKey('name') && raw.containsKey('images')) return raw;
+    return null;
+  }
+
+  String? _strFilter(String key) {
+    final v = widget.extraFilters[key];
+    if (v == null) return null;
+    final s = v.toString().trim();
+    return s.isEmpty ? null : s;
+  }
+
+  int? _intFilter(String key) {
+    final v = widget.extraFilters[key];
+    if (v == null) return null;
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    return int.tryParse(v.toString().trim());
+  }
+
+  double? _doubleFilter(String key) {
+    final v = widget.extraFilters[key];
+    if (v == null) return null;
+    if (v is double) return v;
+    if (v is num) return v.toDouble();
+    return double.tryParse(v.toString().trim());
+  }
+
+  bool? _boolFilter(String key) {
+    final v = widget.extraFilters[key];
+    if (v is bool) return v;
+    if (v == null) return null;
+    final s = v.toString().toLowerCase().trim();
+    if (s == 'true') return true;
+    if (s == 'false') return false;
     return null;
   }
 

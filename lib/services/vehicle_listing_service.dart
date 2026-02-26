@@ -28,6 +28,9 @@ class VehicleListingService {
     int? yearMax,
     int? kmMin,
     int? kmMax,
+    double? lat,
+    double? lng,
+    double? radiusKm,
     String sortBy = "createdAt",
     String sortDir = "desc",
   }) async {
@@ -60,6 +63,9 @@ class VehicleListingService {
       if (yearMax != null) 'year_max': '$yearMax',
       if (kmMin != null) 'km_min': '$kmMin',
       if (kmMax != null) 'km_max': '$kmMax',
+      if (lat != null) 'lat': '$lat',
+      if (lng != null) 'lng': '$lng',
+      if (radiusKm != null) 'radius_km': '$radiusKm',
     };
 
     final data = await api.getJson('/api/v1/vehicle-listing', query: query);
