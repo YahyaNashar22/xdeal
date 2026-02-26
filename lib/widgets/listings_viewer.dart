@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:xdeal/providers/user_provider.dart';
 
 import 'package:xdeal/services/api_client.dart';
+import 'package:xdeal/services/favorite_property_service.dart';
+import 'package:xdeal/services/favorite_vehicle_service.dart';
+import 'package:xdeal/services/property_listing_service.dart';
 import 'package:xdeal/services/vehicle_listing_service.dart';
-import 'package:xdeal/models/vehicle_listing.dart' as model;
-
-import 'package:xdeal/widgets/vehicle_listing.dart' as w;
+import 'package:xdeal/models/property_listing.dart' as pmodel;
+import 'package:xdeal/models/vehicle_listing.dart' as vmodel;
+import 'package:xdeal/widgets/property_listing.dart' as p;
+import 'package:xdeal/widgets/vehicle_listing.dart' as v;
 
 enum ListingFilter { none, newest, cheapest, expensive, notListed }
 
@@ -14,6 +20,7 @@ class ListingsViewer extends StatefulWidget {
   final bool isUploaderViewing;
   final bool onlyFavorites;
   final ListingFilter filter;
+  final String? userId;
 
   final String q;
   final String? categoryId;
@@ -27,6 +34,7 @@ class ListingsViewer extends StatefulWidget {
     this.isUploaderViewing = false,
     this.onlyFavorites = false,
     this.filter = ListingFilter.newest,
+    this.userId,
   });
 
   @override
@@ -37,9 +45,14 @@ class _ListingsViewerState extends State<ListingsViewer> {
   final _scrollController = ScrollController();
 
   late final ApiClient _api;
+  late final FavoritePropertyService _favoritePropertyService;
+  late final FavoriteVehicleService _favoriteVehicleService;
+  late final PropertyListingService _propertyService;
   late final VehicleListingService _vehicleService;
 
-  final List<model.VehicleListing> _vehicles = [];
+  final List<pmodel.PropertyListing> _properties = [];
+  final List<vmodel.VehicleListing> _vehicles = [];
+
   bool _loadingFirstPage = false;
   bool _loadingMore = false;
   bool _hasMore = true;
@@ -52,10 +65,12 @@ class _ListingsViewerState extends State<ListingsViewer> {
     super.initState();
 
     _api = ApiClient(baseUrl: 'http://10.0.2.2:5000');
+    _favoritePropertyService = FavoritePropertyService(_api);
+    _favoriteVehicleService = FavoriteVehicleService(_api);
+    _propertyService = PropertyListingService(_api);
     _vehicleService = VehicleListingService(_api);
 
     _scrollController.addListener(_onScroll);
-
     _fetchFirstPage();
   }
 
@@ -66,12 +81,16 @@ class _ListingsViewerState extends State<ListingsViewer> {
     final viewChanged = oldWidget.selectedView != widget.selectedView;
     final filterChanged = oldWidget.filter != widget.filter;
     final favChanged = oldWidget.onlyFavorites != widget.onlyFavorites;
-
-    // ✅ these were missing
+    final userChanged = oldWidget.userId != widget.userId;
     final qChanged = oldWidget.q != widget.q;
     final catChanged = oldWidget.categoryId != widget.categoryId;
 
-    if (viewChanged || filterChanged || favChanged || qChanged || catChanged) {
+    if (viewChanged ||
+        filterChanged ||
+        favChanged ||
+        userChanged ||
+        qChanged ||
+        catChanged) {
       _resetAndRefetch();
     }
   }
@@ -85,7 +104,6 @@ class _ListingsViewerState extends State<ListingsViewer> {
 
   void _onScroll() {
     if (!_hasMore || _loadingMore || _loadingFirstPage) return;
-
     final position = _scrollController.position;
     if (position.pixels >= position.maxScrollExtent - 250) {
       _fetchMore();
@@ -96,13 +114,13 @@ class _ListingsViewerState extends State<ListingsViewer> {
     if (!mounted) return;
 
     setState(() {
+      _properties.clear();
       _vehicles.clear();
       _page = 1;
       _hasMore = true;
       _error = null;
     });
 
-    // reset scroll so user sees new results from top
     if (_scrollController.hasClients) {
       _scrollController.jumpTo(0);
     }
@@ -126,8 +144,6 @@ class _ListingsViewerState extends State<ListingsViewer> {
   }
 
   Future<void> _fetchFirstPage() async {
-    if (widget.selectedView != 1) return;
-
     setState(() {
       _loadingFirstPage = true;
       _error = null;
@@ -135,28 +151,117 @@ class _ListingsViewerState extends State<ListingsViewer> {
 
     try {
       final f = _filterToQuery();
+      if (widget.onlyFavorites) {
+        final currentUser = context.read<UserProvider>().user;
+        if (currentUser == null || widget.userId == null) {
+          if (!mounted) return;
+          setState(() {
+            _properties.clear();
+            _vehicles.clear();
+            _page = 1;
+            _hasMore = false;
+          });
+          return;
+        }
 
-      // ✅ pass q + categoryId
-      final items = await _vehicleService.getAll(
-        page: 1,
-        limit: _limit,
-        q: widget.q.trim().isEmpty ? null : widget.q.trim(),
-        categoryId: widget.categoryId,
-        isListed: f.isListed,
-        sortBy: f.sortBy,
-        sortDir: f.sortDir,
-      );
+        if (widget.selectedView == 0) {
+          final res = await _favoritePropertyService.myFavorites(
+            userId: widget.userId!,
+          );
+          final raw = (res['items'] as List?) ?? const [];
+          final items = raw
+              .whereType<Map>()
+              .map((e) => pmodel.PropertyListing.fromJson(Map<String, dynamic>.from(e)))
+              .where((e) => _matchesPropertyFilters(e, f.isListed))
+              .toList();
 
-      final filtered = widget.onlyFavorites ? _applyFavorites(items) : items;
+          if (!mounted) return;
+          setState(() {
+            _properties
+              ..clear()
+              ..addAll(items);
+            _vehicles.clear();
+            _page = 1;
+            _hasMore = false;
+          });
+          return;
+        }
 
-      if (!mounted) return;
-      setState(() {
-        _vehicles
-          ..clear()
-          ..addAll(filtered);
-        _page = 1;
-        _hasMore = items.length == _limit;
-      });
+        final res = await _favoriteVehicleService.myFavorites(
+          currentUser,
+          page: 1,
+          limit: _limit,
+        );
+        final raw = (res['items'] as List?) ?? const [];
+        final total = (res['total'] is num) ? (res['total'] as num).toInt() : 0;
+        final items = raw
+            .whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .map(_extractVehicleMap)
+            .whereType<Map<String, dynamic>>()
+            .map(vmodel.VehicleListing.fromJson)
+            .where((e) => _matchesVehicleFilters(e, f.isListed))
+            .toList();
+
+        if (!mounted) return;
+        setState(() {
+          _vehicles
+            ..clear()
+            ..addAll(items);
+          _properties.clear();
+          _page = 1;
+          _hasMore = _limit < total;
+        });
+        return;
+      }
+
+      if (widget.selectedView == 0) {
+        final items = await _propertyService.getAll(
+          page: 1,
+          limit: _limit,
+          q: widget.q.trim().isEmpty ? null : widget.q.trim(),
+          categoryId: widget.categoryId,
+          userId: widget.userId,
+          isListed: f.isListed,
+          sortBy: f.sortBy,
+          sortDir: f.sortDir,
+        );
+
+        final filtered = widget.onlyFavorites
+            ? _applyPropertyFavorites(items)
+            : items;
+
+        if (!mounted) return;
+        setState(() {
+          _properties
+            ..clear()
+            ..addAll(filtered);
+          _page = 1;
+          _hasMore = items.length == _limit;
+        });
+      } else {
+        final items = await _vehicleService.getAll(
+          page: 1,
+          limit: _limit,
+          q: widget.q.trim().isEmpty ? null : widget.q.trim(),
+          categoryId: widget.categoryId,
+          userId: widget.userId,
+          isListed: f.isListed,
+          sortBy: f.sortBy,
+          sortDir: f.sortDir,
+        );
+
+        final filtered = widget.onlyFavorites ? _applyVehicleFavorites(items) : items;
+
+        if (!mounted) return;
+        setState(() {
+          _vehicles
+            ..clear()
+            ..addAll(filtered);
+          _page = 1;
+          _hasMore = items.length == _limit;
+        });
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _error = e.toString());
@@ -166,7 +271,6 @@ class _ListingsViewerState extends State<ListingsViewer> {
   }
 
   Future<void> _fetchMore() async {
-    if (widget.selectedView != 1) return;
     if (_loadingMore || _loadingFirstPage || !_hasMore) return;
 
     setState(() {
@@ -178,25 +282,88 @@ class _ListingsViewerState extends State<ListingsViewer> {
       final nextPage = _page + 1;
       final f = _filterToQuery();
 
-      // ✅ pass q + categoryId here too
-      final items = await _vehicleService.getAll(
-        page: nextPage,
-        limit: _limit,
-        q: widget.q.trim().isEmpty ? null : widget.q.trim(),
-        categoryId: widget.categoryId,
-        isListed: f.isListed,
-        sortBy: f.sortBy,
-        sortDir: f.sortDir,
-      );
+      if (widget.onlyFavorites) {
+        if (widget.selectedView == 0) {
+          if (!mounted) return;
+          setState(() => _hasMore = false);
+          return;
+        }
 
-      final filtered = widget.onlyFavorites ? _applyFavorites(items) : items;
+        final currentUser = context.read<UserProvider>().user;
+        if (currentUser == null) {
+          if (!mounted) return;
+          setState(() => _hasMore = false);
+          return;
+        }
 
-      if (!mounted) return;
-      setState(() {
-        _vehicles.addAll(filtered);
-        _page = nextPage;
-        _hasMore = items.length == _limit;
-      });
+        final res = await _favoriteVehicleService.myFavorites(
+          currentUser,
+          page: nextPage,
+          limit: _limit,
+        );
+        final raw = (res['items'] as List?) ?? const [];
+        final total = (res['total'] is num) ? (res['total'] as num).toInt() : 0;
+        final items = raw
+            .whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .map(_extractVehicleMap)
+            .whereType<Map<String, dynamic>>()
+            .map(vmodel.VehicleListing.fromJson)
+            .where((e) => _matchesVehicleFilters(e, f.isListed))
+            .toList();
+
+        if (!mounted) return;
+        setState(() {
+          _vehicles.addAll(items);
+          _page = nextPage;
+          _hasMore = (nextPage * _limit) < total;
+        });
+        return;
+      }
+
+      if (widget.selectedView == 0) {
+        final items = await _propertyService.getAll(
+          page: nextPage,
+          limit: _limit,
+          q: widget.q.trim().isEmpty ? null : widget.q.trim(),
+          categoryId: widget.categoryId,
+          userId: widget.userId,
+          isListed: f.isListed,
+          sortBy: f.sortBy,
+          sortDir: f.sortDir,
+        );
+
+        final filtered = widget.onlyFavorites
+            ? _applyPropertyFavorites(items)
+            : items;
+
+        if (!mounted) return;
+        setState(() {
+          _properties.addAll(filtered);
+          _page = nextPage;
+          _hasMore = items.length == _limit;
+        });
+      } else {
+        final items = await _vehicleService.getAll(
+          page: nextPage,
+          limit: _limit,
+          q: widget.q.trim().isEmpty ? null : widget.q.trim(),
+          categoryId: widget.categoryId,
+          userId: widget.userId,
+          isListed: f.isListed,
+          sortBy: f.sortBy,
+          sortDir: f.sortDir,
+        );
+
+        final filtered = widget.onlyFavorites ? _applyVehicleFavorites(items) : items;
+
+        if (!mounted) return;
+        setState(() {
+          _vehicles.addAll(filtered);
+          _page = nextPage;
+          _hasMore = items.length == _limit;
+        });
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _error = e.toString());
@@ -205,22 +372,81 @@ class _ListingsViewerState extends State<ListingsViewer> {
     }
   }
 
-  List<model.VehicleListing> _applyFavorites(List<model.VehicleListing> items) {
-    // currently no-op (you can wire it to FavoriteVehicleService later)
+  List<vmodel.VehicleListing> _applyVehicleFavorites(
+    List<vmodel.VehicleListing> items,
+  ) {
     return items;
+  }
+
+  List<pmodel.PropertyListing> _applyPropertyFavorites(
+    List<pmodel.PropertyListing> items,
+  ) {
+    return items;
+  }
+
+  Map<String, dynamic>? _extractVehicleMap(Map<String, dynamic> raw) {
+    final direct = raw['vehicle_id'];
+    if (direct is Map<String, dynamic>) return direct;
+    if (direct is Map) return Map<String, dynamic>.from(direct);
+    if (raw.containsKey('name') && raw.containsKey('images')) return raw;
+    return null;
+  }
+
+  bool _matchesVehicleFilters(vmodel.VehicleListing item, bool? isListed) {
+    final q = widget.q.trim().toLowerCase();
+    final qOk = q.isEmpty ||
+        item.name.toLowerCase().contains(q) ||
+        item.description.toLowerCase().contains(q) ||
+        item.brand.toLowerCase().contains(q) ||
+        item.model.toLowerCase().contains(q);
+    final categoryOk =
+        widget.categoryId == null || widget.categoryId == item.categoryId;
+    final listedOk = isListed == null || item.isListed == isListed;
+    return qOk && categoryOk && listedOk;
+  }
+
+  bool _matchesPropertyFilters(pmodel.PropertyListing item, bool? isListed) {
+    final q = widget.q.trim().toLowerCase();
+    final qOk = q.isEmpty ||
+        item.name.toLowerCase().contains(q) ||
+        item.description.toLowerCase().contains(q);
+    final categoryOk =
+        widget.categoryId == null || widget.categoryId == item.categoryId;
+    final listedOk = isListed == null || item.isListed == isListed;
+    return qOk && categoryOk && listedOk;
+  }
+
+  Map<String, dynamic> _toPropertyCardMap(pmodel.PropertyListing listing) {
+    return {
+      '_id': listing.id,
+      'name': listing.name,
+      'images': listing.images,
+      'price': listing.price,
+      'description': listing.description,
+      'category': listing.categoryTitle ?? '',
+      'coords': listing.coords,
+      'bedrooms': listing.bedrooms,
+      'bathrooms': listing.bathrooms,
+      // backend currently does not expose "space", so keep a safe default
+      'space': 0,
+      'extra_features': listing.extraFeatures,
+      'is_featured': listing.isFeatured,
+      'is_sponsored': listing.isSponsored,
+      'on_sale': listing.onSale,
+      'is_listed': listing.isListed,
+      'owner_id': {
+        '_id': listing.userId,
+        'full_name': listing.userName ?? 'Unknown',
+        'email': listing.userEmail ?? '',
+        'phone': listing.userPhone ?? '',
+        'profile_picture': listing.userProfilePicture ?? '',
+      },
+      'createdAt': listing.createdAt?.toIso8601String(),
+    };
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.selectedView == 0) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24.0),
-          child: Text("TODO: connect property listings service"),
-        ),
-      );
-    }
-
     if (_loadingFirstPage) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -237,20 +463,20 @@ class _ListingsViewerState extends State<ListingsViewer> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: _fetchFirstPage,
-                child: const Text("Retry"),
-              ),
+              ElevatedButton(onPressed: _fetchFirstPage, child: const Text("Retry")),
             ],
           ),
         ),
       );
     }
 
-    if (_vehicles.isEmpty) {
-      return Center(
+    final isPropertyView = widget.selectedView == 0;
+    final itemCount = isPropertyView ? _properties.length : _vehicles.length;
+
+    if (itemCount == 0) {
+      return const Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(24.0),
           child: Text(
             'No current listings',
             style: TextStyle(fontSize: 16, color: Colors.grey),
@@ -263,32 +489,33 @@ class _ListingsViewerState extends State<ListingsViewer> {
       controller: _scrollController,
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.only(bottom: 24),
-      itemCount: _vehicles.length + 1,
+      itemCount: itemCount + 1,
       separatorBuilder: (_, __) => const SizedBox(height: 24),
       itemBuilder: (context, index) {
-        if (index == _vehicles.length) {
+        if (index == itemCount) {
           if (!_hasMore) return const SizedBox(height: 8);
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Center(
               child: _loadingMore
                   ? const CircularProgressIndicator()
-                  : TextButton(
-                      onPressed: _fetchMore,
-                      child: const Text("Load more"),
-                    ),
+                  : TextButton(onPressed: _fetchMore, child: const Text("Load more")),
             ),
           );
         }
 
+        if (isPropertyView) {
+          final listing = _properties[index];
+          return p.PropertyListing(
+            property: _toPropertyCardMap(listing),
+            isDealerProfile: widget.isDealerProfile,
+            isUploaderViewing: widget.isUploaderViewing,
+          );
+        }
+
         final listing = _vehicles[index];
-
-        // ✅ your widget expects Map<String, dynamic>
-        // Ensure your model has toJson() that matches the keys your widget uses.
-        final vehicleMap = listing;
-
-        return w.VehicleListing(
-          vehicle: vehicleMap,
+        return v.VehicleListing(
+          vehicle: listing,
           isDealerProfile: widget.isDealerProfile,
           isUploaderViewing: widget.isUploaderViewing,
         );

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/custom_appbar.dart';
 import 'package:xdeal/widgets/listings_viewer.dart';
@@ -36,16 +38,18 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.watch<UserProvider>().user;
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomAppbar(title: "My Listings"),
-              Divider(),
-              Padding(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CustomAppbar(title: "My Listings"),
+            Divider(),
+            Expanded(
+              child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,22 +76,27 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                       onPressed: _toggleFilter,
                     ),
                     const SizedBox(height: 24),
-                    // filtered listings
-                    ListingsViewer(
-                      selectedView: _selectedView,
-                      isUploaderViewing: true,
-                      filter: _selectedFilter == 1
-                          ? ListingFilter.notListed
-                          : ListingFilter.newest,
-
-                      q: _q,
-                      categoryId: _categoryId,
+                    Expanded(
+                      child: currentUser == null
+                          ? const Center(
+                              child: Text("Please sign in to view your listings."),
+                            )
+                          : ListingsViewer(
+                              selectedView: _selectedView,
+                              isUploaderViewing: true,
+                              filter: _selectedFilter == 1
+                                  ? ListingFilter.notListed
+                                  : ListingFilter.newest,
+                              q: _q,
+                              categoryId: _categoryId,
+                              userId: currentUser.id,
+                            ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

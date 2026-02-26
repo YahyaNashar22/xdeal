@@ -61,7 +61,6 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
 
   @override
   void dispose() {
-    super.dispose();
     _debounce?.cancel();
     _searchController.dispose();
     super.dispose();

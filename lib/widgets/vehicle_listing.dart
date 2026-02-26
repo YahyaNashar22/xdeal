@@ -147,10 +147,22 @@ class _VehicleListingState extends State<VehicleListing> {
                       });
                     },
                     itemBuilder: (context, index) {
-                      return Image.network(
+                      final imageUrl = UtilityFunctions.resolveImageUrl(
                         widget.vehicle.images[index],
+                      );
+                      return Image.network(
+                        imageUrl,
                         fit: BoxFit.cover,
                         width: double.infinity,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: AppColors.inputBg,
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.broken_image_outlined,
+                            color: Colors.grey,
+                            size: 36,
+                          ),
+                        ),
                       );
                     },
                   ),
@@ -273,7 +285,7 @@ class _VehicleListingState extends State<VehicleListing> {
           ),
           // category
           Text(
-            widget.vehicle.categoryTitle!,
+            widget.vehicle.categoryTitle ?? '',
             style: TextStyle(
               fontSize: AppTheme.heading2,
               color: AppColors.primary,
