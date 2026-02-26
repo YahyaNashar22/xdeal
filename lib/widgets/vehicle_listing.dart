@@ -372,7 +372,9 @@ class _VehicleListingState extends State<VehicleListing> {
                     Icon(Icons.edit_road_outlined, color: AppColors.primary),
                     const SizedBox(width: 4),
                     Text(
-                      widget.vehicle.kilometers.toString(),
+                      (widget.vehicle.kilometers as num).toStringAsFixed(
+                        (widget.vehicle.kilometers % 1 == 0) ? 0 : 1,
+                      ),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,

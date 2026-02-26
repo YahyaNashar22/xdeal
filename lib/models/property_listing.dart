@@ -17,6 +17,7 @@ class PropertyListing {
 
   final double bedrooms;
   final double bathrooms;
+  final double space;
   final List<String> extraFeatures;
 
   final bool isFeatured;
@@ -56,6 +57,7 @@ class PropertyListing {
     required this.coords,
     required this.bedrooms,
     required this.bathrooms,
+    required this.space,
     required this.extraFeatures,
     required this.isFeatured,
     required this.isSponsored,
@@ -141,6 +143,7 @@ class PropertyListing {
       coords: normalizedCoords,
       bedrooms: _toDouble(json['bedrooms'], fallback: 0),
       bathrooms: _toDouble(json['bathrooms'], fallback: 0),
+      space: _toDouble(json['space'], fallback: 0),
       extraFeatures: extraFeatures,
       isFeatured: _toBool(json['is_featured']),
       isSponsored: _toBool(json['is_sponsored']),
@@ -178,6 +181,7 @@ class PropertyListing {
       'coords': coords,
       'bedrooms': bedrooms,
       'bathrooms': bathrooms,
+      'space': space,
       'extra_features': extraFeatures,
       'is_featured': isFeatured,
       'is_sponsored': isSponsored,

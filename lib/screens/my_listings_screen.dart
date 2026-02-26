@@ -9,8 +9,6 @@ import 'package:xdeal/widgets/segmented_toggles.dart';
 class MyListingsScreen extends StatefulWidget {
   const MyListingsScreen({super.key});
 
-  // TODO: only fetch listings here by userId
-
   @override
   State<MyListingsScreen> createState() => _MyListingsScreenState();
 }
@@ -79,7 +77,9 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                     Expanded(
                       child: currentUser == null
                           ? const Center(
-                              child: Text("Please sign in to view your listings."),
+                              child: Text(
+                                "Please sign in to view your listings.",
+                              ),
                             )
                           : ListingsViewer(
                               selectedView: _selectedView,

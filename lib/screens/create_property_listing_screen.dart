@@ -37,6 +37,7 @@ class _CreatePropertyListingScreenState
   final _priceCtrl = TextEditingController();
   final _bedroomsCtrl = TextEditingController();
   final _bathroomsCtrl = TextEditingController();
+  final _spaceCtrl = TextEditingController();
 
   bool _loadingCategories = false;
   List<PropertyCategory> _categories = [];
@@ -83,6 +84,7 @@ class _CreatePropertyListingScreenState
     _priceCtrl.dispose();
     _bedroomsCtrl.dispose();
     _bathroomsCtrl.dispose();
+    _spaceCtrl.dispose();
     super.dispose();
   }
 
@@ -183,6 +185,7 @@ class _CreatePropertyListingScreenState
         "coords": _coords,
         "bedrooms": int.tryParse(_bedroomsCtrl.text.trim()) ?? 0,
         "bathrooms": int.tryParse(_bathroomsCtrl.text.trim()) ?? 0,
+        "space": int.tryParse(_spaceCtrl.text.trim()) ?? 0,
         "extra_features": _selectedExtraFeatures,
         "is_featured": false,
         "is_sponsored": false,
@@ -461,6 +464,16 @@ class _CreatePropertyListingScreenState
                         ),
                         validator: (v) => (v == null || v.trim().isEmpty)
                             ? "Bathrooms is required"
+                            : null,
+                      ),
+                      const SizedBox(height: 14),
+                      _sectionLabel("Space (m²)", required: true),
+                      TextFormField(
+                        controller: _spaceCtrl,
+                        keyboardType: TextInputType.number,
+                        decoration: _inputDecoration("Enter property space"),
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? "Space is required"
                             : null,
                       ),
                       const SizedBox(height: 14),

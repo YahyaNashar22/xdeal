@@ -427,8 +427,7 @@ class _ListingsViewerState extends State<ListingsViewer> {
       'coords': listing.coords,
       'bedrooms': listing.bedrooms,
       'bathrooms': listing.bathrooms,
-      // backend currently does not expose "space", so keep a safe default
-      'space': 0,
+      'space': listing.space,
       'extra_features': listing.extraFeatures,
       'is_featured': listing.isFeatured,
       'is_sponsored': listing.isSponsored,

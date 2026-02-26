@@ -22,6 +22,8 @@ class PropertyListingService {
     int? bedroomsMax,
     int? bathroomsMin,
     int? bathroomsMax,
+    int? spaceMin,
+    int? spaceMax,
     String sortBy = "createdAt",
     String sortDir = "desc",
   }) async {
@@ -45,6 +47,8 @@ class PropertyListingService {
       if (bedroomsMax != null) 'bedrooms_max': '$bedroomsMax',
       if (bathroomsMin != null) 'bathrooms_min': '$bathroomsMin',
       if (bathroomsMax != null) 'bathrooms_max': '$bathroomsMax',
+      if (spaceMin != null) 'space_min': '$spaceMin',
+      if (spaceMax != null) 'space_max': '$spaceMax',
     };
 
     final data = await api.getJson('/api/v1/property-listing', query: query);

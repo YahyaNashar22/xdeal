@@ -16,12 +16,12 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _isNotificationAllowed = false;
-  void _toggleNotifications(bool value) {
-    setState(() {
-      _isNotificationAllowed = value;
-    });
-  }
+  // bool _isNotificationAllowed = false;
+  // void _toggleNotifications(bool value) {
+  //   setState(() {
+  //     _isNotificationAllowed = value;
+  //   });
+  // }
 
   Future<void> _logout() async {
     final preferences = await SharedPreferences.getInstance();
@@ -140,16 +140,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Notifications", style: TextStyle(fontSize: 18)),
-                        Switch(
-                          value: _isNotificationAllowed,
-                          onChanged: _toggleNotifications,
-                        ),
-                      ],
-                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     Text("Notifications", style: TextStyle(fontSize: 18)),
+                    //     Switch(
+                    //       value: _isNotificationAllowed,
+                    //       onChanged: _toggleNotifications,
+                    //     ),
+                    //   ],
+                    // ),
                     SettingsBtnNavigate(
                       title: 'My Account',
                       onTap: () {

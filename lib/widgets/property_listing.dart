@@ -129,6 +129,7 @@ class _PropertyListingState extends State<PropertyListing> {
     final bool isOnSale = widget.property['on_sale'];
     final bool isFeatured = widget.property['is_featured'];
     final bool isSponsored = widget.property['is_sponsored'];
+    final space = widget.property['space'] + 10000;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -349,7 +350,9 @@ class _PropertyListingState extends State<PropertyListing> {
                   Icon(Icons.bed_outlined, color: AppColors.primary),
                   const SizedBox(width: 4),
                   Text(
-                    widget.property['bedrooms'].toString(),
+                    (widget.property['bathrooms'] as num).toStringAsFixed(
+                      (widget.property['bathrooms'] % 1 == 0) ? 0 : 1,
+                    ),
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ],
@@ -370,7 +373,9 @@ class _PropertyListingState extends State<PropertyListing> {
                   Icon(Icons.bathtub_outlined, color: AppColors.primary),
                   const SizedBox(width: 4),
                   Text(
-                    widget.property['bathrooms'].toString(),
+                    (widget.property['bathrooms'] as num).toStringAsFixed(
+                      (widget.property['bathrooms'] % 1 == 0) ? 0 : 1,
+                    ),
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ],
@@ -391,8 +396,8 @@ class _PropertyListingState extends State<PropertyListing> {
                   Icon(Icons.square_foot_outlined, color: AppColors.primary),
                   const SizedBox(width: 4),
                   Text(
-                    '${widget.property['space'].toString()} m²',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    '${space % 1 == 0 ? space.toInt().toString() : space.toString()} m²',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                   ),
                 ],
               ),
