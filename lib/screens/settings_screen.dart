@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/screens/about_us_screen.dart';
 import 'package:xdeal/screens/help_screen.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/screens/privacy_policy_screen.dart';
 import 'package:xdeal/screens/terms_conditions_screen.dart';
+import 'package:xdeal/services/auth_service.dart';
+import 'package:xdeal/services/upload_service.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
 import 'package:xdeal/widgets/custom_appbar.dart';
@@ -20,6 +24,10 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  final ImagePicker _imagePicker = ImagePicker();
+  late final UploadService _uploadService =
+      UploadService(baseUrl: 'http://10.0.2.2:5000');
+
   // bool _isNotificationAllowed = false;
   // void _toggleNotifications(bool value) {
   //   setState(() {
@@ -47,6 +55,255 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // TODO: Implement proper delete account
   void _deleteAccount() {
     debugPrint("delete account");
+  }
+
+  Future<void> _openEditAccountModal() async {
+    final userProvider = context.read<UserProvider>();
+    final user = userProvider.user;
+    if (user == null) return;
+
+    final formKey = GlobalKey<FormState>();
+    final fullNameCtrl = TextEditingController(text: user.fullName);
+    final currentPassCtrl = TextEditingController();
+    final newPassCtrl = TextEditingController();
+    final confirmPassCtrl = TextEditingController();
+
+    String selectedAvatarPath = user.profilePicture;
+    XFile? selectedAvatarFile;
+    bool saving = false;
+
+    final submitted = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  top: 16,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                ),
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Edit My Account",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 34,
+                              backgroundColor: AppColors.greyBg,
+                              backgroundImage: selectedAvatarFile != null
+                                  ? FileImage(
+                                      File(selectedAvatarFile!.path),
+                                    )
+                                  : selectedAvatarPath.isNotEmpty
+                                  ? Image.network(
+                                      UtilityFunctions.resolveImageUrl(
+                                        selectedAvatarPath,
+                                      ),
+                                    ).image
+                                  : null,
+                              child:
+                                  selectedAvatarPath.isEmpty &&
+                                  selectedAvatarFile == null
+                                  ? const Icon(Icons.person)
+                                  : null,
+                            ),
+                            const SizedBox(width: 12),
+                            TextButton.icon(
+                              onPressed: saving
+                                  ? null
+                                  : () async {
+                                      final picked = await _imagePicker
+                                          .pickImage(
+                                            source: ImageSource.gallery,
+                                            imageQuality: 80,
+                                          );
+                                      if (picked == null) return;
+                                      setModalState(() {
+                                        selectedAvatarFile = picked;
+                                      });
+                                    },
+                              icon: const Icon(Icons.image_outlined),
+                              label: const Text("Change Picture"),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: fullNameCtrl,
+                          decoration: const InputDecoration(
+                            labelText: "Full Name",
+                          ),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? "Name is required"
+                              : null,
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          controller: currentPassCtrl,
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                            labelText: "Current Password",
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          controller: newPassCtrl,
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                            labelText: "New Password",
+                          ),
+                          validator: (v) {
+                            if (v != null && v.isNotEmpty && v.length < 6) {
+                              return "Password must be at least 6 chars";
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          controller: confirmPassCtrl,
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                            labelText: "Confirm New Password",
+                          ),
+                          validator: (v) {
+                            if (newPassCtrl.text.trim().isEmpty) return null;
+                            if ((v ?? '').trim() != newPassCtrl.text.trim()) {
+                              return "Passwords do not match";
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: saving
+                                    ? null
+                                    : () => Navigator.pop(context, false),
+                                child: const Text("Cancel"),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: saving
+                                    ? null
+                                    : () async {
+                                        if (formKey.currentState?.validate() !=
+                                            true) {
+                                          return;
+                                        }
+
+                                        if (newPassCtrl.text.trim().isNotEmpty &&
+                                            currentPassCtrl.text.trim().isEmpty) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                "Current password is required to change password.",
+                                              ),
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        setModalState(() => saving = true);
+                                        try {
+                                          String profilePicturePath =
+                                              selectedAvatarPath;
+                                          if (selectedAvatarFile != null) {
+                                            profilePicturePath =
+                                                await _uploadService
+                                                    .uploadUserAvatar(
+                                                      selectedAvatarFile!,
+                                                    );
+                                          }
+
+                                          final updatedUser =
+                                              await AuthService.updateCurrentUser(
+                                                token: user.token,
+                                                fullName: fullNameCtrl.text
+                                                    .trim(),
+                                                profilePicture: profilePicturePath,
+                                                currentPassword: currentPassCtrl
+                                                    .text
+                                                    .trim(),
+                                                newPassword: newPassCtrl.text
+                                                    .trim(),
+                                              );
+
+                                          if (!mounted) return;
+                                          userProvider.setUser(updatedUser);
+                                          Navigator.of(this.context).pop(true);
+                                        } catch (e) {
+                                          if (!mounted) return;
+                                          ScaffoldMessenger.of(
+                                            this.context,
+                                          ).showSnackBar(
+                                            SnackBar(content: Text('$e')),
+                                          );
+                                          setModalState(() => saving = false);
+                                        }
+                                      },
+                                child: saving
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const Text("Save"),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    Future<void> disposeControllersSafely() async {
+      await Future<void>.delayed(const Duration(milliseconds: 220));
+      fullNameCtrl.dispose();
+      currentPassCtrl.dispose();
+      newPassCtrl.dispose();
+      confirmPassCtrl.dispose();
+    }
+
+    await disposeControllersSafely();
+
+    if (submitted == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Account updated successfully.")),
+      );
+    }
   }
 
   @override
@@ -97,13 +354,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: Text(
                         user.fullName,
                         style: const TextStyle(fontSize: 22),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.mode_edit_outline_outlined,
-                        size: 32,
                       ),
                     ),
                   ],
@@ -157,7 +407,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SettingsBtnNavigate(
                       title: 'My Account',
                       onTap: () {
-                        debugPrint("Tapped");
+                        _openEditAccountModal();
                       },
                     ),
                     SettingsBtnNavigate(
@@ -211,8 +461,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const TermsConditionsScreen(),
+                            builder: (context) => const TermsConditionsScreen(),
                           ),
                         );
                       },
@@ -245,7 +494,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               Center(
                 child: ElevatedButton(
-                  // TODO: implement proper logout
                   onPressed: _deleteAccount,
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(256, 32),

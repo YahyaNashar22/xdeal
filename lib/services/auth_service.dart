@@ -105,4 +105,45 @@ class AuthService {
 
     return User.fromJson(data);
   }
+
+  static Future<User> updateCurrentUser({
+    required String token,
+    String? fullName,
+    String? profilePicture,
+    String? currentPassword,
+    String? newPassword,
+  }) async {
+    final url = Uri.parse("$baseUrl/me");
+
+    final body = <String, dynamic>{
+      if (fullName != null && fullName.trim().isNotEmpty)
+        "full_name": fullName.trim(),
+      if (profilePicture != null && profilePicture.trim().isNotEmpty)
+        "profile_picture": profilePicture.trim(),
+      if (currentPassword != null && currentPassword.trim().isNotEmpty)
+        "current_password": currentPassword.trim(),
+      if (newPassword != null && newPassword.trim().isNotEmpty)
+        "new_password": newPassword.trim(),
+    };
+
+    final response = await http.patch(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode(body),
+    );
+
+    final data = response.body.isEmpty ? {} : jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception(data['message'] ?? data['error'] ?? "Update failed");
+    }
+
+    if (data is Map<String, dynamic>) {
+      data['token'] = token; // preserve session token in local model
+      return User.fromJson(data);
+    }
+    throw Exception("Unexpected response");
+  }
 }
