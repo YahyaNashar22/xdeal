@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xdeal/providers/user_provider.dart';
+import 'package:xdeal/screens/about_us_screen.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
@@ -182,7 +183,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SettingsBtnNavigate(title: 'About us', onTap: () {}),
+                    SettingsBtnNavigate(
+                      title: 'About us',
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => AboutUsScreen(),
+                          ),
+                        );
+                      },
+                    ),
                     SettingsBtnNavigate(title: 'Privacy Policy', onTap: () {}),
                     SettingsBtnNavigate(
                       title: 'Terms & Conditions',

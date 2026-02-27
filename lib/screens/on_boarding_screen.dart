@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:xdeal/screens/screen_selector.dart';
 import 'package:xdeal/screens/sign_in_screen.dart';
 import 'package:xdeal/screens/sign_up_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
@@ -44,12 +43,12 @@ class OnBoardingScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Continue as Guest button (smaller)
-              onBoardingButton(
-                context,
-                ScreenSelector(),
-                "Continue as Guest",
-                width: 180,
-              ),
+              // onBoardingButton(
+              //   context,
+              //   ScreenSelector(),
+              //   "Continue as Guest",
+              //   width: 180,
+              // ),
             ],
           ),
         ),
