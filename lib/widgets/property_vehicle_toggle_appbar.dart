@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/theme/app_theme.dart';
 import 'package:xdeal/utils/app_colors.dart';
@@ -40,7 +41,7 @@ class PropertyVehicleToggleAppbar extends StatelessWidget {
                 : AppTheme.textColor,
           ),
           onPressed: () => selectView(0),
-          child: Text("Properties"),
+          child: Text(context.tr("Properties")),
         ),
         TextButton(
           style: TextButton.styleFrom(
@@ -49,7 +50,7 @@ class PropertyVehicleToggleAppbar extends StatelessWidget {
                 : AppTheme.textColor,
           ),
           onPressed: () => selectView(1),
-          child: Text("Vehicles"),
+          child: Text(context.tr("Vehicles")),
         ),
         IconButton(
           icon: Icon(Icons.notifications, color: AppColors.primary),

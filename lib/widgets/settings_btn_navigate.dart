@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 
 class SettingsBtnNavigate extends StatelessWidget {
   final String title;
@@ -14,7 +15,7 @@ class SettingsBtnNavigate extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: TextStyle(fontSize: 18)),
+        Text(context.tr(title), style: TextStyle(fontSize: 18)),
         IconButton(onPressed: onTap, icon: Icon(Icons.arrow_forward_ios)),
       ],
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/custom_appbar.dart';
@@ -53,32 +54,35 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 12),
-                    const Text(
-                      "Choose Between:",
+                    Text(
+                      context.tr("Choose Between:"),
                       style: TextStyle(fontSize: 18),
                     ),
                     const SizedBox(height: 12),
                     // toggle views
                     buildSegmentedToggle(
                       selectedIndex: _selectedView,
-                      labels: ['Properties', 'Vehicles'],
+                      labels: [context.tr('Properties'), context.tr('Vehicles')],
                       onPressed: _toggleView,
                     ),
                     const SizedBox(height: 12),
-                    const Text("Is it:", style: TextStyle(fontSize: 18)),
+                    Text(
+                      context.tr("Is it:"),
+                      style: const TextStyle(fontSize: 18),
+                    ),
                     const SizedBox(height: 12),
                     // listed / not listed toggle
                     buildSegmentedToggle(
                       selectedIndex: _selectedFilter,
-                      labels: ['Listed', 'Not Listed'],
+                      labels: [context.tr('Listed'), context.tr('Not Listed')],
                       onPressed: _toggleFilter,
                     ),
                     const SizedBox(height: 24),
                     Expanded(
                       child: currentUser == null
-                          ? const Center(
+                          ? Center(
                               child: Text(
-                                "Please sign in to view your listings.",
+                                context.tr("Please sign in to view your listings."),
                               ),
                             )
                           : ListingsViewer(

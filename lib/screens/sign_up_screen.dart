@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/screens/otp_screen.dart';
 import 'package:xdeal/screens/sign_in_screen.dart';
@@ -41,7 +42,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void _onSignUp() async {
     if (!agree) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("You must agree to the terms")),
+        SnackBar(content: Text(context.tr("You must agree to the terms"))),
       );
       return;
     }
@@ -58,9 +59,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
         password.isEmpty ||
         phone.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            "Please fill in the full name, email, password, and phone number",
+            context.tr(
+              "Please fill in the full name, email, password, and phone number",
+            ),
           ),
         ),
       );
@@ -103,19 +106,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Full Name
-              buildTextField("Full Name", fullNameController),
+              buildTextField(context, "Full Name", fullNameController),
               const SizedBox(height: 16),
 
               // Email
-              buildTextField("Email", emailController),
+              buildTextField(context, "Email", emailController),
               const SizedBox(height: 16),
 
               // Password
-              buildTextField("Password", passwordController, obscureText: true),
+              buildTextField(context, "Password", passwordController, obscureText: true),
               const SizedBox(height: 16),
 
               // Address
-              buildTextField("Address", addressController),
+              buildTextField(context, "Address", addressController),
               const SizedBox(height: 16),
 
               // Phone Row
@@ -123,11 +126,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   SizedBox(
                     width: 80,
-                    child: buildTextField("+961", countryCodeController),
+                    child: buildTextField(context, "+961", countryCodeController),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: buildTextField("Phone Number", phoneController),
+                    child: buildTextField(context, "Phone Number", phoneController),
                   ),
                 ],
               ),
@@ -144,9 +147,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       });
                     },
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      "I agree to the terms and conditions",
+                      context.tr("I agree to the terms and conditions"),
                       style: TextStyle(fontSize: 14),
                     ),
                   ),
@@ -195,7 +198,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     navigateToReplacement(context, const SignInScreen());
                   },
                   child: Text(
-                    "Already have an account? Sign in",
+                    context.tr("Already have an account? Sign in"),
                     style: TextStyle(
                       color: AppColors.secondary,
                       decoration: TextDecoration.underline,
@@ -223,7 +226,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             navigateToReplacement(context, const OnBoardingScreen()),
       ),
       title: Text(
-        "Sign up",
+        context.tr("Sign up"),
         style: TextStyle(color: AppColors.black, fontWeight: FontWeight.w500),
       ),
     );

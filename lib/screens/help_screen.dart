@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
 
@@ -18,6 +19,7 @@ class HelpScreen extends StatelessWidget {
               const _HelpTopBar(title: 'Help & Support'),
               const SizedBox(height: 16),
               _supportCard(
+                context: context,
                 icon: Icons.contact_support_outlined,
                 title: 'Need Assistance?',
                 body:
@@ -25,6 +27,7 @@ class HelpScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               _actionTile(
+                context: context,
                 icon: Icons.email_outlined,
                 title: 'Email Support',
                 subtitle: 'xdeal.application@gmail.com',
@@ -32,6 +35,7 @@ class HelpScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               _actionTile(
+                context: context,
                 icon: Icons.phone_forwarded_outlined,
                 title: 'Call Support',
                 subtitle: '+961 71 566 122',
@@ -39,14 +43,15 @@ class HelpScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               _actionTile(
+                context: context,
                 icon: Icons.chat_outlined,
                 title: 'WhatsApp Support',
                 subtitle: '+961 71 566 122',
                 onTap: () => UtilityFunctions.launchWhatsApp('+96171566122'),
               ),
               const SizedBox(height: 18),
-              const Text(
-                'Frequently Asked Questions',
+              Text(
+                context.tr('Frequently Asked Questions'),
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 10),
@@ -82,6 +87,7 @@ class HelpScreen extends StatelessWidget {
   }
 
   Widget _supportCard({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String body,
@@ -104,7 +110,7 @@ class HelpScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  context.tr(title),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -129,6 +135,7 @@ class HelpScreen extends StatelessWidget {
   }
 
   Widget _actionTile({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String subtitle,
@@ -154,7 +161,7 @@ class HelpScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    context.tr(title),
                     style: TextStyle(
                       color: AppColors.black,
                       fontWeight: FontWeight.w700,
@@ -192,7 +199,7 @@ class _HelpTopBar extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
         ),
         Text(
-          title,
+          context.tr(title),
           style: TextStyle(
             color: AppColors.black,
             fontSize: 24,
@@ -223,7 +230,7 @@ class _FaqItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            q,
+            context.tr(q),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,

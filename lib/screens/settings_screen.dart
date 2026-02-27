@@ -3,6 +3,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'package:xdeal/localization/app_localizations.dart';
+import 'package:xdeal/providers/locale_provider.dart';
 import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/screens/about_us_screen.dart';
 import 'package:xdeal/screens/help_screen.dart';
@@ -93,8 +95,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Edit My Account",
+                        Text(
+                          context.tr("Edit My Account"),
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -139,38 +141,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       });
                                     },
                               icon: const Icon(Icons.image_outlined),
-                              label: const Text("Change Picture"),
+                              label: Text(context.tr("Change Picture")),
                             ),
                           ],
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
                           controller: fullNameCtrl,
-                          decoration: const InputDecoration(
-                            labelText: "Full Name",
+                          decoration: InputDecoration(
+                            labelText: context.tr("Full Name"),
                           ),
                           validator: (v) => (v == null || v.trim().isEmpty)
-                              ? "Name is required"
+                              ? context.tr("Name is required")
                               : null,
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
                           controller: currentPassCtrl,
                           obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: "Current Password",
+                          decoration: InputDecoration(
+                            labelText: context.tr("Current Password"),
                           ),
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
                           controller: newPassCtrl,
                           obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: "New Password",
+                          decoration: InputDecoration(
+                            labelText: context.tr("New Password"),
                           ),
                           validator: (v) {
                             if (v != null && v.isNotEmpty && v.length < 6) {
-                              return "Password must be at least 6 chars";
+                              return context.tr(
+                                "Password must be at least 6 chars",
+                              );
                             }
                             return null;
                           },
@@ -179,13 +183,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         TextFormField(
                           controller: confirmPassCtrl,
                           obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: "Confirm New Password",
+                          decoration: InputDecoration(
+                            labelText: context.tr("Confirm New Password"),
                           ),
                           validator: (v) {
                             if (newPassCtrl.text.trim().isEmpty) return null;
                             if ((v ?? '').trim() != newPassCtrl.text.trim()) {
-                              return "Passwords do not match";
+                              return context.tr("Passwords do not match");
                             }
                             return null;
                           },
@@ -198,7 +202,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 onPressed: saving
                                     ? null
                                     : () => Navigator.pop(context, false),
-                                child: const Text("Cancel"),
+                                child: Text(context.tr("Cancel")),
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -217,9 +221,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           ScaffoldMessenger.of(
                                             context,
                                           ).showSnackBar(
-                                            const SnackBar(
+                                            SnackBar(
                                               content: Text(
-                                                "Current password is required to change password.",
+                                                context.tr(
+                                                  "Current password is required to change password.",
+                                                ),
                                               ),
                                             ),
                                           );
@@ -273,7 +279,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           color: Colors.white,
                                         ),
                                       )
-                                    : const Text("Save"),
+                                    : Text(context.tr("Save")),
                               ),
                             ),
                           ],
@@ -301,7 +307,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (submitted == true && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Account updated successfully.")),
+        SnackBar(content: Text(context.tr("Account updated successfully."))),
       );
     }
   }
@@ -373,7 +379,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         vertical: 32,
                       ),
                       child: Text(
-                        user.plan == 'free' ? "Free Plan" : "Paid Plan",
+                        user.plan == 'free'
+                            ? context.tr("Free Plan")
+                            : context.tr("Paid Plan"),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 32,
@@ -411,9 +419,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                     ),
                     SettingsBtnNavigate(
-                      title: 'English',
+                      title:
+                          context.watch<LocaleProvider>().locale.languageCode ==
+                              'en'
+                          ? 'English'
+                          : 'Arabic',
                       onTap: () {
-                        debugPrint("Tapped");
+                        context.read<LocaleProvider>().toggleLanguage();
                       },
                     ),
                   ],
@@ -422,8 +434,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: const Text(
-                  'Other',
+                child: Text(
+                  context.tr('Other'),
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                 ),
               ),
@@ -488,7 +500,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     backgroundColor: AppColors.greyBg,
                     foregroundColor: AppColors.primary,
                   ),
-                  child: Text("Logout"),
+                  child: Text(context.tr("Logout")),
                 ),
               ),
 
@@ -499,7 +511,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     minimumSize: Size(256, 32),
                     backgroundColor: AppColors.red,
                   ),
-                  child: Text("Delete Account"),
+                  child: Text(context.tr("Delete Account")),
                 ),
               ),
             ],

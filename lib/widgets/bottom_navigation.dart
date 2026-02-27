@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 
 class BottomNavigation extends StatelessWidget {
   final int selectedIndex;
@@ -15,18 +16,24 @@ class BottomNavigation extends StatelessWidget {
       currentIndex: selectedIndex,
       onTap: onItemTapped,
       type: BottomNavigationBarType.fixed,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favorites'),
+      items: [
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: context.tr('Home')),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.favorite),
+          label: context.tr('Favorites'),
+        ),
         BottomNavigationBarItem(
           icon: Icon(Icons.add_box_outlined),
-          label: 'Add Listings',
+          label: context.tr('Add Listings'),
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.list_alt),
-          label: 'My Listings',
+          label: context.tr('My Listings'),
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.settings),
+          label: context.tr('Settings'),
+        ),
       ],
     );
   }

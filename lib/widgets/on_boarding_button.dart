@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/navigation_helper.dart';
 
@@ -20,7 +21,7 @@ SizedBox onBoardingButton(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         padding: const EdgeInsets.symmetric(vertical: 14),
       ),
-      child: Text(text),
+      child: Builder(builder: (context) => Text(context.tr(text))),
     ),
   );
 }

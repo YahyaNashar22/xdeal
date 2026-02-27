@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/models/user.dart';
 import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/screens/forgot_password_screen.dart';
@@ -40,7 +41,9 @@ class _SignInScreenState extends State<SignInScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter both email and password")),
+        SnackBar(
+          content: Text(context.tr("Please enter both email and password")),
+        ),
       );
       return;
     }
@@ -104,11 +107,16 @@ class _SignInScreenState extends State<SignInScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // Email
-              buildTextField("Email", emailController),
+              buildTextField(context, "Email", emailController),
               const SizedBox(height: 16),
 
               // Password
-              buildTextField("Password", passwordController, obscureText: true),
+              buildTextField(
+                context,
+                "Password",
+                passwordController,
+                obscureText: true,
+              ),
               const SizedBox(height: 16),
 
               Align(
@@ -121,7 +129,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                     );
                   },
-                  child: const Text("Forgot Password ?"),
+                  child: Text(context.tr("Forgot Password ?")),
                 ),
               ),
               const SizedBox(height: 16),
@@ -167,7 +175,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     navigateToReplacement(context, const SignUpScreen());
                   },
                   child: Text(
-                    "Don't have an account? Sign up",
+                    context.tr("Don't have an account? Sign up"),
                     style: TextStyle(
                       color: AppColors.secondary,
                       decoration: TextDecoration.underline,
@@ -193,7 +201,7 @@ class _SignInScreenState extends State<SignInScreen> {
         onPressed: () => navigateToReplacement(context, OnBoardingScreen()),
       ),
       title: Text(
-        "Sign in",
+        context.tr("Sign in"),
         style: TextStyle(color: AppColors.black, fontWeight: FontWeight.w500),
       ),
     );

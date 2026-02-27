@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/providers/user_provider.dart';
 
 import 'package:xdeal/services/api_client.dart';
@@ -550,11 +551,14 @@ class _ListingsViewerState extends State<ListingsViewer> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "Failed to load listings:\n$_error",
+                "${context.tr("Failed to load listings:")}\n$_error",
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              ElevatedButton(onPressed: _fetchFirstPage, child: const Text("Retry")),
+              ElevatedButton(
+                onPressed: _fetchFirstPage,
+                child: Text(context.tr("Retry")),
+              ),
             ],
           ),
         ),
@@ -565,12 +569,12 @@ class _ListingsViewerState extends State<ListingsViewer> {
     final itemCount = isPropertyView ? _properties.length : _vehicles.length;
 
     if (itemCount == 0) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24.0),
           child: Text(
-            'No current listings',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
+            context.tr('No current listings'),
+            style: const TextStyle(fontSize: 16, color: Colors.grey),
           ),
         ),
       );
@@ -590,7 +594,10 @@ class _ListingsViewerState extends State<ListingsViewer> {
             child: Center(
               child: _loadingMore
                   ? const CircularProgressIndicator()
-                  : TextButton(onPressed: _fetchMore, child: const Text("Load more")),
+                  : TextButton(
+                      onPressed: _fetchMore,
+                      child: Text(context.tr("Load more")),
+                    ),
             ),
           );
         }

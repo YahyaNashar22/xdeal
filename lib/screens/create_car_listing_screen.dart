@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/models/vehicle_category.dart';
 import 'package:xdeal/screens/map_picker_screen.dart';
 import 'package:xdeal/screens/screen_selector.dart';
@@ -203,7 +204,7 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
 
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
-      hintText: hint,
+      hintText: context.tr(hint),
       filled: true,
       fillColor: const Color(0xFFF3F1FA),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -230,7 +231,7 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
       child: Row(
         children: [
           Text(
-            text,
+            context.tr(text),
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
           ),
           if (required)
@@ -270,7 +271,7 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
       children: items.map((e) {
         final selected = e.value == value;
         return ChoiceChip(
-          label: Text(e.key),
+          label: Text(context.tr(e.key)),
           selected: selected,
           onSelected: (_) => onChanged(e.value),
           selectedColor: AppColors.primary,
@@ -292,8 +293,8 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
 
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("You must be logged in to post a listing."),
+        SnackBar(
+          content: Text(context.tr("You must be logged in to post a listing.")),
         ),
       );
       return;
@@ -303,28 +304,28 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
 
     if (_images.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please add at least one image.")),
+        SnackBar(content: Text(context.tr("Please add at least one image."))),
       );
       return;
     }
 
     if (_coords == null || _coords!.length != 2) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a location.")),
+        SnackBar(content: Text(context.tr("Please select a location."))),
       );
       return;
     }
 
     if (_categories.isEmpty || _selectedCategoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a valid category.")),
+        SnackBar(content: Text(context.tr("Please select a valid category."))),
       );
       return;
     }
 
     if (_isAccessoryCategory && (_accessoryType == null || _accessoryType!.isEmpty)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select accessory type.")),
+        SnackBar(content: Text(context.tr("Please select accessory type."))),
       );
       return;
     }
@@ -409,13 +410,15 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Listing posted.")));
+      ).showSnackBar(SnackBar(content: Text(context.tr("Listing posted."))));
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Failed: $e")));
+      ).showSnackBar(
+        SnackBar(content: Text("${context.tr("Failed")}: $e")),
+      );
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -458,8 +461,8 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
                         ),
                         child: Column(
                           children: [
-                            const Text(
-                              "Add Images",
+                            Text(
+                              context.tr("Add Images"),
                               style: TextStyle(fontWeight: FontWeight.w700),
                             ),
                             const SizedBox(height: 10),
@@ -476,14 +479,16 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
                                 ),
                                 elevation: 0,
                               ),
-                              child: const Text(
-                                "Select Images",
+                              child: Text(
+                                context.tr("Select Images"),
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
                             const SizedBox(height: 10),
-                            const Text(
-                              "For the cover picture we recommend using the landscape mode",
+                            Text(
+                              context.tr(
+                                "For the cover picture we recommend using the landscape mode",
+                              ),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 11,
@@ -903,7 +908,7 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
                                   horizontal: 18,
                                 ),
                               ),
-                              child: Text("Cancel"),
+                              child: Text(context.tr("Cancel")),
                             ),
                           ),
                           SizedBox(
@@ -932,8 +937,8 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
                                         color: Colors.white,
                                       ),
                                     )
-                                  : const Text(
-                                      "Post Now",
+                                  : Text(
+                                      context.tr("Post Now"),
                                       style: TextStyle(color: Colors.white),
                                     ),
                             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:xdeal/models/property_listing.dart' as pmodel;
 import 'package:xdeal/models/vehicle_listing.dart' as vmodel;
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/screens/property_viewer_screen.dart';
 import 'package:xdeal/screens/vehicle_viewer_screen.dart';
 import 'package:xdeal/services/api_client.dart';
@@ -227,7 +228,7 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 6),
-            Text('USD ${listing.price}'),
+            Text('${context.tr('USD')} ${listing.price}'),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
@@ -244,7 +245,7 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                 ),
-                child: const Text('Open Listing'),
+                child: Text(context.tr('Open Listing')),
               ),
             ),
           ],
@@ -267,7 +268,7 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 6),
-            Text('USD ${listing.price}'),
+            Text('${context.tr('USD')} ${listing.price}'),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
@@ -284,7 +285,7 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                 ),
-                child: const Text('Open Listing'),
+                child: Text(context.tr('Open Listing')),
               ),
             ),
           ],
@@ -301,7 +302,11 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.selectedView == 0 ? 'Properties Map' : 'Vehicles Map'),
+        title: Text(
+          widget.selectedView == 0
+              ? context.tr('Properties Map')
+              : context.tr('Vehicles Map'),
+        ),
         backgroundColor: AppColors.white,
       ),
       body: _loading
@@ -314,13 +319,13 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Failed to load listings map:\n$_error',
+                      '${context.tr('Failed to load listings map:')}\n$_error',
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: _fetchListings,
-                      child: const Text('Retry'),
+                      child: Text(context.tr('Retry')),
                     ),
                   ],
                 ),
@@ -356,8 +361,8 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
                       ),
                       child: Text(
                         _markers.isEmpty
-                            ? 'No listings with valid location found.'
-                            : '${_markers.length} listings found on map',
+                            ? context.tr('No listings with valid location found.')
+                            : '${_markers.length} ${context.tr('listings found on map')}',
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),

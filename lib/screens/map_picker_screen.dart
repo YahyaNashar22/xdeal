@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 
 class MapPickResult {
   final LatLng latLng;
@@ -70,7 +71,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
     if (!enabled) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Enable location services.")),
+        SnackBar(content: Text(context.tr("Enable location services."))),
       );
       return;
     }
@@ -82,7 +83,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
         perm == LocationPermission.deniedForever) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Location permission denied.")),
+        SnackBar(content: Text(context.tr("Location permission denied."))),
       );
       return;
     }
@@ -99,7 +100,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Pick Location"),
+        title: Text(context.tr("Pick Location")),
         actions: [
           TextButton(
             onPressed: () {
@@ -108,7 +109,10 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                 MapPickResult(latLng: _selected, address: _address),
               );
             },
-            child: const Text("Done", style: TextStyle(color: Colors.white)),
+            child: Text(
+              context.tr("Done"),
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -157,7 +161,9 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        _address,
+                        _address == "Move the map to pick a location"
+                            ? context.tr("Move the map to pick a location")
+                            : _address,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontWeight: FontWeight.w600),

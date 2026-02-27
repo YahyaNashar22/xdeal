@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/screens/vehicle_viewer_screen.dart';
 import 'package:xdeal/services/api_client.dart';
@@ -233,7 +234,9 @@ class _VehicleListingState extends State<VehicleListing> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          isSponsored ? "Sponsored" : "Featured",
+                          isSponsored
+                              ? context.tr("Sponsored")
+                              : context.tr("Featured"),
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColors.white,
@@ -257,7 +260,7 @@ class _VehicleListingState extends State<VehicleListing> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          "Sale",
+                          context.tr("Sale"),
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColors.white,
@@ -273,7 +276,7 @@ class _VehicleListingState extends State<VehicleListing> {
           const SizedBox(height: 12),
           // price
           Text(
-            "USD ${UtilityFunctions.formatPrice(widget.vehicle.price)}",
+            "${context.tr("USD")} ${UtilityFunctions.formatPrice(widget.vehicle.price)}",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: AppTheme.heading1,
@@ -315,7 +318,11 @@ class _VehicleListingState extends State<VehicleListing> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Icon(Icons.location_on_outlined, color: AppColors.primary),
-                    Text(_location.isEmpty ? "Loading location..." : _location),
+                    Text(
+                      _location.isEmpty
+                          ? context.tr("Loading location...")
+                          : _location,
+                    ),
                   ],
                 ),
               ),
@@ -448,7 +455,7 @@ class _VehicleListingState extends State<VehicleListing> {
                         Icon(Icons.email_outlined, color: AppColors.primary),
                         const SizedBox(width: 4),
                         Text(
-                          'Email',
+                          context.tr('Email'),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -480,7 +487,7 @@ class _VehicleListingState extends State<VehicleListing> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Call',
+                          context.tr('Call'),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -518,7 +525,7 @@ class _VehicleListingState extends State<VehicleListing> {
 
   void _showPhonePopup(BuildContext context) {
     // Extracting the phone number for readability
-    final String phoneNumber = widget.vehicle.userPhone ?? 'no phone';
+    final String phoneNumber = widget.vehicle.userPhone ?? context.tr('No phone');
 
     showDialog(
       context: context,
@@ -527,13 +534,18 @@ class _VehicleListingState extends State<VehicleListing> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-          title: const Text("Contact Owner"),
-          content: Text("Would you like to call $phoneNumber?"),
+          title: Text(context.tr("Contact Owner")),
+          content: Text(
+            '${context.tr("Would you like to call")} $phoneNumber?',
+          ),
           actions: [
             // Cancel Button
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+              child: Text(
+                context.tr("Cancel"),
+                style: const TextStyle(color: Colors.grey),
+              ),
             ),
             // Call Button
             ElevatedButton(
@@ -545,7 +557,7 @@ class _VehicleListingState extends State<VehicleListing> {
                 Navigator.pop(context); // Close the popup first
                 UtilityFunctions.launchCall(phoneNumber);
               },
-              child: const Text("Call Now"),
+              child: Text(context.tr("Call Now")),
             ),
           ],
         );

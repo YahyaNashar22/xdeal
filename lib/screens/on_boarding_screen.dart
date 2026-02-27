@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/screens/sign_in_screen.dart';
 import 'package:xdeal/screens/sign_up_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
@@ -22,7 +23,7 @@ class OnBoardingScreen extends StatelessWidget {
               ),
 
               Text(
-                "Welcome",
+                context.tr("Welcome"),
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,

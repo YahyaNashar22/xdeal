@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/text_field_builder.dart';
 import 'package:xdeal/widgets/submit_btn.dart';
@@ -41,7 +42,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
 
         title: Text(
-          "Forgot Password",
+          context.tr("Forgot Password"),
           style: TextStyle(color: AppColors.black, fontWeight: FontWeight.w500),
         ),
       ),
@@ -52,7 +53,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                "Enter your email",
+                context.tr("Enter your email"),
                 style: TextStyle(
                   color: AppColors.black,
                   fontWeight: FontWeight.w600,
@@ -62,12 +63,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(height: 8),
 
               Text(
-                "We will send you a verification code",
+                context.tr("We will send you a verification code"),
                 style: TextStyle(color: AppColors.black, fontSize: 18),
               ),
               const SizedBox(height: 20),
               // Email
-              buildTextField("Email", emailController),
+              buildTextField(context, "Email", emailController),
 
               const SizedBox(height: 20),
 

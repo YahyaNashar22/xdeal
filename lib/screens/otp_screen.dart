@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/screens/sign_up_screen.dart';
 import 'package:xdeal/services/auth_service.dart';
@@ -32,7 +33,7 @@ class _OtpScreenState extends State<OtpScreen> {
     if (otp.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Enter OTP")));
+      ).showSnackBar(SnackBar(content: Text(context.tr("Enter OTP"))));
       return;
     }
 
@@ -50,7 +51,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Account created successfully!")),
+        SnackBar(content: Text(context.tr("Account created successfully!"))),
       );
       navigateToReplacement(context, OnBoardingScreen());
     } catch (e) {
@@ -74,7 +75,7 @@ class _OtpScreenState extends State<OtpScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                "Otp",
+                context.tr("Otp"),
                 style: TextStyle(
                   color: AppColors.black,
                   fontWeight: FontWeight.w600,
@@ -83,11 +84,11 @@ class _OtpScreenState extends State<OtpScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                "Please enter the otp you received below",
+                context.tr("Please enter the otp you received below"),
                 style: TextStyle(color: AppColors.black, fontSize: 18),
               ),
 
-              buildTextField("Otp", otpController),
+              buildTextField(context, "Otp", otpController),
               const SizedBox(height: 20),
               isLoading
                   ? SizedBox(
@@ -114,7 +115,7 @@ class _OtpScreenState extends State<OtpScreen> {
         onPressed: () => navigateToReplacement(context, const SignUpScreen()),
       ),
       title: Text(
-        "Verify Email",
+        context.tr("Verify Email"),
         style: TextStyle(color: AppColors.black, fontWeight: FontWeight.w500),
       ),
     );

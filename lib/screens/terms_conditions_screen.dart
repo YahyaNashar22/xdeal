@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/utils/app_colors.dart';
 
 class TermsConditionsScreen extends StatelessWidget {
@@ -84,7 +85,7 @@ class _TermsTopBar extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
         ),
         Text(
-          title,
+          context.tr(title),
           style: TextStyle(
             color: AppColors.black,
             fontSize: 24,
@@ -115,7 +116,7 @@ class _TermsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title,
+            context.tr(title),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,

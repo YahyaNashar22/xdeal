@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/custom_appbar.dart';
@@ -54,16 +55,21 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                       children: [
                         TextButton(
                           onPressed: () => _selectView(0),
-                          child:
-                              Text("Properties", style: _selectedBtnStyle(0)),
+                          child: Text(
+                            context.tr("Properties"),
+                            style: _selectedBtnStyle(0),
+                          ),
                         ),
                         TextButton(
                           onPressed: () => _selectView(1),
-                          child: Text("Vehicles", style: _selectedBtnStyle(1)),
+                          child: Text(
+                            context.tr("Vehicles"),
+                            style: _selectedBtnStyle(1),
+                          ),
                         ),
                       ],
                     ),
-                    Divider(),
+                    const Divider(),
                     const SizedBox(height: 24),
                     Expanded(
                       child: ListingsViewer(

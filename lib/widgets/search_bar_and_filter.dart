@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/models/saved_search.dart';
 import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/screens/map_picker_screen.dart';
@@ -273,18 +274,20 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        'Custom Filters',
+                      Text(
+                        context.tr('Custom Filters'),
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String?>(
                         initialValue: tempCategoryId,
-                        decoration: const InputDecoration(labelText: 'Category'),
+                        decoration: InputDecoration(
+                          labelText: context.tr('Category'),
+                        ),
                         items: [
-                          const DropdownMenuItem<String?>(
+                          DropdownMenuItem<String?>(
                             value: null,
-                            child: Text('All'),
+                            child: Text(context.tr('All')),
                           ),
                           ...cats.map(
                             (c) => DropdownMenuItem<String?>(
@@ -302,28 +305,34 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                         title: Text(
                           (locationLabel != null && locationLabel!.isNotEmpty)
                               ? locationLabel!
-                              : 'Pick Location',
+                              : context.tr('Pick Location'),
                         ),
-                        subtitle: const Text('Used with radius to search nearby'),
+                        subtitle: Text(context.tr('Used with radius to search nearby')),
                         trailing: TextButton(
                           onPressed: () => pickLocation(setModalState),
-                          child: const Text('Choose'),
+                          child: Text(context.tr('Choose')),
                         ),
                       ),
                       TextFormField(
                         controller: radiusCtrl,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'Radius (km)'),
+                        decoration: InputDecoration(
+                          labelText: context.tr('Radius (km)'),
+                        ),
                       ),
                       const SizedBox(height: 12),
                       if (widget.selectedView == 1) ...[
                         TextFormField(
                           controller: brandCtrl,
-                          decoration: const InputDecoration(labelText: 'Brand'),
+                          decoration: InputDecoration(
+                            labelText: context.tr('Brand'),
+                          ),
                         ),
                         TextFormField(
                           controller: modelCtrl,
-                          decoration: const InputDecoration(labelText: 'Model'),
+                          decoration: InputDecoration(
+                            labelText: context.tr('Model'),
+                          ),
                         ),
                         Row(
                           children: [
@@ -331,7 +340,9 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                               child: TextFormField(
                                 controller: yearMinCtrl,
                                 keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(labelText: 'Year min'),
+                                decoration: InputDecoration(
+                                  labelText: context.tr('Year min'),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -339,7 +350,9 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                               child: TextFormField(
                                 controller: yearMaxCtrl,
                                 keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(labelText: 'Year max'),
+                                decoration: InputDecoration(
+                                  labelText: context.tr('Year max'),
+                                ),
                               ),
                             ),
                           ],
@@ -350,7 +363,9 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                               child: TextFormField(
                                 controller: kmMinCtrl,
                                 keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(labelText: 'KM min'),
+                                decoration: InputDecoration(
+                                  labelText: context.tr('KM min'),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -358,7 +373,9 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                               child: TextFormField(
                                 controller: kmMaxCtrl,
                                 keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(labelText: 'KM max'),
+                                decoration: InputDecoration(
+                                  labelText: context.tr('KM max'),
+                                ),
                               ),
                             ),
                           ],
@@ -370,8 +387,9 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                               child: TextFormField(
                                 controller: bedroomsMinCtrl,
                                 keyboardType: TextInputType.number,
-                                decoration:
-                                    const InputDecoration(labelText: 'Bedrooms min'),
+                                decoration: InputDecoration(
+                                  labelText: context.tr('Bedrooms min'),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -379,8 +397,9 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                               child: TextFormField(
                                 controller: bathroomsMinCtrl,
                                 keyboardType: TextInputType.number,
-                                decoration:
-                                    const InputDecoration(labelText: 'Bathrooms min'),
+                                decoration: InputDecoration(
+                                  labelText: context.tr('Bathrooms min'),
+                                ),
                               ),
                             ),
                           ],
@@ -388,20 +407,22 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                         TextFormField(
                           controller: spaceMinCtrl,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(labelText: 'Space min (m²)'),
+                          decoration: InputDecoration(
+                            labelText: context.tr('Space min (m²)'),
+                          ),
                         ),
                       ],
                       const SizedBox(height: 14),
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('On Sale Only'),
+                        title: Text(context.tr('On Sale Only')),
                         value: (tempFilters['on_sale'] as bool?) ?? false,
                         onChanged: (v) => setModalState(() => tempFilters['on_sale'] = v),
                       ),
                       if (widget.selectedView == 0)
                         SwitchListTile(
                           contentPadding: EdgeInsets.zero,
-                          title: const Text('Rent Only'),
+                          title: Text(context.tr('Rent Only')),
                           value: (tempFilters['is_rent'] as bool?) ?? false,
                           onChanged: (v) =>
                               setModalState(() => tempFilters['is_rent'] = v),
@@ -423,7 +444,7 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                                 );
                                 Navigator.pop(context);
                               },
-                              child: const Text('Reset'),
+                              child: Text(context.tr('Reset')),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -486,7 +507,7 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                                 );
                                 Navigator.pop(context);
                               },
-                              child: const Text('Apply'),
+                              child: Text(context.tr('Apply')),
                             ),
                           ),
                         ],
@@ -641,7 +662,7 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                   onSubmitted: _handleSearchSubmit,
                   style: TextStyle(color: AppTheme.primaryColor),
                   decoration: InputDecoration(
-                    hintText: "Lebanon",
+                    hintText: context.tr("Lebanon"),
                     hintStyle: TextStyle(color: AppTheme.primaryColor),
                     prefixIcon: Icon(
                       Icons.search,
@@ -724,7 +745,7 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
           if (index == 0) {
             final selected = _selectedCategoryId == null;
             return ChoiceChip(
-              label: const Text('All'),
+              label: Text(context.tr('All')),
               selected: selected,
               onSelected: (_) {
                 setState(() => _selectedCategoryId = null);

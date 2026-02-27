@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/screens/screen_selector.dart';
 import 'package:xdeal/utils/app_colors.dart';
 
@@ -106,8 +107,8 @@ class AboutUsScreen extends StatelessWidget {
             onPressed: () => Navigator.of(context).pop(),
             icon: const Icon(Icons.arrow_back),
           ),
-          const Text(
-            'About Us',
+          Text(
+            context.tr('About Us'),
             style: TextStyle(fontSize: 32 / 1.5, fontWeight: FontWeight.w700),
           ),
           const Spacer(),
@@ -145,10 +146,10 @@ class AboutUsScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const Text(
-                  'Your Gateway to\nSmarter Property &\nCar Deals',
+                Text(
+                  context.tr('Your Gateway to\nSmarter Property &\nCar Deals'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 48 / 1.5,
                     fontWeight: FontWeight.w800,
@@ -177,8 +178,8 @@ class AboutUsScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(28),
                     ),
                   ),
-                  child: const Text(
-                    'Explore Listings',
+                  child: Text(
+                    context.tr('Explore Listings'),
                     style: TextStyle(
                       fontSize: 22 / 1.5,
                       fontWeight: FontWeight.w700,
@@ -205,7 +206,7 @@ class _SectionBlock extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          title,
+          context.tr(title),
           style: TextStyle(
             color: AppColors.black,
             fontWeight: FontWeight.w800,
@@ -237,7 +238,7 @@ class _FeatureSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          title,
+          context.tr(title),
           style: TextStyle(
             color: AppColors.black,
             fontWeight: FontWeight.w800,
@@ -277,7 +278,7 @@ class _FeatureCard extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                item.text,
+                context.tr(item.text),
                 style: TextStyle(
                   color: AppColors.black,
                   fontSize: 31 / 2,

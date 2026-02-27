@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/notification_modal.dart';
 
@@ -14,7 +15,7 @@ class CustomAppbar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            title,
+            context.tr(title),
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
           ),
           IconButton(

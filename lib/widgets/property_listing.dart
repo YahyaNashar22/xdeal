@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/screens/property_viewer_screen.dart';
 import 'package:xdeal/services/api_client.dart';
@@ -240,7 +241,9 @@ class _PropertyListingState extends State<PropertyListing> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          isSponsored ? "Sponsored" : "Featured",
+                          isSponsored
+                              ? context.tr("Sponsored")
+                              : context.tr("Featured"),
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColors.white,
@@ -264,7 +267,7 @@ class _PropertyListingState extends State<PropertyListing> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          "Sale",
+                          context.tr("Sale"),
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColors.white,
@@ -281,7 +284,7 @@ class _PropertyListingState extends State<PropertyListing> {
         const SizedBox(height: 12),
         // price
         Text(
-          "USD ${UtilityFunctions.formatPrice(widget.property['price'])}",
+          "${context.tr("USD")} ${UtilityFunctions.formatPrice(widget.property['price'])}",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: AppTheme.heading1,
@@ -323,7 +326,11 @@ class _PropertyListingState extends State<PropertyListing> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Icon(Icons.location_on_outlined, color: AppColors.primary),
-                  Text(_location.isEmpty ? "Loading location..." : _location),
+                  Text(
+                    _location.isEmpty
+                        ? context.tr("Loading location...")
+                        : _location,
+                  ),
                 ],
               ),
             ),
@@ -413,8 +420,10 @@ class _PropertyListingState extends State<PropertyListing> {
         // contact info
         const SizedBox(height: 12),
         if (!widget.isDealerProfile && !widget.isUploaderViewing)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               InkWell(
                 onTap: () => UtilityFunctions.launchEmail(
@@ -422,13 +431,12 @@ class _PropertyListingState extends State<PropertyListing> {
                 ),
                 child: Container(
                   height: 40,
-                  width: 120,
+                  width: 110,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: 8,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    // color: AppColors.greyBg,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(
@@ -436,11 +444,14 @@ class _PropertyListingState extends State<PropertyListing> {
                     children: [
                       Icon(Icons.email_outlined, color: AppColors.primary),
                       const SizedBox(width: 4),
-                      Text(
-                        'Email',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      Flexible(
+                        child: Text(
+                          context.tr('Email'),
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ],
@@ -451,13 +462,12 @@ class _PropertyListingState extends State<PropertyListing> {
                 onTap: () => _showPhonePopup(context),
                 child: Container(
                   height: 40,
-                  width: 120,
+                  width: 110,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: 8,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    // color: AppColors.greyBg,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(
@@ -468,11 +478,14 @@ class _PropertyListingState extends State<PropertyListing> {
                         color: AppColors.primary,
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        'Call',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      Flexible(
+                        child: Text(
+                          context.tr('Call'),
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ],
@@ -484,14 +497,13 @@ class _PropertyListingState extends State<PropertyListing> {
                   widget.property['owner_id']['phone'],
                 ),
                 child: Container(
-                  width: 120,
+                  width: 110,
                   height: 40,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: 8,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    // color: AppColors.greyBg,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Image.asset('assets/icons/whatsapp.png'),
@@ -507,7 +519,7 @@ class _PropertyListingState extends State<PropertyListing> {
   void _showPhonePopup(BuildContext context) {
     // Extracting the phone number for readability
     final String phoneNumber =
-        widget.property['owner_id']['phone'] ?? 'Unknown';
+        widget.property['owner_id']['phone'] ?? context.tr('Unknown');
 
     showDialog(
       context: context,
@@ -516,13 +528,18 @@ class _PropertyListingState extends State<PropertyListing> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-          title: const Text("Contact Owner"),
-          content: Text("Would you like to call $phoneNumber?"),
+          title: Text(context.tr("Contact Owner")),
+          content: Text(
+            '${context.tr("Would you like to call")} $phoneNumber?',
+          ),
           actions: [
             // Cancel Button
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+              child: Text(
+                context.tr("Cancel"),
+                style: const TextStyle(color: Colors.grey),
+              ),
             ),
             // Call Button
             ElevatedButton(
@@ -534,7 +551,7 @@ class _PropertyListingState extends State<PropertyListing> {
                 Navigator.pop(context); // Close the popup first
                 UtilityFunctions.launchCall(phoneNumber);
               },
-              child: const Text("Call Now"),
+              child: Text(context.tr("Call Now")),
             ),
           ],
         );

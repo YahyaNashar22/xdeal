@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/screens/create_car_listing_screen.dart';
 import 'package:xdeal/screens/create_property_listing_screen.dart';
 import 'package:xdeal/widgets/custom_appbar.dart';
@@ -29,7 +30,7 @@ class AddListingModal extends StatelessWidget {
                   ),
                 );
               },
-              child: Text("Add Property"),
+              child: Text(context.tr("Add Property")),
             ),
           ),
           const SizedBox(height: 12),
@@ -46,7 +47,7 @@ class AddListingModal extends StatelessWidget {
                   ),
                 );
               },
-              child: Text("Add Vehicle"),
+              child: Text(context.tr("Add Vehicle")),
             ),
           ),
           const SizedBox(height: 50),

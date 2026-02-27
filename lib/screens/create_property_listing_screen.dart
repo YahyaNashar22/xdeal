@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/models/property_category.dart';
 import 'package:xdeal/models/property_listing.dart';
 import 'package:xdeal/providers/user_provider.dart';
@@ -139,8 +140,8 @@ class _CreatePropertyListingScreenState
 
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("You must be logged in to post a listing."),
+        SnackBar(
+          content: Text(context.tr("You must be logged in to post a listing.")),
         ),
       );
       return;
@@ -150,21 +151,23 @@ class _CreatePropertyListingScreenState
 
     if (_images.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please add at least one image.")),
+        SnackBar(content: Text(context.tr("Please add at least one image."))),
       );
       return;
     }
 
     if (_coords == null || _coords!.length != 2) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a location.")),
+        SnackBar(content: Text(context.tr("Please select a location."))),
       );
       return;
     }
 
     if (_isRent && (_rentalPayment == null || _rentalPayment!.isEmpty)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select rental payment period.")),
+        SnackBar(
+          content: Text(context.tr("Please select rental payment period.")),
+        ),
       );
       return;
     }
@@ -204,13 +207,15 @@ class _CreatePropertyListingScreenState
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Property listed.")));
+      ).showSnackBar(SnackBar(content: Text(context.tr("Property listed."))));
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Failed: $e")));
+      ).showSnackBar(
+        SnackBar(content: Text("${context.tr("Failed")}: $e")),
+      );
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -218,7 +223,7 @@ class _CreatePropertyListingScreenState
 
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
-      hintText: hint,
+      hintText: context.tr(hint),
       filled: true,
       fillColor: const Color(0xFFF3F1FA),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -245,7 +250,7 @@ class _CreatePropertyListingScreenState
       child: Row(
         children: [
           Text(
-            text,
+            context.tr(text),
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
           ),
           if (required)
@@ -285,7 +290,7 @@ class _CreatePropertyListingScreenState
       children: items.map((e) {
         final selected = e.value == value;
         return ChoiceChip(
-          label: Text(e.key),
+          label: Text(context.tr(e.key)),
           selected: selected,
           onSelected: (_) => onChanged(e.value),
           selectedColor: AppColors.primary,
@@ -332,8 +337,8 @@ class _CreatePropertyListingScreenState
                         ),
                         child: Column(
                           children: [
-                            const Text(
-                              "Add Images",
+                            Text(
+                              context.tr("Add Images"),
                               style: TextStyle(fontWeight: FontWeight.w700),
                             ),
                             const SizedBox(height: 10),
@@ -350,8 +355,8 @@ class _CreatePropertyListingScreenState
                                 ),
                                 elevation: 0,
                               ),
-                              child: const Text(
-                                "Select Images",
+                              child: Text(
+                                context.tr("Select Images"),
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
@@ -611,7 +616,7 @@ class _CreatePropertyListingScreenState
                                   horizontal: 18,
                                 ),
                               ),
-                              child: const Text("Cancel"),
+                              child: Text(context.tr("Cancel")),
                             ),
                           ),
                           SizedBox(
@@ -640,8 +645,8 @@ class _CreatePropertyListingScreenState
                                         color: Colors.white,
                                       ),
                                     )
-                                  : const Text(
-                                      "Post Now",
+                                  : Text(
+                                      context.tr("Post Now"),
                                       style: TextStyle(color: Colors.white),
                                     ),
                             ),
@@ -671,7 +676,7 @@ class _CreatePropertyListingScreenState
       children: options.map((opt) {
         final isSelected = selected.contains(opt);
         return FilterChip(
-          label: Text(opt),
+          label: Text(context.tr(opt)),
           selected: isSelected,
           onSelected: (v) {
             final next = [...selected];
