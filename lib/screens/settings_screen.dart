@@ -3,7 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/screens/about_us_screen.dart';
+import 'package:xdeal/screens/help_screen.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
+import 'package:xdeal/screens/privacy_policy_screen.dart';
+import 'package:xdeal/screens/terms_conditions_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
 import 'package:xdeal/widgets/custom_appbar.dart';
@@ -193,13 +196,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         );
                       },
                     ),
-                    SettingsBtnNavigate(title: 'Privacy Policy', onTap: () {}),
+                    SettingsBtnNavigate(
+                      title: 'Privacy Policy',
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const PrivacyPolicyScreen(),
+                          ),
+                        );
+                      },
+                    ),
                     SettingsBtnNavigate(
                       title: 'Terms & Conditions',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const TermsConditionsScreen(),
+                          ),
+                        );
+                      },
                     ),
-                    SettingsBtnNavigate(title: 'Help & Support', onTap: () {}),
-                    SettingsBtnNavigate(title: 'Rate us', onTap: () {}),
+                    SettingsBtnNavigate(
+                      title: 'Help & Support',
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const HelpScreen(),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
