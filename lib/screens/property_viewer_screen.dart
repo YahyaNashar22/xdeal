@@ -2,13 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:panorama_viewer/panorama_viewer.dart';
-import 'package:xdeal/dummy_data.dart';
+import 'package:provider/provider.dart';
+import 'package:xdeal/models/property_listing.dart';
+import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/screens/dealer_profile_screen.dart';
 import 'package:xdeal/screens/full_screen_image_viewer.dart';
 import 'package:xdeal/screens/full_screen_panorama.dart';
+import 'package:xdeal/services/api_client.dart';
+import 'package:xdeal/services/favorite_property_service.dart';
+import 'package:xdeal/services/property_listing_service.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/utils/utility_functions.dart';
-import 'package:xdeal/widgets/listing_map_preview.dart';
 import 'package:xdeal/widgets/notification_modal.dart';
 
 class PropertyViewerScreen extends StatefulWidget {
@@ -20,51 +24,146 @@ class PropertyViewerScreen extends StatefulWidget {
 }
 
 class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
-  Map<String, dynamic>? _property;
-
   final PageController _pageController = PageController();
   int _currentPage = 0;
   Timer? _timer;
 
-  bool _isFavorite = false;
-  String _location = '';
-  bool isExpanded = false;
+  PropertyListing? _property;
+  bool _loading = true;
+  String? _error;
 
-  void toggleFavorite() {
-    setState(() {
-      _isFavorite = !_isFavorite;
-    });
-  }
+  bool _isFavorite = false;
+  bool _favLoading = false;
+  String _location = '';
+  bool _isExpanded = false;
+
+  late final PropertyListingService _service = PropertyListingService(
+    ApiClient(baseUrl: 'http://10.0.2.2:5000'),
+  );
+
+  late final FavoritePropertyService _favService = FavoritePropertyService(
+    ApiClient(baseUrl: 'http://10.0.2.2:5000'),
+  );
 
   @override
-  initState() {
+  void initState() {
     super.initState();
+    _loadProperty();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadFavoriteState());
+  }
+
+  Future<void> _loadProperty() async {
     setState(() {
-      _property = DummyData.propertiesListings
-          .where((p) => p['_id'] == widget.propertyId)
-          .first;
+      _loading = true;
+      _error = null;
     });
 
-    // auto slide every 2 seconds
-    _timer = Timer.periodic(const Duration(seconds: 2), (Timer timer) {
-      if (_currentPage < _property!['images'].length - 1) {
-        _currentPage++;
-      } else {
-        _currentPage = 0;
-      }
+    try {
+      final p = await _service.getById(widget.propertyId);
+      if (!mounted) return;
 
+      setState(() {
+        _property = p;
+        _loading = false;
+      });
+
+      unawaited(_service.incrementViews(widget.propertyId));
+      _startAutoSlide();
+
+      if (p.coords.length >= 2) {
+        final loc = await UtilityFunctions.getLocationFromCoordinatesGoogle(
+          p.coords[0],
+          p.coords[1],
+        );
+        if (mounted) setState(() => _location = loc);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _loadFavoriteState() async {
+    final user = context.read<UserProvider>().user;
+    if (user == null) return;
+
+    try {
+      final isFav = await _favService.isFavorited(
+        userId: user.id,
+        propertyId: widget.propertyId,
+      );
+      if (!mounted) return;
+      setState(() => _isFavorite = isFav);
+    } catch (_) {}
+  }
+
+  Future<void> _toggleFavoriteBackend() async {
+    final user = context.read<UserProvider>().user;
+    if (user == null || _favLoading) return;
+
+    setState(() => _favLoading = true);
+    try {
+      final next = await _favService.toggle(
+        userId: user.id,
+        propertyId: widget.propertyId,
+      );
+      if (!mounted) return;
+      setState(() => _isFavorite = next);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed: $e')));
+    } finally {
+      if (mounted) setState(() => _favLoading = false);
+    }
+  }
+
+  void _startAutoSlide() {
+    _timer?.cancel();
+    final images = _property?.images ?? const <String>[];
+    if (images.length <= 1) return;
+
+    _timer = Timer.periodic(const Duration(seconds: 2), (_) {
+      if (!mounted) return;
+      _currentPage = (_currentPage + 1) % images.length;
       _pageController.animateToPage(
         _currentPage,
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
       );
     });
+  }
 
-    // reverse geolocation
-    UtilityFunctions.getLocationFromCoordinatesGoogle(
-      _property!['coords'][0],
-      _property!['coords'][1],
-    ).then((loc) => setState(() => _location = loc));
+  void _showPhonePopup(BuildContext context, String phoneNumber) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text("Contact Owner"),
+        content: Text("Would you like to call $phoneNumber?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              UtilityFunctions.launchCall(phoneNumber);
+            },
+            child: const Text("Call Now"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -74,59 +173,32 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
     super.dispose();
   }
 
-  void _showPhonePopup(BuildContext context) {
-    // Extracting the phone number for readability
-    final String phoneNumber = _property!['owner_id']['phone'] ?? 'Unknown';
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          title: const Text("Contact Owner"),
-          content: Text("Would you like to call $phoneNumber?"),
-          actions: [
-            // Cancel Button
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
-            ),
-            // Call Button
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary, // Using your app color
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.pop(context); // Close the popup first
-                UtilityFunctions.launchCall(phoneNumber);
-              },
-              child: const Text("Call Now"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final bool isOnSale = _property!['on_sale'];
-    final bool isFeatured = _property!['is_featured'];
-    final bool isSponsored = _property!['is_sponsored'];
+    if (_loading) {
+      return _loadingScaffold();
+    }
+
+    if (_error != null || _property == null) {
+      return _errorScaffold();
+    }
+
+    final p = _property!;
+    final isOnSale = p.onSale;
+    final isFeatured = p.isFeatured;
+    final isSponsored = p.isSponsored;
+    final hasPanorama = (p.threeSixty ?? '').trim().isNotEmpty;
 
     void handleBottomNavTap(int index) {
       switch (index) {
         case 0:
-          UtilityFunctions.launchEmail(_property!['owner_id']['email']);
+          UtilityFunctions.launchEmail(p.userEmail ?? "no email");
           break;
         case 1:
-          _showPhonePopup(context);
+          _showPhonePopup(context, p.userPhone ?? 'no phone');
           break;
         case 2:
-          UtilityFunctions.launchWhatsApp(_property!['owner_id']['phone']);
+          UtilityFunctions.launchWhatsApp(p.userPhone ?? "no phone");
           break;
       }
     }
@@ -152,11 +224,11 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
       bottomNavigationBar: BottomNavigationBar(
         onTap: handleBottomNavTap,
         items: [
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.email_outlined),
             label: 'Email',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.phone_forwarded_outlined),
             label: 'Phone',
           ),
@@ -169,145 +241,140 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // gallery
               SizedBox(
-                height: 200,
-                child: ClipRRect(
-                  child: Stack(
-                    children: [
-                      // slide show
-                      PageView.builder(
-                        controller: _pageController,
-                        itemCount: _property!['images'].length,
-                        onPageChanged: (int index) {
-                          setState(() {
-                            _currentPage = index;
-                          });
-                        },
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => FullScreenImageViewer(
-                                    images: _property!['images'],
-                                    initialIndex: index,
-                                  ),
+                height: 220,
+                child: Stack(
+                  children: [
+                    PageView.builder(
+                      controller: _pageController,
+                      itemCount: p.images.length,
+                      onPageChanged: (index) =>
+                          setState(() => _currentPage = index),
+                      itemBuilder: (context, index) {
+                        final imageUrl = UtilityFunctions.resolveImageUrl(
+                          p.images[index],
+                        );
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => FullScreenImageViewer(
+                                  images: p.images
+                                      .map(UtilityFunctions.resolveImageUrl)
+                                      .toList(),
+                                  initialIndex: index,
                                 ),
-                              );
-                            },
-                            child: Image.network(
-                              _property!['images'][index],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                            ),
-                          );
-                        },
-                      ),
-                      // dots indicator
-                      Positioned(
-                        bottom: 12,
-                        left: 0,
-                        right: 0,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(_property!['images'].length, (
-                            index,
-                          ) {
-                            return AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              width: _currentPage == index ? 10 : 8,
-                              height: _currentPage == index ? 10 : 8,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: _currentPage == index
-                                    ? AppColors.primary
-                                    : AppColors.inputBg,
                               ),
                             );
-                          }),
+                          },
+                          child: Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          ),
+                        );
+                      },
+                    ),
+                    Positioned(
+                      bottom: 12,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(p.images.length, (index) {
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: _currentPage == index ? 10 : 8,
+                            height: _currentPage == index ? 10 : 8,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: _currentPage == index
+                                  ? AppColors.primary
+                                  : AppColors.inputBg,
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 6,
+                      right: 6,
+                      child: IconButton(
+                        onPressed: _favLoading ? null : _toggleFavoriteBackend,
+                        icon: _favLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Icon(
+                                _isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                              ),
+                        color: _isFavorite ? AppColors.primary : Colors.white,
+                      ),
+                    ),
+                    if (isSponsored || isFeatured)
+                      Positioned(
+                        top: 6,
+                        left: 6,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            isSponsored ? "Sponsored" : "Featured",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
-                      // favorite icon
+                    if (isOnSale)
                       Positioned(
                         bottom: 6,
-                        right: 6,
-                        child: _isFavorite
-                            ? IconButton(
-                                onPressed: toggleFavorite,
-                                icon: Icon(Icons.favorite),
-                                color: AppColors.primary,
-                              )
-                            : IconButton(
-                                onPressed: toggleFavorite,
-                                icon: Icon(Icons.favorite_border),
-                              ),
+                        left: 6,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            "Sale",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
-                      // featured / sponsored flag
-                      if (isSponsored || isFeatured)
-                        Positioned(
-                          top: 6,
-                          left: 6,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              isSponsored ? "Sponsored" : "Featured",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      // sale flag
-                      if (isOnSale)
-                        Positioned(
-                          bottom: 6,
-                          left: 6,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              "Sale",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(12.0),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // price
                     const Text(
                       "Price",
                       style: TextStyle(
@@ -316,37 +383,30 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                       ),
                     ),
                     Text(
-                      "\$${UtilityFunctions.formatPrice(_property!['price'])}",
+                      "\$${UtilityFunctions.formatPrice(p.price)}",
                       style: TextStyle(color: AppColors.primary, fontSize: 16),
                     ),
                     const SizedBox(height: 12),
-                    // name
                     Text(
-                      _property!['name'],
-                      style: TextStyle(
+                      p.name,
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 24,
                       ),
                     ),
-                    // location and date
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         TextButton(
-                          onPressed: () {
-                            UtilityFunctions.openMapsAtCoords(
-                              _property!['coords'],
-                            );
-                          },
+                          onPressed: () =>
+                              UtilityFunctions.openMapsAtCoords(p.coords),
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,
-                            minimumSize: Size(0, 0),
+                            minimumSize: const Size(0, 0),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Icon(
                                 Icons.location_on_outlined,
@@ -361,7 +421,7 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                           ),
                         ),
                         Text(
-                          UtilityFunctions.formatDate(_property!['createdAt']),
+                          UtilityFunctions.formatDate(p.createdAt),
                           style: TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
@@ -369,175 +429,83 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    Divider(),
-                    const SizedBox(height: 24),
-
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        // additional info
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        _infoBox(
+                          Icons.bed_outlined,
+                          p.bedrooms.toStringAsFixed(
+                            (p.bedrooms % 1 == 0) ? 0 : 1,
+                          ),
+                        ),
+                        _infoBox(
+                          Icons.bathtub_outlined,
+                          p.bathrooms.toStringAsFixed(
+                            (p.bathrooms % 1 == 0) ? 0 : 1,
+                          ),
+                        ),
+                        _infoBox(
+                          Icons.square_foot_outlined,
+                          '${p.space % 1 == 0 ? p.space.toInt().toString() : p.space.toString()} m²',
+                        ),
+                      ],
+                    ),
+                    if (hasPanorama) ...[
+                      const SizedBox(height: 24),
+                      const Text(
+                        "360° View",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 250,
+                        child: Stack(
                           children: [
-                            // bedrooms
-                            Container(
-                              height: 40,
-                              width: 110,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.greyBg,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    _property!['bedrooms'].toString(),
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: PanoramaViewer(
+                                zoom: 1,
+                                interactive: true,
+                                child: Image.network(
+                                  UtilityFunctions.resolveImageUrl(
+                                    p.threeSixty!,
                                   ),
-                                  const SizedBox(width: 4),
-                                  Icon(
-                                    Icons.bed_outlined,
-                                    color: AppColors.primary,
-                                  ),
-                                ],
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                            // bathrooms
-                            Container(
-                              width: 110,
-                              height: 40,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.greyBg,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    _property!['bathrooms'].toString(),
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                            Positioned(
+                              right: 8,
+                              bottom: 8,
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.fullscreen,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => FullScreenPanorama(
+                                        imageUrl:
+                                            UtilityFunctions.resolveImageUrl(
+                                              p.threeSixty!,
+                                            ),
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Icon(
-                                    Icons.bathtub_outlined,
-                                    color: AppColors.primary,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // space m²
-                            Container(
-                              width: 110,
-                              height: 40,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.greyBg,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '${_property!['space'].toString()} m²',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Icon(
-                                    Icons.square_foot_outlined,
-                                    color: AppColors.primary,
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
-                        Text(
-                          "360° View",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: 250,
-                          child: Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: PanoramaViewer(
-                                  zoom: 1,
-                                  interactive: true,
-                                  child: Image.network(
-                                    _property!['three_sixty'],
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              // Add a full-screen button since drag is used for rotating
-                              Positioned(
-                                right: 8,
-                                bottom: 8,
-                                child: IconButton(
-                                  icon: const Icon(
-                                    Icons.fullscreen,
-                                    color: Colors.white,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            FullScreenPanorama(
-                                              imageUrl:
-                                                  _property!['three_sixty'],
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Description
+                      ),
+                    ],
+                    const SizedBox(height: 24),
                     const Text(
                       "Description",
                       style: TextStyle(
@@ -546,72 +514,7 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        // Create a TextPainter to calculate the size of the text
-                        final span = TextSpan(
-                          text: _property!['description'],
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black87,
-                          ),
-                        );
-
-                        final tp = TextPainter(
-                          text: span,
-                          maxLines: 2,
-                          textAlign: TextAlign.left,
-                          textDirection: TextDirection.ltr,
-                        );
-
-                        // Apply the constraints of the parent width
-                        tp.layout(maxWidth: constraints.maxWidth);
-
-                        // Check if the text actually overflows 2 lines
-                        final bool isOverflowing = tp.didExceedMaxLines;
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _property!['description'],
-                              // When not expanded, show only 2 lines. When expanded, show everything.
-                              maxLines: isExpanded ? null : 2,
-                              overflow: isExpanded
-                                  ? TextOverflow.visible
-                                  : TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            if (isOverflowing || isExpanded)
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    isExpanded = !isExpanded;
-                                  });
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 4,
-                                  ),
-                                  child: Text(
-                                    isExpanded ? "Show Less" : "Read More",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 24),
-                    // TODO: FIX THIS FOR PROPERTY
-                    // ListingMapPreview(listing: _property!),
+                    _buildExpandableText(p.description),
                     const SizedBox(height: 24),
                     const Text(
                       "Features",
@@ -622,83 +525,52 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                     ),
                     const SizedBox(height: 12),
                     Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      spacing: 14, // horizontal spacing between squares
-                      runSpacing: 14, // vertical spacing between rows
-                      children: _property!['extra_features'].map<Widget>((
-                        feature,
-                      ) {
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: p.extraFeatures.map((feature) {
                         return Container(
-                          width: 130,
+                          width: 140,
                           height: 50,
                           alignment: Alignment.center,
                           padding: const EdgeInsets.symmetric(horizontal: 6),
                           decoration: BoxDecoration(
                             color: AppColors.inputBg,
-                            borderRadius: BorderRadius.circular(
-                              12,
-                            ), // rounded corners
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             feature,
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16),
+                            style: const TextStyle(fontSize: 15),
                           ),
                         );
                       }).toList(),
                     ),
-                    const SizedBox(height: 24),
-                    Center(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size(120, 30),
-                        ),
-                        onPressed: toggleFavorite,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _isFavorite
-                                ? Icon(Icons.favorite)
-                                : Icon(Icons.favorite_border),
-                            const SizedBox(width: 12),
-                            Text("Add to Favorites"),
-                          ],
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
-
-              // owner info
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: AppColors.greyBg),
                 child: Row(
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadiusGeometry.circular(12),
-                      child: Image.network(
-                        _property!['owner_id']['profile_picture'],
-                        width: 100,
-                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      child: _ownerImage(p),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _property!['owner_id']['full_name'],
-                          style: TextStyle(fontSize: 24),
+                          p.userName ?? "Unknown",
+                          style: const TextStyle(fontSize: 22),
                         ),
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => DealerProfileScreen(
-                                  dealerId: _property!['owner_id']['_id'],
-                                ),
+                                builder: (_) =>
+                                    DealerProfileScreen(dealerId: p.userId),
                               ),
                             );
                           },
@@ -708,7 +580,7 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
                                 "See profile",
                                 style: TextStyle(color: AppColors.primary),
                               ),
-                              Icon(Icons.arrow_forward_ios_outlined),
+                              const Icon(Icons.arrow_forward_ios_outlined),
                             ],
                           ),
                         ),
@@ -719,6 +591,150 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _ownerImage(PropertyListing p) {
+    final raw = p.userProfilePicture;
+    final hasImage = raw != null && raw.trim().isNotEmpty;
+    if (!hasImage) {
+      return Container(
+        width: 100,
+        height: 100,
+        color: Colors.white,
+        alignment: Alignment.center,
+        child: const Icon(Icons.person, size: 42),
+      );
+    }
+    return Image.network(
+      UtilityFunctions.resolveImageUrl(raw),
+      width: 100,
+      height: 100,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Container(
+        width: 100,
+        height: 100,
+        color: Colors.white,
+        alignment: Alignment.center,
+        child: const Icon(Icons.person, size: 42),
+      ),
+    );
+  }
+
+  Widget _infoBox(IconData icon, String value) {
+    return Container(
+      height: 42,
+      width: 110,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppColors.greyBg,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: AppColors.primary),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              value,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExpandableText(String text) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final span = TextSpan(
+          text: text,
+          style: const TextStyle(fontSize: 14, color: Colors.black87),
+        );
+        final tp = TextPainter(
+          text: span,
+          maxLines: 2,
+          textDirection: TextDirection.ltr,
+        )..layout(maxWidth: constraints.maxWidth);
+
+        final overflowing = tp.didExceedMaxLines;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              text,
+              maxLines: _isExpanded ? null : 2,
+              overflow: _isExpanded
+                  ? TextOverflow.visible
+                  : TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+            if (overflowing || _isExpanded)
+              InkWell(
+                onTap: () => setState(() => _isExpanded = !_isExpanded),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    _isExpanded ? "Show Less" : "Read More",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _loadingScaffold() {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColors.white,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Icons.arrow_back, color: AppColors.black),
+        ),
+        title: Text(
+          'Property Viewer',
+          style: TextStyle(color: AppColors.black),
+        ),
+      ),
+      body: const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Widget _errorScaffold() {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColors.white,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Icons.arrow_back, color: AppColors.black),
+        ),
+        title: Text(
+          'Property Viewer',
+          style: TextStyle(color: AppColors.black),
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(_error ?? 'Failed to load', textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _loadProperty,
+              child: const Text("Retry"),
+            ),
+          ],
         ),
       ),
     );

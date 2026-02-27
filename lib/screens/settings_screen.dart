@@ -162,12 +162,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         debugPrint("Tapped");
                       },
                     ),
-                    SettingsBtnNavigate(
-                      title: 'Saved Searches',
-                      onTap: () {
-                        debugPrint("Tapped");
-                      },
-                    ),
                   ],
                 ),
               ),

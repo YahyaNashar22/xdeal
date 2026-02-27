@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:xdeal/screens/listings_map_screen.dart';
 import 'package:xdeal/utils/app_colors.dart';
 import 'package:xdeal/widgets/ads_carousel.dart';
 import 'package:xdeal/widgets/listings_viewer.dart';
@@ -70,6 +71,22 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ListingsMapScreen(
+                selectedView: selectedView,
+                q: _q,
+                categoryId: _categoryId,
+                extraFilters: _extraFilters,
+              ),
+            ),
+          );
+        },
+        backgroundColor: AppColors.primary,
+        child: const Icon(Icons.map_outlined, color: Colors.white),
+      ),
       body: SafeArea(
         child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {

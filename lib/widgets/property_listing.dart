@@ -135,7 +135,7 @@ class _PropertyListingState extends State<PropertyListing> {
     final bool isOnSale = widget.property['on_sale'];
     final bool isFeatured = widget.property['is_featured'];
     final bool isSponsored = widget.property['is_sponsored'];
-    final space = widget.property['space'] + 10000;
+    final space = widget.property['space'];
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
