@@ -7,6 +7,7 @@ import 'package:xdeal/localization/app_localizations.dart';
 import 'package:xdeal/providers/locale_provider.dart';
 import 'package:xdeal/providers/user_provider.dart';
 import 'package:xdeal/screens/about_us_screen.dart';
+import 'package:xdeal/screens/ad_management_screen.dart';
 import 'package:xdeal/screens/help_screen.dart';
 import 'package:xdeal/screens/on_boarding_screen.dart';
 import 'package:xdeal/screens/privacy_policy_screen.dart';
@@ -27,8 +28,9 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final ImagePicker _imagePicker = ImagePicker();
-  late final UploadService _uploadService =
-      UploadService(baseUrl: 'http://10.0.2.2:5000');
+  late final UploadService _uploadService = UploadService(
+    baseUrl: 'https://xdeal.beproagency.com',
+  );
 
   // bool _isNotificationAllowed = false;
   // void _toggleNotifications(bool value) {
@@ -109,9 +111,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               radius: 34,
                               backgroundColor: AppColors.greyBg,
                               backgroundImage: selectedAvatarFile != null
-                                  ? FileImage(
-                                      File(selectedAvatarFile!.path),
-                                    )
+                                  ? FileImage(File(selectedAvatarFile!.path))
                                   : selectedAvatarPath.isNotEmpty
                                   ? Image.network(
                                       UtilityFunctions.resolveImageUrl(
@@ -121,7 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   : null,
                               child:
                                   selectedAvatarPath.isEmpty &&
-                                  selectedAvatarFile == null
+                                      selectedAvatarFile == null
                                   ? const Icon(Icons.person)
                                   : null,
                             ),
@@ -216,8 +216,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           return;
                                         }
 
-                                        if (newPassCtrl.text.trim().isNotEmpty &&
-                                            currentPassCtrl.text.trim().isEmpty) {
+                                        if (newPassCtrl.text
+                                                .trim()
+                                                .isNotEmpty &&
+                                            currentPassCtrl.text
+                                                .trim()
+                                                .isEmpty) {
                                           ScaffoldMessenger.of(
                                             context,
                                           ).showSnackBar(
@@ -249,7 +253,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                 token: user.token,
                                                 fullName: fullNameCtrl.text
                                                     .trim(),
-                                                profilePicture: profilePicturePath,
+                                                profilePicture:
+                                                    profilePicturePath,
                                                 currentPassword: currentPassCtrl
                                                     .text
                                                     .trim(),
@@ -428,6 +433,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         context.read<LocaleProvider>().toggleLanguage();
                       },
                     ),
+                    if (user.isAdmin)
+                      SettingsBtnNavigate(
+                        title: 'Ad Management',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const AdManagementScreen(),
+                            ),
+                          );
+                        },
+                      ),
                   ],
                 ),
               ),

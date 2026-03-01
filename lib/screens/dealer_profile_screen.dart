@@ -13,7 +13,7 @@ class DealerProfileScreen extends StatefulWidget {
 }
 
 class _DealerProfileScreenState extends State<DealerProfileScreen> {
-  final ApiClient _api = ApiClient(baseUrl: 'http://10.0.2.2:5000');
+  final ApiClient _api = ApiClient(baseUrl: 'https://xdeal.beproagency.com');
 
   int _selectedView = 0; // 0 properties, 1 vehicles
   final String _q = '';
@@ -217,7 +217,10 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
                 ),
               )
             : Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 8,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -233,7 +236,9 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
                                 child: const Icon(Icons.person, size: 44),
                               )
                             : Image.network(
-                                UtilityFunctions.resolveImageUrl(_dealerPicture),
+                                UtilityFunctions.resolveImageUrl(
+                                  _dealerPicture,
+                                ),
                                 width: 120,
                                 height: 120,
                                 fit: BoxFit.cover,
@@ -295,7 +300,10 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
                       children: [
                         TextButton(
                           onPressed: () => _selectView(0),
-                          child: Text("Properties", style: _selectedBtnStyle(0)),
+                          child: Text(
+                            "Properties",
+                            style: _selectedBtnStyle(0),
+                          ),
                         ),
                         TextButton(
                           onPressed: () => _selectView(1),
@@ -307,7 +315,10 @@ class _DealerProfileScreenState extends State<DealerProfileScreen> {
                     const SizedBox(height: 8),
                     const Text(
                       "Filter",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     SingleChildScrollView(

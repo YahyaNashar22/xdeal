@@ -46,7 +46,7 @@ class _UserViewListingModalState extends State<UserViewListingModal> {
   @override
   void initState() {
     super.initState();
-    _api = ApiClient(baseUrl: 'http://10.0.2.2:5000');
+    _api = ApiClient(baseUrl: 'https://xdeal.beproagency.com');
     _propertyService = PropertyListingService(_api);
     _vehicleService = VehicleListingService(_api);
     _propertyCategoryService = PropertyCategoryService(_api);

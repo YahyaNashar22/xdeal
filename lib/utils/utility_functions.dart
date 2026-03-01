@@ -144,6 +144,6 @@ class UtilityFunctions {
 
   static String resolveImageUrl(String path) {
     if (path.startsWith('http')) return path;
-    return "http://10.0.2.2:5000$path";
+    return "https://xdeal.beproagency.com$path";
   }
 }

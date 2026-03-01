@@ -103,7 +103,7 @@ class _SignInScreenState extends State<SignInScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // Email
@@ -137,8 +137,8 @@ class _SignInScreenState extends State<SignInScreen> {
               // Sign In Button
               isLoading
                   ? SizedBox(
-                      height: 20.0,
-                      width: 20.0,
+                      height: 40.0,
+                      width: 40.0,
                       child: CircularProgressIndicator(),
                     )
                   : submitBtn(_signin, "Sign in"),

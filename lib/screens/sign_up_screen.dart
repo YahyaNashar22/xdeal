@@ -103,7 +103,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Full Name
               buildTextField(context, "Full Name", fullNameController),
@@ -114,7 +114,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 16),
 
               // Password
-              buildTextField(context, "Password", passwordController, obscureText: true),
+              buildTextField(
+                context,
+                "Password",
+                passwordController,
+                obscureText: true,
+              ),
               const SizedBox(height: 16),
 
               // Address
@@ -126,11 +131,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   SizedBox(
                     width: 80,
-                    child: buildTextField(context, "+961", countryCodeController),
+                    child: buildTextField(
+                      context,
+                      "+961",
+                      countryCodeController,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: buildTextField(context, "Phone Number", phoneController),
+                    child: buildTextField(
+                      context,
+                      "Phone Number",
+                      phoneController,
+                    ),
                   ),
                 ],
               ),
@@ -160,8 +173,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               // Sign Up Button
               isLoading
                   ? SizedBox(
-                      height: 20.0,
-                      width: 20.0,
+                      height: 40.0,
+                      width: 40.0,
                       child: CircularProgressIndicator(),
                     )
                   : submitBtn(_onSignUp, "Sign up"),

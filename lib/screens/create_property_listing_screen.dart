@@ -71,9 +71,9 @@ class _CreatePropertyListingScreenState
   @override
   void initState() {
     super.initState();
-    _api = ApiClient(baseUrl: 'http://10.0.2.2:5000');
+    _api = ApiClient(baseUrl: 'https://xdeal.beproagency.com');
     _propertyCategoryService = PropertyCategoryService(_api);
-    _uploadService = UploadService(baseUrl: 'http://10.0.2.2:5000');
+    _uploadService = UploadService(baseUrl: 'https://xdeal.beproagency.com');
     _loadPropertyCategories();
   }
 
@@ -213,9 +213,7 @@ class _CreatePropertyListingScreenState
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(
-        SnackBar(content: Text("${context.tr("Failed")}: $e")),
-      );
+      ).showSnackBar(SnackBar(content: Text("${context.tr("Failed")}: $e")));
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -454,7 +452,9 @@ class _CreatePropertyListingScreenState
                       TextFormField(
                         controller: _bedroomsCtrl,
                         keyboardType: TextInputType.number,
-                        decoration: _inputDecoration("Enter number of bedrooms"),
+                        decoration: _inputDecoration(
+                          "Enter number of bedrooms",
+                        ),
                         validator: (v) => (v == null || v.trim().isEmpty)
                             ? "Bedrooms is required"
                             : null,
@@ -521,7 +521,8 @@ class _CreatePropertyListingScreenState
                               )
                               .toList(),
                           onChanged: (v) => setState(() => _rentalPayment = v),
-                          validator: (v) => (_isRent && (v == null || v.isEmpty))
+                          validator: (v) =>
+                              (_isRent && (v == null || v.isEmpty))
                               ? "Rental payment is required"
                               : null,
                         ),

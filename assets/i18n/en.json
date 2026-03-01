@@ -142,5 +142,19 @@
   "Please select rental payment period.": "Please select rental payment period.",
   "Listing posted.": "Listing posted.",
   "Property listed.": "Property listed.",
-  "Failed": "Failed"
+  "Failed": "Failed",
+  "Ad Management": "Ad Management",
+  "Add Ad": "Add Ad",
+  "Ad Title": "Ad Title",
+  "Select Ad Image": "Select Ad Image",
+  "Please enter ad title": "Please enter ad title",
+  "Please select ad image": "Please select ad image",
+  "Failed to upload image": "Failed to upload image",
+  "Ad created successfully.": "Ad created successfully.",
+  "Delete Ad?": "Delete Ad?",
+  "This action cannot be undone.": "This action cannot be undone.",
+  "Delete": "Delete",
+  "Ad deleted.": "Ad deleted.",
+  "Failed to load ads:": "Failed to load ads:",
+  "No ads available": "No ads available"
 }

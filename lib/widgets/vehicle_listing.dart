@@ -34,7 +34,7 @@ class _VehicleListingState extends State<VehicleListing> {
   final PageController _pageController = PageController();
 
   late final FavoriteVehicleService favService = FavoriteVehicleService(
-    ApiClient(baseUrl: 'http://10.0.2.2:5000'),
+    ApiClient(baseUrl: 'https://xdeal.beproagency.com'),
   );
 
   int _currentPage = 0;
@@ -525,7 +525,8 @@ class _VehicleListingState extends State<VehicleListing> {
 
   void _showPhonePopup(BuildContext context) {
     // Extracting the phone number for readability
-    final String phoneNumber = widget.vehicle.userPhone ?? context.tr('No phone');
+    final String phoneNumber =
+        widget.vehicle.userPhone ?? context.tr('No phone');
 
     showDialog(
       context: context,

@@ -38,11 +38,11 @@ class _PropertyViewerScreenState extends State<PropertyViewerScreen> {
   bool _isExpanded = false;
 
   late final PropertyListingService _service = PropertyListingService(
-    ApiClient(baseUrl: 'http://10.0.2.2:5000'),
+    ApiClient(baseUrl: 'https://xdeal.beproagency.com'),
   );
 
   late final FavoritePropertyService _favService = FavoritePropertyService(
-    ApiClient(baseUrl: 'http://10.0.2.2:5000'),
+    ApiClient(baseUrl: 'https://xdeal.beproagency.com'),
   );
 
   @override

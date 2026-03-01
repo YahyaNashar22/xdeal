@@ -142,5 +142,19 @@
   "Please select rental payment period.": "يرجى اختيار فترة دفع الإيجار.",
   "Listing posted.": "تم نشر الإعلان.",
   "Property listed.": "تم نشر العقار.",
-  "Failed": "فشل"
+  "Failed": "فشل",
+  "Ad Management": "إدارة الإعلانات",
+  "Add Ad": "إضافة إعلان",
+  "Ad Title": "عنوان الإعلان",
+  "Select Ad Image": "اختر صورة الإعلان",
+  "Please enter ad title": "يرجى إدخال عنوان الإعلان",
+  "Please select ad image": "يرجى اختيار صورة للإعلان",
+  "Failed to upload image": "فشل رفع الصورة",
+  "Ad created successfully.": "تم إنشاء الإعلان بنجاح.",
+  "Delete Ad?": "حذف الإعلان؟",
+  "This action cannot be undone.": "لا يمكن التراجع عن هذا الإجراء.",
+  "Delete": "حذف",
+  "Ad deleted.": "تم حذف الإعلان.",
+  "Failed to load ads:": "فشل تحميل الإعلانات:",
+  "No ads available": "لا توجد إعلانات"
 }

@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:xdeal/dummy_data.dart';
+import 'package:xdeal/models/ad.dart';
+import 'package:xdeal/services/ads_service.dart';
+import 'package:xdeal/services/api_client.dart';
+import 'package:xdeal/utils/utility_functions.dart';
 import 'package:xdeal/utils/app_colors.dart';
-
-// TODO: fetch ads from backend
 
 class AdsCarousel extends StatefulWidget {
   const AdsCarousel({super.key});
@@ -15,15 +16,38 @@ class AdsCarousel extends StatefulWidget {
 
 class _AdsCarouselState extends State<AdsCarousel> {
   final PageController _pageController = PageController();
+  late final AdsService _adsService = AdsService(
+    ApiClient(baseUrl: 'https://xdeal.beproagency.com'),
+  );
   int _currentPage = 0;
   Timer? _timer;
+  List<Ad> _ads = [];
 
   @override
   void initState() {
     super.initState();
+    _loadAds();
+  }
+
+  Future<void> _loadAds() async {
+    try {
+      final items = await _adsService.getAds(limit: 20);
+      if (!mounted) return;
+      setState(() => _ads = items);
+      _startAutoSlide();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _ads = []);
+    }
+  }
+
+  void _startAutoSlide() {
+    _timer?.cancel();
+    if (_ads.length <= 1) return;
+
     // auto-slide every 3 seconds
     _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
-      if (_currentPage < DummyData.ads.length - 1) {
+      if (_currentPage < _ads.length - 1) {
         _currentPage++;
       } else {
         _currentPage = 0;
@@ -47,6 +71,8 @@ class _AdsCarouselState extends State<AdsCarousel> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        if (_ads.isEmpty) const SizedBox.shrink(),
+        if (_ads.isNotEmpty)
         SizedBox(
           height: 150,
           child: ClipRRect(
@@ -55,7 +81,7 @@ class _AdsCarouselState extends State<AdsCarousel> {
               children: [
                 PageView.builder(
                   controller: _pageController,
-                  itemCount: DummyData.ads.length,
+                  itemCount: _ads.length,
                   onPageChanged: (int index) {
                     setState(() {
                       _currentPage = index;
@@ -63,7 +89,7 @@ class _AdsCarouselState extends State<AdsCarousel> {
                   },
                   itemBuilder: (context, index) {
                     return Image.network(
-                      DummyData.ads[index]['image'],
+                      UtilityFunctions.resolveImageUrl(_ads[index].image),
                       fit: BoxFit.cover,
                       width: double.infinity,
                     );
@@ -77,7 +103,7 @@ class _AdsCarouselState extends State<AdsCarousel> {
                   right: 0,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(DummyData.ads.length, (index) {
+                    children: List.generate(_ads.length, (index) {
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: const EdgeInsets.symmetric(horizontal: 4),

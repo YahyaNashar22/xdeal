@@ -41,11 +41,11 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
   // inject your ApiClient however you do it in the app (Provider/GetIt/etc).
   // For now: create it here (replace with your real instance).
   late final VehicleListingService _service = VehicleListingService(
-    ApiClient(baseUrl: 'http://10.0.2.2:5000'),
+    ApiClient(baseUrl: 'https://xdeal.beproagency.com'),
   );
 
   late final FavoriteVehicleService favService = FavoriteVehicleService(
-    ApiClient(baseUrl: 'http://10.0.2.2:5000'),
+    ApiClient(baseUrl: 'https://xdeal.beproagency.com'),
   );
 
   bool _favLoading = false;
@@ -784,7 +784,7 @@ class _VehicleViewerScreenState extends State<VehicleViewerScreen> {
                     ClipRRect(
                       borderRadius: BorderRadiusGeometry.circular(12),
                       child: Image.network(
-                        "http://10.0.2.2:5000${_vehicle!.userProfilePicture!}",
+                        "https://xdeal.beproagency.com${_vehicle!.userProfilePicture!}",
                         width: 100,
                       ),
                     ),

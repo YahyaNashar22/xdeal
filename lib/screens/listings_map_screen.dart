@@ -44,7 +44,7 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
   @override
   void initState() {
     super.initState();
-    _api = ApiClient(baseUrl: 'http://10.0.2.2:5000');
+    _api = ApiClient(baseUrl: 'https://xdeal.beproagency.com');
     _propertyService = PropertyListingService(_api);
     _vehicleService = VehicleListingService(_api);
     _fetchListings();
@@ -211,7 +211,9 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
       southwest: LatLng(minLat, minLng),
       northeast: LatLng(maxLat, maxLng),
     );
-    await _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 56));
+    await _mapController!.animateCamera(
+      CameraUpdate.newLatLngBounds(bounds, 56),
+    );
   }
 
   void _showPropertyDetails(pmodel.PropertyListing listing) {
@@ -237,7 +239,8 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
                   Navigator.pop(context);
                   Navigator.of(this.context).push(
                     MaterialPageRoute(
-                      builder: (_) => PropertyViewerScreen(propertyId: listing.id),
+                      builder: (_) =>
+                          PropertyViewerScreen(propertyId: listing.id),
                     ),
                   );
                 },
@@ -277,7 +280,8 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
                   Navigator.pop(context);
                   Navigator.of(this.context).push(
                     MaterialPageRoute(
-                      builder: (_) => VehicleViewerScreen(vehicleId: listing.id),
+                      builder: (_) =>
+                          VehicleViewerScreen(vehicleId: listing.id),
                     ),
                   );
                 },
@@ -312,29 +316,34 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${context.tr('Failed to load listings map:')}\n$_error',
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: _fetchListings,
-                      child: Text(context.tr('Retry')),
-                    ),
-                  ],
+          ? SafeArea(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${context.tr('Failed to load listings map:')}\n$_error',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: _fetchListings,
+                        child: Text(context.tr('Retry')),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             )
           : Stack(
               children: [
                 GoogleMap(
-                  initialCameraPosition: CameraPosition(target: fallback, zoom: 11),
+                  initialCameraPosition: CameraPosition(
+                    target: fallback,
+                    zoom: 11,
+                  ),
                   markers: _markers,
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
@@ -361,7 +370,9 @@ class _ListingsMapScreenState extends State<ListingsMapScreen> {
                       ),
                       child: Text(
                         _markers.isEmpty
-                            ? context.tr('No listings with valid location found.')
+                            ? context.tr(
+                                'No listings with valid location found.',
+                              )
                             : '${_markers.length} ${context.tr('listings found on map')}',
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),

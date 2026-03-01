@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:xdeal/models/user.dart';
 
 class AuthService {
-  static const String baseUrl = "http://10.0.2.2:5000/api/v1/auth";
+  static const String baseUrl = "https://xdeal.beproagency.com/api/v1/auth";
 
   static Future<Map<String, dynamic>> signin({
     required String email,

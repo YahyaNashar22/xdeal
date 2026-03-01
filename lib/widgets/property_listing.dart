@@ -33,7 +33,9 @@ class _PropertyListingState extends State<PropertyListing> {
   final PageController _pageController = PageController();
 
   late final FavoritePropertyService _favoritePropertyService =
-      FavoritePropertyService(ApiClient(baseUrl: 'http://10.0.2.2:5000'));
+      FavoritePropertyService(
+        ApiClient(baseUrl: 'https://xdeal.beproagency.com'),
+      );
 
   int _currentPage = 0;
 

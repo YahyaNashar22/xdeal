@@ -122,9 +122,9 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
   void initState() {
     super.initState();
 
-    _api = ApiClient(baseUrl: 'http://10.0.2.2:5000');
+    _api = ApiClient(baseUrl: 'https://xdeal.beproagency.com');
     _vehicleCategoryService = VehicleCategoryService(_api);
-    _uploadService = UploadService(baseUrl: 'http://10.0.2.2:5000');
+    _uploadService = UploadService(baseUrl: 'https://xdeal.beproagency.com');
 
     _loadVehicleCategories();
   }
@@ -323,7 +323,8 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
       return;
     }
 
-    if (_isAccessoryCategory && (_accessoryType == null || _accessoryType!.isEmpty)) {
+    if (_isAccessoryCategory &&
+        (_accessoryType == null || _accessoryType!.isEmpty)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.tr("Please select accessory type."))),
       );
@@ -376,7 +377,8 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
                   ? null
                   : _versionCtrl.text.trim(),
               "condition": _condition,
-              "kilometers": int.tryParse(
+              "kilometers":
+                  int.tryParse(
                     _kilometersCtrl.text.replaceAll(",", "").trim(),
                   ) ??
                   0,
@@ -400,7 +402,7 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
             };
 
       // Call your service (wire it to your API)
-      final api = ApiClient(baseUrl: 'http://10.0.2.2:5000');
+      final api = ApiClient(baseUrl: 'https://xdeal.beproagency.com');
       final service = VehicleListingService(api);
       await service.createFromMap(payload);
 
@@ -416,9 +418,7 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(
-        SnackBar(content: Text("${context.tr("Failed")}: $e")),
-      );
+      ).showSnackBar(SnackBar(content: Text("${context.tr("Failed")}: $e")));
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -761,9 +761,7 @@ class _CreateCarListingScreenState extends State<CreateCarListingScreen> {
                         TextFormField(
                           controller: _seatsCtrl,
                           keyboardType: TextInputType.number,
-                          decoration: _inputDecoration(
-                            "Enter Number of Seats",
-                          ),
+                          decoration: _inputDecoration("Enter Number of Seats"),
                         ),
                         const SizedBox(height: 14),
                         _sectionLabel("Number of Doors", required: true),

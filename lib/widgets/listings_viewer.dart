@@ -68,7 +68,7 @@ class _ListingsViewerState extends State<ListingsViewer> {
   void initState() {
     super.initState();
 
-    _api = ApiClient(baseUrl: 'http://10.0.2.2:5000');
+    _api = ApiClient(baseUrl: 'https://xdeal.beproagency.com');
     _favoritePropertyService = FavoritePropertyService(_api);
     _favoriteVehicleService = FavoriteVehicleService(_api);
     _propertyService = PropertyListingService(_api);
@@ -88,7 +88,10 @@ class _ListingsViewerState extends State<ListingsViewer> {
     final userChanged = oldWidget.userId != widget.userId;
     final qChanged = oldWidget.q != widget.q;
     final catChanged = oldWidget.categoryId != widget.categoryId;
-    final extraChanged = !mapEquals(oldWidget.extraFilters, widget.extraFilters);
+    final extraChanged = !mapEquals(
+      oldWidget.extraFilters,
+      widget.extraFilters,
+    );
 
     if (viewChanged ||
         filterChanged ||
@@ -177,7 +180,11 @@ class _ListingsViewerState extends State<ListingsViewer> {
           final raw = (res['items'] as List?) ?? const [];
           final items = raw
               .whereType<Map>()
-              .map((e) => pmodel.PropertyListing.fromJson(Map<String, dynamic>.from(e)))
+              .map(
+                (e) => pmodel.PropertyListing.fromJson(
+                  Map<String, dynamic>.from(e),
+                ),
+              )
               .where((e) => _matchesPropertyFilters(e, f.isListed))
               .toList();
 
@@ -284,7 +291,9 @@ class _ListingsViewerState extends State<ListingsViewer> {
           radiusKm: _doubleFilter('radius_km'),
         );
 
-        final filtered = widget.onlyFavorites ? _applyVehicleFavorites(items) : items;
+        final filtered = widget.onlyFavorites
+            ? _applyVehicleFavorites(items)
+            : items;
 
         if (!mounted) return;
         setState(() {
@@ -415,7 +424,9 @@ class _ListingsViewerState extends State<ListingsViewer> {
           radiusKm: _doubleFilter('radius_km'),
         );
 
-        final filtered = widget.onlyFavorites ? _applyVehicleFavorites(items) : items;
+        final filtered = widget.onlyFavorites
+            ? _applyVehicleFavorites(items)
+            : items;
 
         if (!mounted) return;
         setState(() {
@@ -487,7 +498,8 @@ class _ListingsViewerState extends State<ListingsViewer> {
 
   bool _matchesVehicleFilters(vmodel.VehicleListing item, bool? isListed) {
     final q = widget.q.trim().toLowerCase();
-    final qOk = q.isEmpty ||
+    final qOk =
+        q.isEmpty ||
         item.name.toLowerCase().contains(q) ||
         item.description.toLowerCase().contains(q) ||
         item.brand.toLowerCase().contains(q) ||
@@ -500,7 +512,8 @@ class _ListingsViewerState extends State<ListingsViewer> {
 
   bool _matchesPropertyFilters(pmodel.PropertyListing item, bool? isListed) {
     final q = widget.q.trim().toLowerCase();
-    final qOk = q.isEmpty ||
+    final qOk =
+        q.isEmpty ||
         item.name.toLowerCase().contains(q) ||
         item.description.toLowerCase().contains(q);
     final categoryOk =

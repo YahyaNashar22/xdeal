@@ -24,7 +24,12 @@ class SearchBarAndFilter extends StatefulWidget {
   final int selectedView;
 
   /// called whenever search/category changes
-  final void Function(String q, String? categoryId, Map<String, dynamic> extraFilters) onChanged;
+  final void Function(
+    String q,
+    String? categoryId,
+    Map<String, dynamic> extraFilters,
+  )
+  onChanged;
 
   const SearchBarAndFilter({
     super.key,
@@ -62,7 +67,7 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
   void initState() {
     super.initState();
 
-    _api = ApiClient(baseUrl: 'http://10.0.2.2:5000');
+    _api = ApiClient(baseUrl: 'https://xdeal.beproagency.com');
     _vehicleService = VehicleCategoryService(_api);
     _propertyService = PropertyCategoryService(_api);
     _savedSearchService = SavedSearchService(_api);
@@ -276,7 +281,10 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                     children: [
                       Text(
                         context.tr('Custom Filters'),
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String?>(
@@ -296,7 +304,8 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                             ),
                           ),
                         ],
-                        onChanged: (v) => setModalState(() => tempCategoryId = v),
+                        onChanged: (v) =>
+                            setModalState(() => tempCategoryId = v),
                       ),
                       const SizedBox(height: 12),
                       ListTile(
@@ -307,7 +316,9 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                               ? locationLabel!
                               : context.tr('Pick Location'),
                         ),
-                        subtitle: Text(context.tr('Used with radius to search nearby')),
+                        subtitle: Text(
+                          context.tr('Used with radius to search nearby'),
+                        ),
                         trailing: TextButton(
                           onPressed: () => pickLocation(setModalState),
                           child: Text(context.tr('Choose')),
@@ -417,7 +428,8 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                         contentPadding: EdgeInsets.zero,
                         title: Text(context.tr('On Sale Only')),
                         value: (tempFilters['on_sale'] as bool?) ?? false,
-                        onChanged: (v) => setModalState(() => tempFilters['on_sale'] = v),
+                        onChanged: (v) =>
+                            setModalState(() => tempFilters['on_sale'] = v),
                       ),
                       if (widget.selectedView == 0)
                         SwitchListTile(
@@ -455,7 +467,10 @@ class _SearchBarAndFilterState extends State<SearchBarAndFilter> {
                                   ...tempFilters,
                                 };
 
-                                void putInt(String key, TextEditingController c) {
+                                void putInt(
+                                  String key,
+                                  TextEditingController c,
+                                ) {
                                   final v = int.tryParse(c.text.trim());
                                   if (v == null) {
                                     nextFilters.remove(key);
